@@ -1,0 +1,3017 @@
+id: 1
+	firstName: Stan
+	lastName: Wright
+	username: stan.wright
+	email: stan.wright@thetriangle.org
+	role: 1
+
+id: 2
+	firstName: Jamie
+	lastName: Thomson
+	username: jamie.thomson
+	email: jamie.thomson@thetriangle.org
+	role: 1
+
+id: 3
+	firstName: Tyler
+	lastName: Chance
+	username: tyler.chance
+	email: tyler.chance@thetriangle.org
+	role: 1
+
+id: 4
+	firstName: Triangle
+	lastName: Administrator
+	username: triangle.administrator
+	email: admin@thetriangle.org
+	role: 1
+
+id: 5
+	firstName: Helen
+	lastName: Nowotnik
+	username: helen.nowotnik
+	email: helen@thetriangle.org
+	role: 1
+
+id: 6
+	firstName: Josh
+	lastName: Kurtz
+	username: josh.kurtz
+	email: josh.kurtz@thetriangle.org
+	role: 1
+
+id: 7
+	firstName: Bernadette
+	lastName: Ikhena
+	username: bernadette.ikhena
+	email: bernadette.ikhena@thetriangle.org
+	role: 1
+
+id: 8
+	firstName: David
+	lastName: Stephenson
+	username: david.stephenson
+	email: david.stephenson@thetriangle.org
+	role: 1
+
+id: 9
+	firstName: Robert
+	lastName: Zaller
+	username: robert.zaller
+	email: robert.zaller@thetriangle.org
+	role: 1
+
+id: 10
+	firstName: A&E
+	lastName: Desk
+	username: a&e.desk
+	email: entertainment@thetriangle.org
+	role: 1
+
+id: 11
+	firstName: Nicole
+	lastName: Zusman
+	username: nicole.zusman
+	email: nicole.zusman@thetriangle.org
+	role: 1
+
+id: 12
+	firstName: Joseph
+	lastName: Ciminera
+	username: joseph.ciminera
+	email: joseph.ciminera@thetriangle.org
+	role: 1
+
+id: 13
+	firstName: Sayini
+	lastName: Shaw
+	username: sayini.shaw
+	email: sayini.shaw@thetriangle.org
+	role: 1
+
+id: 14
+	firstName: Daniel
+	lastName: Abelson
+	username: daniel.abelson
+	email: daniel.abelson@thetriangle.org
+	role: 1
+
+id: 15
+	firstName: Matthew
+	lastName: Hartshorne
+	username: matthew.hartshorne
+	email: matthew.hartshorne@thetriangle.org
+	role: 1
+
+id: 16
+	firstName: Kari
+	lastName: Bestrycki
+	username: kari.bestrycki
+	email: kari.bestrycki@thetriangle.org
+	role: 1
+
+id: 17
+	firstName: Brian
+	lastName: McChesney
+	username: brian.mcchesney
+	email: brian.mcchesney@thetriangle.org
+	role: 1
+
+id: 18
+	firstName: Julia
+	lastName: Fisher
+	username: julia.fisher
+	email: julia.fisher@thetriangle.org
+	role: 1
+
+id: 19
+	firstName: Joe
+	lastName: Ciminera
+	username: joe.ciminera
+	email: joe.ciminera@thetriangle.org
+	role: 1
+
+id: 20
+	firstName: John
+	lastName: Chagaris
+	username: john.chagaris
+	email: john.chagaris@thetriangle.org
+	role: 1
+
+id: 21
+	firstName: Editorial
+	lastName: Board
+	username: editorial.board
+	email: edboard@thetriangle.org
+	role: 1
+
+id: 22
+	firstName: The Triangle Op-Ed Section
+	lastName: None
+	username: None
+	email: op-ed@thetriangle.org
+	role: 1
+
+id: 23
+	firstName: Shawkat
+	lastName: Hammoudeh
+	username: shawkat.hammoudeh
+	email: Shawkat.Hammoudeh@thetriangle.org
+	role: 1
+
+id: 24
+	firstName: Jess
+	lastName: Herbine
+	username: jess.herbine
+	email: jess.herbine@thetriangle.org
+	role: 1
+
+id: 25
+	firstName: Kayleigh
+	lastName: Houde
+	username: kayleigh.houde
+	email: kayleigh.houde@thetriangle.org
+	role: 1
+
+id: 26
+	firstName: Jasmine
+	lastName: Whaley
+	username: jasmine.whaley
+	email: jasmine.whaley@thetriangle.org
+	role: 1
+
+id: 27
+	firstName: Lydia
+	lastName: Hryshchyshyn
+	username: lydia.hryshchyshyn
+	email: lydia.hryshchyshyn@thetriangle.org
+	role: 1
+
+id: 28
+	firstName: Alissa
+	lastName: Falcone
+	username: alissa.falcone
+	email: alissa.falcone@thetriangle.org
+	role: 1
+
+id: 29
+	firstName: Michael
+	lastName: Angelina
+	username: michael.angelina
+	email: michael.angelina@thetriangle.org
+	role: 1
+
+id: 30
+	firstName: Samantha
+	lastName: Slusarczyk
+	username: samantha.slusarczyk
+	email: samantha.slusarczyk@thetriangle.org
+	role: 1
+
+id: 31
+	firstName: Ashley
+	lastName: Otis
+	username: ashley.otis
+	email: ashley.otis@thetriangle.org
+	role: 1
+
+id: 32
+	firstName: Nick
+	lastName: Stropko
+	username: nick.stropko
+	email: nick.stropko@thetriangle.org
+	role: 1
+
+id: 33
+	firstName: Jess
+	lastName: Leung
+	username: jess.leung
+	email: jess.leung@thetriangle.org
+	role: 1
+
+id: 34
+	firstName: Blaire
+	lastName: Flory
+	username: blaire.flory
+	email: blaire.flory@thetriangle.org
+	role: 1
+
+id: 35
+	firstName: Martin
+	lastName: Buckley
+	username: martin.buckley
+	email: martin.buckley@thetriangle.org
+	role: 1
+
+id: 36
+	firstName: Harrison
+	lastName: Brown
+	username: harrison.brown
+	email: harrison.brown@thetriangle.org
+	role: 1
+
+id: 37
+	firstName: Anne
+	lastName: Most
+	username: anne.most
+	email: anne.most@thetriangle.org
+	role: 1
+
+id: 38
+	firstName: Lily
+	lastName: Reed
+	username: lily.reed
+	email: Lily.Reed@thetriangle.org
+	role: 1
+
+id: 39
+	firstName: Robert
+	lastName: Belardi
+	username: robert.belardi
+	email: robert.belardi@thetriangle.org
+	role: 1
+
+id: 40
+	firstName: Brandon
+	lastName: Kelley
+	username: brandon.kelley
+	email: brandon.kelley@thetriangle.org
+	role: 1
+
+id: 41
+	firstName: Mikhail
+	lastName: Furman
+	username: mikhail.furman
+	email: mikhail.furman@thetriangle.org
+	role: 1
+
+id: 42
+	firstName: Rahul
+	lastName: Doshi
+	username: rahul.doshi
+	email: rahul.doshi@thetriangle.org
+	role: 1
+
+id: 43
+	firstName: The Triangle
+	lastName: Sports Desk
+	username: the triangle.sports desk
+	email: sports@thetriangle.org
+	role: 1
+
+id: 44
+	firstName: Laura
+	lastName: DiSanto
+	username: laura.disanto
+	email: laura@thetriangle.org
+	role: 1
+
+id: 45
+	firstName: Lauren
+	lastName: Thomas
+	username: lauren.thomas
+	email: lauren.thomas@thetriangle.org
+	role: 1
+
+id: 46
+	firstName: Elizabeth
+	lastName: Finch
+	username: elizabeth.finch
+	email: elizabeth.finch@thetriangle.org
+	role: 1
+
+id: 47
+	firstName: Louis
+	lastName: Finley
+	username: louis.finley
+	email: louis.finley@thetriangle.org
+	role: 1
+
+id: 48
+	firstName: Lizzy
+	lastName: Friesen
+	username: lizzy.friesen
+	email: lizzy.friesen@thetriangle.org
+	role: 1
+
+id: 49
+	firstName: Drew
+	lastName: Kratz
+	username: drew.kratz
+	email: drew.kratz@thetriangle.org
+	role: 1
+
+id: 50
+	firstName: Jess
+	lastName: Mintz
+	username: jess.mintz
+	email: jess.mintz@thetriangle.org
+	role: 1
+
+id: 51
+	firstName: Nick
+	lastName: Gioffre
+	username: nick.gioffre
+	email: nick.gioffre@thetriangle.org
+	role: 1
+
+id: 52
+	firstName: Zachary
+	lastName: Shevich
+	username: zachary.shevich
+	email: zachary.shevich@thetriangle.org
+	role: 1
+
+id: 53
+	firstName: The Triangle News Desk
+	lastName: None
+	username: None
+	email: news@thetriangle.org
+	role: 1
+
+id: 54
+	firstName: Zack
+	lastName: Ssebatindira
+	username: zack.ssebatindira
+	email: zack.ssebatindira@thetriangle.org
+	role: 1
+
+id: 55
+	firstName: Furrah
+	lastName: Qureshi
+	username: furrah.qureshi
+	email: furrah@thetriangle.org
+	role: 1
+
+id: 56
+	firstName: Kendra
+	lastName: Dobson
+	username: kendra.dobson
+	email: kendra.dobson@thetriangle.org
+	role: 1
+
+id: 57
+	firstName: Roberto
+	lastName: Salome
+	username: roberto.salome
+	email: roberto.salome@thetriangle.org
+	role: 1
+
+id: 58
+	firstName: Katie
+	lastName: Lavoie
+	username: katie.lavoie
+	email: katie.lavoie@thetriangle.org
+	role: 1
+
+id: 59
+	firstName: Matt
+	lastName: Battafarano
+	username: matt.battafarano
+	email: matt.battafarano@thetriangle.org
+	role: 1
+
+id: 60
+	firstName: Elizabeth
+	lastName: Dempsey
+	username: elizabeth.dempsey
+	email: elizabeth.dempsey@thetriangle.org
+	role: 1
+
+id: 61
+	firstName: Kelcey
+	lastName: Zacarese
+	username: kelcey.zacarese
+	email: kelcey.zacarese@thetriangle.org
+	role: 1
+
+id: 62
+	firstName: Sadie
+	lastName: Says
+	username: sadie.says
+	email: advice@thetriangle.org
+	role: 1
+
+id: 63
+	firstName: Jennifer
+	lastName: Everett
+	username: jennifer.everett
+	email: jennifer.everett@thetriangle.org
+	role: 1
+
+id: 64
+	firstName: Harjas
+	lastName: Siugh
+	username: harjas.siugh
+	email: harjas.singh@thetriangle.org
+	role: 1
+
+id: 65
+	firstName: Bryan
+	lastName: Fyalkowski
+	username: bryan.fyalkowski
+	email: bryan.fyalkowski@thetriangle.org
+	role: 1
+
+id: 66
+	firstName: Kelly
+	lastName: Davis
+	username: kelly.davis
+	email: entertainmet@thetriangle.org
+	role: 1
+
+id: 67
+	firstName: Sandra
+	lastName: Petri
+	username: sandra.petri
+	email: sandra.petri@thetriangle.org
+	role: 1
+
+id: 68
+	firstName: Joshua
+	lastName: DiCristo
+	username: joshua.dicristo
+	email: joshua.dicristo@thetriangle.org
+	role: 1
+
+id: 69
+	firstName: Brian
+	lastName: Palmer
+	username: brian.palmer
+	email: brian.palmer@thetriangle.org
+	role: 1
+
+id: 70
+	firstName: Jeu-Hee
+	lastName: Hahn
+	username: jeu-hee.hahn
+	email: jeuhee.hahn@thetriangle.org
+	role: 1
+
+id: 71
+	firstName: Prakriti
+	lastName: Singh
+	username: prakriti.singh
+	email: prakriti.singh@thetriangle.org
+	role: 1
+
+id: 72
+	firstName: Peyton
+	lastName: Parrott
+	username: peyton.parrott
+	email: peyton.parrott@thetriangle.org
+	role: 1
+
+id: 73
+	firstName: James
+	lastName: Hamalian
+	username: james.hamalian
+	email: james.hamalian@thetriangle.org
+	role: 1
+
+id: 74
+	firstName: Julia
+	lastName: Casciato
+	username: julia.casciato
+	email: julia.casciato@thetriangle.org
+	role: 1
+
+id: 75
+	firstName: Ali
+	lastName: Swider
+	username: ali.swider
+	email: ali.swider@thetriangle.org
+	role: 1
+
+id: 76
+	firstName: Courtney
+	lastName: Wylie
+	username: courtney.wylie
+	email: courtney.wylie@thetriangle.org
+	role: 1
+
+id: 77
+	firstName: Tim
+	lastName: Rattray
+	username: tim.rattray
+	email: tim.rattray@thetriangle.org
+	role: 1
+
+id: 78
+	firstName: Benjamin
+	lastName: Heidengren
+	username: benjamin.heidengren
+	email: benjamin.heidengren@thetriangle.org
+	role: 1
+
+id: 79
+	firstName: Sterling
+	lastName: Becker
+	username: sterling.becker
+	email: sterling.becker@thetriangle.org
+	role: 1
+
+id: 80
+	firstName: Nahdir
+	lastName: Austin
+	username: nahdir.austin
+	email: nahdir.austin@thetriangle.org
+	role: 1
+
+id: 81
+	firstName: Kofi
+	lastName: Biney
+	username: kofi.biney
+	email: kofi.biney@thetriangle.org
+	role: 1
+
+id: 82
+	firstName: Vidhi
+	lastName: Vakharia
+	username: vidhi.vakharia
+	email: vidhi.vakharia@thetriangle.org
+	role: 1
+
+id: 83
+	firstName: Chelsea
+	lastName: Korley
+	username: chelsea.korley
+	email: chelsea.korley@thetriangle.org
+	role: 1
+
+id: 84
+	firstName: Jena M.
+	lastName: Doka
+	username: jena m..doka
+	email: jena.m.doka@thetriangle.org
+	role: 1
+
+id: 85
+	firstName: Maxwell
+	lastName: Balbin
+	username: maxwell.balbin
+	email: maxwell.balbin@thetriangle.org
+	role: 1
+
+id: 86
+	firstName: E. Levi
+	lastName: Allen
+	username: e. levi.allen
+	email: e.levi.allen@thetriangle.org
+	role: 1
+
+id: 87
+	firstName: Alisha
+	lastName: Zaveri
+	username: alisha.zaveri
+	email: alisha.zaveri@thetriangle.org
+	role: 1
+
+id: 88
+	firstName: Connor
+	lastName: Small
+	username: connor.small
+	email: connor.small@thetriangle.org
+	role: 1
+
+id: 89
+	firstName: Blaise
+	lastName: Tobia
+	username: blaise.tobia
+	email: blaise.tobia@thetriangle.org
+	role: 1
+
+id: 90
+	firstName: Ian
+	lastName: Crumm
+	username: ian.crumm
+	email: ian.crumm@thetriangle.org
+	role: 1
+
+id: 91
+	firstName: Chris
+	lastName: Blondel
+	username: chris.blondel
+	email: chris.blondell@thetriangle.org
+	role: 1
+
+id: 92
+	firstName: Sarah
+	lastName: Michelson
+	username: sarah.michelson
+	email: sarah.michelson@thetriangle.org
+	role: 1
+
+id: 93
+	firstName: Roger
+	lastName: McCain
+	username: roger.mccain
+	email: roger.mccain@thetriangle.org
+	role: 1
+
+id: 94
+	firstName: Johnathan
+	lastName: Guest
+	username: johnathan.guest
+	email: johnathan.guest@thetriangle.org
+	role: 1
+
+id: 95
+	firstName: Ajon
+	lastName: Brodie
+	username: ajon.brodie
+	email: ajon.brodie@thetriangle.org
+	role: 1
+
+id: 96
+	firstName: Emma
+	lastName: Foley
+	username: emma.foley
+	email: emma.foley@thetriangle.org
+	role: 1
+
+id: 97
+	firstName: Bobby
+	lastName: Davies
+	username: bobby.davies
+	email: bobby.davies@thetriangle.org
+	role: 1
+
+id: 98
+	firstName: Nick
+	lastName: Sukiennik
+	username: nick.sukiennik
+	email: nick.sukiennik@thetriangle.org
+	role: 1
+
+id: 99
+	firstName: Casey
+	lastName: Mulshine
+	username: casey.mulshine
+	email: casey.mulshine@thetriangle.org
+	role: 1
+
+id: 100
+	firstName: Tad
+	lastName: Morrison
+	username: tad.morrison
+	email: tad.morrison@thetriangle.org
+	role: 1
+
+id: 101
+	firstName: Shelby
+	lastName: Vittek
+	username: shelby.vittek
+	email: shelby.vittek@thetriangle.org
+	role: 1
+
+id: 102
+	firstName: Sabrina
+	lastName: Wong
+	username: sabrina.wong
+	email: sabrina.wong@thetriangle.org
+	role: 1
+
+id: 103
+	firstName: Ed
+	lastName: Stroud
+	username: ed.stroud
+	email: ed.stroud@thetriangle.org
+	role: 1
+
+id: 104
+	firstName: Chris
+	lastName: Martin
+	username: chris.martin
+	email: chris.martin@thetriangle.org
+	role: 1
+
+id: 105
+	firstName: Melody
+	lastName: Nielson
+	username: melody.nielson
+	email: melody.nielson@thetriangle.org
+	role: 1
+
+id: 106
+	firstName: Sean
+	lastName: Craig
+	username: sean.craig
+	email: sean.craig@thetriangle.org
+	role: 1
+
+id: 107
+	firstName: Justin
+	lastName: Roczniak
+	username: justin.roczniak
+	email: justin.roczniak@thetriangle.org
+	role: 1
+
+id: 108
+	firstName: Hannah
+	lastName: Kurtz
+	username: hannah.kurtz
+	email: hannah.kurtz@thetriangle.org
+	role: 1
+
+id: 109
+	firstName: Christine
+	lastName: Piccirillo
+	username: christine.piccirillo
+	email: christine.piccirillo@thetriangle.org
+	role: 1
+
+id: 110
+	firstName: Jonathan
+	lastName: Toribio
+	username: jonathan.toribio
+	email: jonathan.toribio@thetriangle.org
+	role: 1
+
+id: 111
+	firstName: Shannon
+	lastName: Nolan
+	username: shannon.nolan
+	email: shannon.nolan@thetriangle.org
+	role: 1
+
+id: 112
+	firstName: Caleigh
+	lastName: Flynn
+	username: caleigh.flynn
+	email: caleigh.flynn@thetriangle.org
+	role: 1
+
+id: 113
+	firstName: Glenn
+	lastName: Reyes
+	username: glenn.reyes
+	email: glenn.reyes@thetriangle.org
+	role: 1
+
+id: 114
+	firstName: Matt
+	lastName: Whitworth
+	username: matt.whitworth
+	email: matt.whitworth@thetriangle.org
+	role: 1
+
+id: 115
+	firstName: Ayana
+	lastName: Lee
+	username: ayana.lee
+	email: ayanna.lee@thetriangle.org
+	role: 1
+
+id: 116
+	firstName: Enis
+	lastName: Banaj
+	username: enis.banaj
+	email: enis.banaj@thetriangle.org
+	role: 1
+
+id: 117
+	firstName: Sean
+	lastName: Davis
+	username: sean.davis
+	email: sean.davis@thetriangle.org
+	role: 1
+
+id: 118
+	firstName: Devin
+	lastName: Southard
+	username: devin.southard
+	email: devin.southard@thetriangle.org
+	role: 1
+
+id: 119
+	firstName: Tara
+	lastName: Giancaspro
+	username: tara.giancaspro
+	email: tara.giancaspro@thetriangle.org
+	role: 1
+
+id: 120
+	firstName: Aubrey
+	lastName: Nagle
+	username: aubrey.nagle
+	email: aubrey.nagle@thetriangle.org
+	role: 1
+
+id: 121
+	firstName: Keith
+	lastName: Hobin
+	username: keith.hobin
+	email: keith.hobin@thetriangle.org
+	role: 1
+
+id: 122
+	firstName: Pretentious
+	lastName: Film Majors
+	username: pretentious.film majors
+	email: the.pretentious.film.majors@thetriangle.org
+	role: 1
+
+id: 123
+	firstName: Jared
+	lastName: Ely
+	username: jared.ely
+	email: jared.ely@thetriangle.org
+	role: 1
+
+id: 124
+	firstName: Constante
+	lastName: Quirino
+	username: constante.quirino
+	email: constante.quirino@thetriangle.org
+	role: 1
+
+id: 125
+	firstName: Surina
+	lastName: Seetha
+	username: surina.seetha
+	email: surina.seetha@thetriangle.org
+	role: 1
+
+id: 126
+	firstName: Jared
+	lastName: Smith
+	username: jared.smith
+	email: jared.smith@thetriangle.org
+	role: 1
+
+id: 127
+	firstName: Lauren
+	lastName: Haynes
+	username: lauren.haynes
+	email: lauren.haynes@thetriangle.org
+	role: 1
+
+id: 128
+	firstName: Carly
+	lastName: Pogachefsky
+	username: carly.pogachefsky
+	email: carly.pogachefsky@thetriangle.org
+	role: 1
+
+id: 129
+	firstName: Adam
+	lastName: Hermann
+	username: adam.hermann
+	email: adam.hermann2@thetriangle.org
+	role: 1
+
+id: 130
+	firstName: Greta
+	lastName: Jusyte
+	username: greta.jusyte
+	email: greta.jusyte@thetriangle.org
+	role: 1
+
+id: 131
+	firstName: Sean
+	lastName: Lewin
+	username: sean.lewin
+	email: sean.lewin@thetriangle.org
+	role: 1
+
+id: 132
+	firstName: Maggie
+	lastName: Heath
+	username: maggie.heath
+	email: maggie.heath@thetriangle.org
+	role: 1
+
+id: 133
+	firstName: Sam
+	lastName: Pomager
+	username: sam.pomager
+	email: sam.pomager@thetriangle.org
+	role: 1
+
+id: 134
+	firstName: Rachel
+	lastName: Bergen
+	username: rachel.bergen
+	email: rachel.bergen@thetriangle.org
+	role: 1
+
+id: 135
+	firstName: Corrine
+	lastName: Weeks
+	username: corrine.weeks
+	email: corrine.weeks@thetriangle.org
+	role: 1
+
+id: 136
+	firstName: Jolie
+	lastName: Higazi
+	username: jolie.higazi
+	email: jolie.higazi@thetriangle.org
+	role: 1
+
+id: 137
+	firstName: Lane
+	lastName: Kirshner
+	username: lane.kirshner
+	email: lane.kirshner@thetriangle.org
+	role: 1
+
+id: 138
+	firstName: Brandon
+	lastName: Marder
+	username: brandon.marder
+	email: brandon.marder@thetriangle.org
+	role: 1
+
+id: 139
+	firstName: Christopher
+	lastName: McLaughlin
+	username: christopher.mclaughlin
+	email: christopher.mclaughlin@thetriangle.org
+	role: 1
+
+id: 140
+	firstName: David
+	lastName: Klein
+	username: david.klein
+	email: david.klein@thetriangle.org
+	role: 1
+
+id: 141
+	firstName: Janette
+	lastName: Danella
+	username: janette.danella
+	email: janette.danella@thetriangle.org
+	role: 1
+
+id: 142
+	firstName: Shane
+	lastName: O'Connor
+	username: shane.o'connor
+	email: shane.oconnor@thetriangle.org
+	role: 1
+
+id: 143
+	firstName: Josh
+	lastName: Weiss
+	username: josh.weiss
+	email: josh.weiss@thetriangle.org
+	role: 1
+
+id: 144
+	firstName: Paul
+	lastName: DeVassal
+	username: paul.devassal
+	email: paul.devassal@thetriangle.org
+	role: 1
+
+id: 145
+	firstName: Victoria
+	lastName: Gant
+	username: victoria.gant
+	email: victoria.gant@thetriangle.org
+	role: 1
+
+id: 146
+	firstName: Carlos
+	lastName: Miranda
+	username: carlos.miranda
+	email: carlos.miranda@thetriangle.org
+	role: 1
+
+id: 147
+	firstName: Devon
+	lastName: Harman
+	username: devon.harman
+	email: devon.harman@thetriangle.org
+	role: 1
+
+id: 148
+	firstName: Angela
+	lastName: Bastian
+	username: angela.bastian
+	email: angela.bastian@thetriangle.org
+	role: 1
+
+id: 149
+	firstName: Shawn
+	lastName: Parker
+	username: shawn.parker
+	email: shawn.parker@thetriangle.org
+	role: 1
+
+id: 150
+	firstName: Howard
+	lastName: Hutchinson
+	username: howard.hutchinson
+	email: howard.hutchinson@thetriangle.org
+	role: 1
+
+id: 151
+	firstName: Allie
+	lastName: Inergersoll
+	username: allie.inergersoll
+	email: allie.inegersoll@thetriangle.org
+	role: 1
+
+id: 152
+	firstName: Jennifer
+	lastName: Lam
+	username: jennifer.lam
+	email: jennifer.lam@thetriangle.org
+	role: 1
+
+id: 153
+	firstName: Victoria
+	lastName: Schick
+	username: victoria.schick
+	email: victoria.schick@thetriangle.org
+	role: 1
+
+id: 154
+	firstName: Jocelyn
+	lastName: Joseph
+	username: jocelyn.joseph
+	email: jocelyn.joseph@thetriangle.org
+	role: 1
+
+id: 155
+	firstName: Josh
+	lastName: Highfield
+	username: josh.highfield
+	email: josh.highfield@thetriangle.org
+	role: 1
+
+id: 156
+	firstName: Joe
+	lastName: Massott
+	username: joe.massott
+	email: joe.massott@thetriangle.org
+	role: 1
+
+id: 157
+	firstName: Amanda
+	lastName: Chan
+	username: amanda.chan
+	email: amanda.chan@thetriangle.org
+	role: 1
+
+id: 158
+	firstName: Mollie
+	lastName: Snyder
+	username: mollie.snyder
+	email: mollie.snyder@thetriangle.org
+	role: 1
+
+id: 159
+	firstName: Naomi
+	lastName: Izen
+	username: naomi.izen
+	email: naomi.izen@thetriangle.org
+	role: 1
+
+id: 160
+	firstName: Granny
+	lastName: Eloise
+	username: granny.eloise
+	email: advice1@thetriangle.org
+	role: 1
+
+id: 161
+	firstName: Nela
+	lastName: Mleczak
+	username: nela.mleczak
+	email: nela.mleczak@thetriangle.org
+	role: 1
+
+id: 162
+	firstName: Samantha
+	lastName: Bambino
+	username: samantha.bambino
+	email: samantha.bambino@thetriangle.org
+	role: 1
+
+id: 163
+	firstName: Alexander
+	lastName: Uboldi
+	username: alexander.uboldi
+	email: alexander.uboldi@thetriangle.org
+	role: 1
+
+id: 164
+	firstName: Azwad
+	lastName: Rahman
+	username: azwad.rahman
+	email: azwad.rahman@thetriangle.org
+	role: 1
+
+id: 165
+	firstName: Nora
+	lastName: Goldberg
+	username: nora.goldberg
+	email: nora.goldberg@thetriangle.org
+	role: 1
+
+id: 166
+	firstName: Paulina
+	lastName: Gawod
+	username: paulina.gawod
+	email: paulina.gawod@thetriangle.org
+	role: 1
+
+id: 167
+	firstName: Jaclyn
+	lastName: Fleurant
+	username: jaclyn.fleurant
+	email: stye@thetriangle.org
+	role: 1
+
+id: 168
+	firstName: Emily
+	lastName: Krantz
+	username: emily.krantz
+	email: emily.krantz@thetriangle.org
+	role: 1
+
+id: 169
+	firstName: Olivia
+	lastName: Deng
+	username: olivia.deng
+	email: olivia.deng@thetriangle.org
+	role: 1
+
+id: 170
+	firstName: Morgan
+	lastName: Dudkewitz
+	username: morgan.dudkewitz
+	email: morgan.dudkewitz@thetriangle.org
+	role: 1
+
+id: 171
+	firstName: Paulina
+	lastName: Gee
+	username: paulina.gee
+	email: paulina.gee@thetriangle.org
+	role: 1
+
+id: 172
+	firstName: Adrienne
+	lastName: Beckham
+	username: adrienne.beckham
+	email: adrienne.beckham@thetriangle.org
+	role: 1
+
+id: 173
+	firstName: Robin
+	lastName: Moreland
+	username: robin.moreland
+	email: robin.moreland@thetriangle.org
+	role: 1
+
+id: 174
+	firstName: Rose
+	lastName: Ehrlich
+	username: rose.ehrlich
+	email: rose.ehrlich@thetriangle.org
+	role: 1
+
+id: 175
+	firstName: Tom
+	lastName: Petri
+	username: tom.petri
+	email: tom.petri@thetriangle.org
+	role: 1
+
+id: 176
+	firstName: Anika
+	lastName: Ajmera
+	username: anika.ajmera
+	email: anika.ajmera@thetriangle.org
+	role: 1
+
+id: 177
+	firstName: Cortney
+	lastName: Costa
+	username: cortney.costa
+	email: cortney.costa@thetriangle.org
+	role: 1
+
+id: 178
+	firstName: Thao
+	lastName: Duong
+	username: thao.duong
+	email: thao.duong@thetriangle.org
+	role: 1
+
+id: 179
+	firstName: John
+	lastName: Capone
+	username: john.capone
+	email: john.capone@thetriangle.org
+	role: 1
+
+id: 180
+	firstName: Gabriella
+	lastName: Tam
+	username: gabriella.tam
+	email: gabriella.tam@thetriangle.org
+	role: 1
+
+id: 181
+	firstName: Alana
+	lastName: Maddox
+	username: alana.maddox
+	email: alana.maddox@thetriangle.org
+	role: 1
+
+id: 182
+	firstName: Lauren
+	lastName: Subers
+	username: lauren.subers
+	email: lauren.subers@thetriangle.org
+	role: 1
+
+id: 183
+	firstName: Magda
+	lastName: Papaioannou
+	username: magda.papaioannou
+	email: magda.papaioannou@thetriangle.org
+	role: 1
+
+id: 184
+	firstName: Jasleen
+	lastName: Walia
+	username: jasleen.walia
+	email: jasleen.walia@thetriangle.org
+	role: 1
+
+id: 185
+	firstName: Nick
+	lastName: Grinups
+	username: nick.grinups
+	email: nick.grinups@thetriangle.org
+	role: 1
+
+id: 186
+	firstName: Matt
+	lastName: Michini
+	username: matt.michini
+	email: matt.michini@thetriangle.org
+	role: 1
+
+id: 187
+	firstName: Sim
+	lastName: Raghunathan
+	username: sim.raghunathan
+	email: sim.raghunathan@thetriangle.org
+	role: 1
+
+id: 188
+	firstName: Paige
+	lastName: Brownell
+	username: paige.brownell
+	email: paige.brownell@thetriangle.org
+	role: 1
+
+id: 189
+	firstName: Danielle
+	lastName: Verghese
+	username: danielle.verghese
+	email: danielle.verghese@thetriangle.org
+	role: 1
+
+id: 190
+	firstName: Courtney
+	lastName: Denton
+	username: courtney.denton
+	email: courtney.denton@thetriangle.org
+	role: 1
+
+id: 191
+	firstName: Courtney
+	lastName: Rosen
+	username: courtney.rosen
+	email: courtney.rosen@thetriangle.org
+	role: 1
+
+id: 192
+	firstName: Jessica
+	lastName: Mattern
+	username: jessica.mattern
+	email: jessica.mattern@thetriangle.org
+	role: 1
+
+id: 193
+	firstName: Kevin
+	lastName: Rossi
+	username: kevin.rossi
+	email: kevin.rossi@thetriangle.org
+	role: 1
+
+id: 194
+	firstName: Kate
+	lastName: Delaney
+	username: kate.delaney
+	email: kate.delaney@thetriangle.org
+	role: 1
+
+id: 195
+	firstName: Rachel
+	lastName: Wisniewski
+	username: rachel.wisniewski
+	email: rachel.w@thetriangle.org
+	role: 1
+
+id: 196
+	firstName: Steve
+	lastName: Winfield
+	username: steve.winfield
+	email: steve.winfield@thetriangle.org
+	role: 1
+
+id: 197
+	firstName: Elyssa
+	lastName: Kerstein
+	username: elyssa.kerstein
+	email: elyssa.kerstein@thetriangle.org
+	role: 1
+
+id: 198
+	firstName: Phillip
+	lastName: Williams
+	username: phillip.williams
+	email: phillip.williams@thetriangle.org
+	role: 1
+
+id: 199
+	firstName: Devon
+	lastName: Kodger
+	username: devon.kodger
+	email: devon.kodger@thetriangle.org
+	role: 1
+
+id: 200
+	firstName: Alexandra
+	lastName: Jones
+	username: alexandra.jones
+	email: alexandra.jones@thetriangle.org
+	role: 1
+
+id: 201
+	firstName: Walker
+	lastName: Green
+	username: walker.green
+	email: walker.green@thetriangle.org
+	role: 1
+
+id: 202
+	firstName: Valerie
+	lastName: Laub
+	username: valerie.laub
+	email: valerie.laub@thetriangle.org
+	role: 1
+
+id: 203
+	firstName: Rachel
+	lastName: Tinkelman
+	username: rachel.tinkelman
+	email: rachel.tinkelman@thetriangle.org
+	role: 1
+
+id: 204
+	firstName: Amanda
+	lastName: Shooster
+	username: amanda.shooster
+	email: amanda.shooster@thetriangle.org
+	role: 1
+
+id: 205
+	firstName: Emma
+	lastName: Cardwell
+	username: emma.cardwell
+	email: emma.cardwell@thetriangle.org
+	role: 1
+
+id: 206
+	firstName: Maddie
+	lastName: Baxter
+	username: maddie.baxter
+	email: maddie.baxter@thetriangle.org
+	role: 1
+
+id: 207
+	firstName: Allison
+	lastName: Mann
+	username: allison.mann
+	email: allison.mann@thetriangle.org
+	role: 1
+
+id: 208
+	firstName: Ryan
+	lastName: Shults
+	username: ryan.shults
+	email: ryan.shults@thetriangle.org
+	role: 1
+
+id: 209
+	firstName: Allison
+	lastName: Starr
+	username: allison.starr
+	email: allison.starr@thetriangle.org
+	role: 1
+
+id: 210
+	firstName: Rachel
+	lastName: Filippone
+	username: rachel.filippone
+	email: rachel.filippone@thetriangle.org
+	role: 1
+
+id: 211
+	firstName: Christine
+	lastName: Nieman
+	username: christine.nieman
+	email: christine.nieman@thetriangle.org
+	role: 1
+
+id: 212
+	firstName: Mirijam
+	lastName: Schuster
+	username: mirijam.schuster
+	email: mirijam.schuster@thetriangle.org
+	role: 1
+
+id: 213
+	firstName: Cathy
+	lastName: White
+	username: cathy.white
+	email: cathy.white@thetriangle.org
+	role: 1
+
+id: 214
+	firstName: Victoria
+	lastName: Sibalich
+	username: victoria.sibalich
+	email: victoria.sibalich@thetriangle.org
+	role: 1
+
+id: 215
+	firstName: Joseph
+	lastName: Baider
+	username: joseph.baider
+	email: joseph.baider@thetriangle.org
+	role: 1
+
+id: 216
+	firstName: Michelle
+	lastName: Laggan
+	username: michelle.laggan
+	email: michelle.laggan@thetriangle.org
+	role: 1
+
+id: 217
+	firstName: Kim
+	lastName: Post
+	username: kim.post
+	email: kim.post@thetriangle.org
+	role: 1
+
+id: 218
+	firstName: Josephine
+	lastName: Murgor
+	username: josephine.murgor
+	email: josephine.murgor@thetriangle.org
+	role: 1
+
+id: 219
+	firstName: Alexis
+	lastName: Carlsson
+	username: alexis.carlsson
+	email: alexis.carlsson@thetriangle.org
+	role: 1
+
+id: 220
+	firstName: Nebi
+	lastName: Mema
+	username: nebi.mema
+	email: nebi.mema@thetriangle.org
+	role: 1
+
+id: 221
+	firstName: Billy
+	lastName: Bauer
+	username: billy.bauer
+	email: billy.bauer@thetriangle.org
+	role: 1
+
+id: 222
+	firstName: Josh
+	lastName: Einbinder-Schatz
+	username: josh.einbinder-schatz
+	email: josh.einbinder@thetriangle.org
+	role: 1
+
+id: 223
+	firstName: Ashlee
+	lastName: Douglas
+	username: ashlee.douglas
+	email: ashlee.douglas@thetriangle.org
+	role: 1
+
+id: 224
+	firstName: Benjamin
+	lastName: Sylvester
+	username: benjamin.sylvester
+	email: benjamin.sylvester@thetriangle.org
+	role: 1
+
+id: 225
+	firstName: Sankha
+	lastName: Wanigasekara
+	username: sankha.wanigasekara
+	email: sankha.wanigasekara@thetriangle.org
+	role: 1
+
+id: 226
+	firstName: Gabrielle
+	lastName: Tam
+	username: gabrielle.tam
+	email: gabrielle.tam@thetriangle.org
+	role: 1
+
+id: 227
+	firstName: Lisa
+	lastName: DeSantis
+	username: lisa.desantis
+	email: lisa.desantis@thetriangle.org
+	role: 1
+
+id: 228
+	firstName: Angelika
+	lastName: Ghosh
+	username: angelika.ghosh
+	email: angelika.ghosh@thetriangle.org
+	role: 1
+
+id: 229
+	firstName: Jessa
+	lastName: Eskin
+	username: jessa.eskin
+	email: jessa.eskin@thetriangle.org
+	role: 1
+
+id: 230
+	firstName: Eliya
+	lastName: Bernstein
+	username: eliya.bernstein
+	email: eliya.bernstein@thetriangle.org
+	role: 1
+
+id: 231
+	firstName: Maren
+	lastName: Larsen
+	username: maren.larsen
+	email: maren.larsen@thetriangle.org
+	role: 1
+
+id: 232
+	firstName: Bhavya
+	lastName: Sharma
+	username: bhavya.sharma
+	email: bhavya.sharma@thetriangle.org
+	role: 1
+
+id: 233
+	firstName: Alex
+	lastName: Cho
+	username: alex.cho
+	email: alex.cho@thetriangle.org
+	role: 1
+
+id: 234
+	firstName: Peter
+	lastName: Sandilos
+	username: peter.sandilos
+	email: awh43@drexel.edu
+	role: 1
+
+id: 235
+	firstName: Eric
+	lastName: Birkhead
+	username: eric.birkhead
+	email: eric.birkhead@thetriangle.org
+	role: 1
+
+id: 236
+	firstName: Kristin
+	lastName: Schrier
+	username: kristin.schrier
+	email: kristin.schrier@thetriangle.org
+	role: 1
+
+id: 237
+	firstName: Joe
+	lastName: Howanski
+	username: joe.howanski
+	email: joe.howanski@thetriangle.org
+	role: 1
+
+id: 238
+	firstName: Maria Elena
+	lastName: Marinelli
+	username: maria elena.marinelli
+	email: maria.marinelli@thetriangle.org
+	role: 1
+
+id: 239
+	firstName: Matt
+	lastName: Olenik
+	username: matt.olenik
+	email: mattolenik@thetriangle.org
+	role: 1
+
+id: 240
+	firstName: David
+	lastName: Hagelgans
+	username: david.hagelgans
+	email: david.hagelgans@thetriangle.org
+	role: 1
+
+id: 241
+	firstName: Yifan
+	lastName: Li
+	username: yifan.li
+	email: yifan.li@thetriangle.org
+	role: 1
+
+id: 242
+	firstName: Brittany
+	lastName: Maclean
+	username: brittany.maclean
+	email: brittany.maclean@thetriangle.org
+	role: 1
+
+id: 243
+	firstName: Raquel
+	lastName: Moon
+	username: raquel.moon
+	email: raquel.moon@thetriangle.org
+	role: 1
+
+id: 244
+	firstName: Jithin
+	lastName: Thenasseril
+	username: jithin.thenasseril
+	email: jithin.thenasseril@thetriangle.org
+	role: 1
+
+id: 245
+	firstName: Imani
+	lastName: Dorsey
+	username: imani.dorsey
+	email: imani.dorsey@thetriangle.org
+	role: 1
+
+id: 246
+	firstName: Carly
+	lastName: Helfand
+	username: carly.helfand
+	email: carly.helfand@thetriangle.org
+	role: 1
+
+id: 247
+	firstName: Elizabeth
+	lastName: Mak
+	username: elizabeth.mak
+	email: elizabeth.mak@thetriangle.org
+	role: 1
+
+id: 248
+	firstName: Mansoor
+	lastName: Siddiqui
+	username: mansoor.siddiqui
+	email: mansoor.siddiqui@thetriangle.org
+	role: 1
+
+id: 249
+	firstName: Ann
+	lastName: Haftl
+	username: ann.haftl
+	email: ann.haftl@thetriangle.org
+	role: 1
+
+id: 250
+	firstName: Nicolena
+	lastName: Stiles
+	username: nicolena.stiles
+	email: nicolena.stiles@thetriangle.org
+	role: 1
+
+id: 251
+	firstName: Mariya
+	lastName: Zhorova
+	username: mariya.zhorova
+	email: mariya.zhorova@thetriangle.org
+	role: 1
+
+id: 252
+	firstName: Daniel
+	lastName: Teano
+	username: daniel.teano
+	email: daniel.teano@thetriangle.org
+	role: 1
+
+id: 253
+	firstName: Meaghan
+	lastName: Geatens
+	username: meaghan.geatens
+	email: meaghan.geatens@thetriangle.org
+	role: 1
+
+id: 254
+	firstName: Ryan
+	lastName: Stone
+	username: ryan.stone
+	email: ryan.stone@thetriangle.org
+	role: 1
+
+id: 255
+	firstName: Mariya
+	lastName: Zharova
+	username: mariya.zharova
+	email: mariya.zharova@thetriangle.org
+	role: 1
+
+id: 256
+	firstName: Navya
+	lastName: Dandu
+	username: navya.dandu
+	email: navya.dandu@thetriangle.org
+	role: 1
+
+id: 257
+	firstName: Meredith
+	lastName: Rephelson
+	username: meredith.rephelson
+	email: meredith.raphelson@thetriangle.org
+	role: 1
+
+id: 258
+	firstName: Kevin
+	lastName: Schimes
+	username: kevin.schimes
+	email: entertainmentwriters@thetriangle.org
+	role: 1
+
+id: 259
+	firstName: Andrew
+	lastName: Taylor
+	username: andrew.taylor
+	email: gray.taylor@thetriangle.org
+	role: 1
+
+id: 260
+	firstName: Zhengyuan
+	lastName: Bi
+	username: zhengyuan.bi
+	email: Zhengyuan.Bi@thetriangle.org
+	role: 1
+
+id: 261
+	firstName: Emily
+	lastName: McDonald
+	username: emily.mcdonald
+	email: emily.mcdonald@thetriangle.org
+	role: 1
+
+id: 262
+	firstName: Eunice Maya
+	lastName: Kamami
+	username: eunice maya.kamami
+	email: maya.kamami@thetriangle.org
+	role: 1
+
+id: 263
+	firstName: Michael
+	lastName: Hyatt
+	username: michael.hyatt
+	email: Michael.Hyatt@thetriangle.org
+	role: 1
+
+id: 264
+	firstName: Eillie
+	lastName: Belcheff
+	username: eillie.belcheff
+	email: Gabrielle.Belchefs@thetriangle.org
+	role: 1
+
+id: 265
+	firstName: Rogelio
+	lastName: Aguilar
+	username: rogelio.aguilar
+	email: rogelio.aguilar@thetriangle.org
+	role: 1
+
+id: 266
+	firstName: Parker
+	lastName: Spiro
+	username: parker.spiro
+	email: parker.spiro@thetriangle.org
+	role: 1
+
+id: 267
+	firstName: Leah
+	lastName: Friedman
+	username: leah.friedman
+	email: leah.friedman@thetriangle.org
+	role: 1
+
+id: 268
+	firstName: Amanda
+	lastName: Schwarz
+	username: amanda.schwarz
+	email: amanda.schwarz@thetriangle.org
+	role: 1
+
+id: 269
+	firstName: Badri
+	lastName: Karthikeyan
+	username: badri.karthikeyan
+	email: badri.karthikeyan@thetriangle.org
+	role: 1
+
+id: 270
+	firstName: Nicholas
+	lastName: Piva
+	username: nicholas.piva
+	email: Nicholas.Piva@thetriangle.org
+	role: 1
+
+id: 271
+	firstName: Micah
+	lastName: Watanabe
+	username: micah.watanabe
+	email: micah.watanabe@thetriangle.org
+	role: 1
+
+id: 272
+	firstName: Krishna
+	lastName: Satwani
+	username: krishna.satwani
+	email: krishna.satwani@thetriangle.org
+	role: 1
+
+id: 273
+	firstName: Lauren
+	lastName: Sand
+	username: lauren.sand
+	email: lauren.sand@thetriangle.org
+	role: 1
+
+id: 274
+	firstName: Brannon
+	lastName: Blunk
+	username: brannon.blunk
+	email: brannon.blunk@thetriangle.org
+	role: 1
+
+id: 275
+	firstName: Benjamin
+	lastName: Coleman
+	username: benjamin.coleman
+	email: Benjamin.Coleman@thetriangle.org
+	role: 1
+
+id: 276
+	firstName: Ambeisa
+	lastName: Boswell
+	username: ambeisa.boswell
+	email: ambeisaboswell@thetriangle.org
+	role: 1
+
+id: 277
+	firstName: Max
+	lastName: Kahn
+	username: max.kahn
+	email: Max.Kahn@thetriangle.org
+	role: 1
+
+id: 278
+	firstName: Nikhil
+	lastName: Grandhi
+	username: nikhil.grandhi
+	email: Nikhil.Grandhi@thetriangle.org
+	role: 1
+
+id: 279
+	firstName: Ben
+	lastName: Wolbransky
+	username: ben.wolbransky
+	email: ben.wolbransky@thetriangle.org
+	role: 1
+
+id: 280
+	firstName: Sonia
+	lastName: Zacher
+	username: sonia.zacher
+	email: sonia.zacher@thetriangle.org
+	role: 1
+
+id: 281
+	firstName: Christian
+	lastName: Coassin
+	username: christian.coassin
+	email: Christian.Coassin@thetriangle.org
+	role: 1
+
+id: 282
+	firstName: Kristen
+	lastName: Nagy
+	username: kristen.nagy
+	email: kristen.nagy@thetriangle.org
+	role: 1
+
+id: 283
+	firstName: James
+	lastName: Tucker
+	username: james.tucker
+	email: James.Tucker@thetriangle.org
+	role: 1
+
+id: 284
+	firstName: Jarett
+	lastName: Gross
+	username: jarett.gross
+	email: Jarrett.Gross@thetriangle.org
+	role: 1
+
+id: 285
+	firstName: Daniel
+	lastName: Johnson
+	username: daniel.johnson
+	email: daniel.johnson@thetriangle.org
+	role: 1
+
+id: 286
+	firstName: Kartik
+	lastName: Raman
+	username: kartik.raman
+	email: kartik.raman@thetriangle.org
+	role: 1
+
+id: 287
+	firstName: Karnik
+	lastName: Hajjar
+	username: karnik.hajjar
+	email: Karnik.Hajjar@thetriangle.org
+	role: 1
+
+id: 288
+	firstName: Allison
+	lastName: Liu
+	username: allison.liu
+	email: allison.liu@thetriangle.org
+	role: 1
+
+id: 289
+	firstName: Krystal
+	lastName: Richmond
+	username: krystal.richmond
+	email: krystalrichmond@thetriangle.org
+	role: 1
+
+id: 290
+	firstName: Matt
+	lastName: Coakley
+	username: matt.coakley
+	email: matthew.coakley@thetriangle.org
+	role: 1
+
+id: 291
+	firstName: Chelsea
+	lastName: Bello
+	username: chelsea.bello
+	email: chelsea.bello@thetriangle.org
+	role: 1
+
+id: 292
+	firstName: Ben
+	lastName: Eastman
+	username: ben.eastman
+	email: Ben.Eastman@thetriangle.org
+	role: 1
+
+id: 293
+	firstName: Naomi
+	lastName: Shah
+	username: naomi.shah
+	email: naomi.shah@thetriangle.org
+	role: 1
+
+id: 294
+	firstName: Christopher
+	lastName: Markowitz
+	username: christopher.markowitz
+	email: chris.markowitz@thetriangle.org
+	role: 1
+
+id: 295
+	firstName: Lolia
+	lastName: Briggs
+	username: lolia.briggs
+	email: loila.briggs@thetriangle.org
+	role: 1
+
+id: 296
+	firstName: Snehal
+	lastName: Yarlagadda
+	username: snehal.yarlagadda
+	email: snehal.yarlagadda@thetriangle.org
+	role: 1
+
+id: 297
+	firstName: Sabrin
+	lastName: Hilal
+	username: sabrin.hilal
+	email: sabrin.hilal@thetriangle.org
+	role: 1
+
+id: 298
+	firstName: Abigail
+	lastName: Amey
+	username: abigail.amey
+	email: abigail.amey@thetriangle.org
+	role: 1
+
+id: 299
+	firstName: Eva
+	lastName: McGrath
+	username: eva.mcgrath
+	email: Eva.McGrath@thetriangle.org
+	role: 1
+
+id: 300
+	firstName: Moby
+	lastName: Osoba
+	username: moby.osoba
+	email: Moby.Osoba@thetriangle.org
+	role: 1
+
+id: 301
+	firstName: Yumi
+	lastName: Abe
+	username: yumi.abe
+	email: Yumi.Abe@thetriangle.org
+	role: 1
+
+id: 302
+	firstName: Mary Elizabeth
+	lastName: Hoffman
+	username: mary elizabeth.hoffman
+	email: Mary.Elizabeth.Hoffman@thetriangle.org
+	role: 1
+
+id: 303
+	firstName: Shreya
+	lastName: Dundumalla
+	username: shreya.dundumalla
+	email: shreya.dundumalla@thetriangle.org
+	role: 1
+
+id: 304
+	firstName: Ariana
+	lastName: Kaufmann
+	username: ariana.kaufmann
+	email: ariana.kaufmann@thetriangle.org
+	role: 1
+
+id: 305
+	firstName: Ryan
+	lastName: Quint
+	username: ryan.quint
+	email: Ryan.Quint@thetriangle.org
+	role: 1
+
+id: 306
+	firstName: Becquerel
+	lastName: Dalton
+	username: becquerel.dalton
+	email: becquerel.dalton@thetriangle.org
+	role: 1
+
+id: 307
+	firstName: Erin
+	lastName: Maguire
+	username: erin.maguire
+	email: erin.maguire@thetriangle.org
+	role: 1
+
+id: 308
+	firstName: Maggie
+	lastName: Fedorocsko
+	username: maggie.fedorocsko
+	email: opinion@thetriangle.org
+	role: 1
+
+id: 309
+	firstName: Alexis
+	lastName: Verdini
+	username: alexis.verdini
+	email: alexis.verdini@thetriangle.org
+	role: 1
+
+id: 310
+	firstName: Simone
+	lastName: Wiley
+	username: simone.wiley
+	email: Simone.Wiley@thetriangle.org
+	role: 1
+
+id: 311
+	firstName: Derrick
+	lastName: Dieso
+	username: derrick.dieso
+	email: derrick.dieso@thetriangle.org
+	role: 1
+
+id: 312
+	firstName: Dan
+	lastName: Eberhart
+	username: dan.eberhart
+	email: eberhart.dan@gmail.com
+	role: 1
+
+id: 313
+	firstName: Morgan
+	lastName: Weiss
+	username: morgan.weiss
+	email: morgan.weiss@thetriangle.org
+	role: 1
+
+id: 314
+	firstName: Adelaide
+	lastName: Key
+	username: adelaide.key
+	email: Adelaide.Key@thetriangle.org
+	role: 1
+
+id: 315
+	firstName: Alyssa
+	lastName: Jones
+	username: alyssa.jones
+	email: alyssa.jones@thetriangle.org
+	role: 1
+
+id: 316
+	firstName: Elisa
+	lastName: Money
+	username: elisa.money
+	email: elisa.money@thetriangle.org
+	role: 1
+
+id: 317
+	firstName: Gina
+	lastName: Vitale
+	username: gina.vitale
+	email: gina.vitale@thetriangle.org
+	role: 1
+
+id: 318
+	firstName: Steven
+	lastName: Blumberg
+	username: steven.blumberg
+	email: steven.blumberg@thetriangle.org
+	role: 1
+
+id: 319
+	firstName: Jake
+	lastName: Fischer
+	username: jake.fischer
+	email: jake.fischer@thetriangle.org
+	role: 1
+
+id: 320
+	firstName: Richa
+	lastName: Srivastava
+	username: richa.srivastava
+	email: Richa.Srivastava@thetriangle.org
+	role: 1
+
+id: 321
+	firstName: Joe
+	lastName: Kavanagh
+	username: joe.kavanagh
+	email: joe.kavanagh@thetriangle.org
+	role: 1
+
+id: 322
+	firstName: Elizabeth
+	lastName: Hoffman
+	username: elizabeth.hoffman
+	email: elizabeth.hoffman@thetriangle.org
+	role: 1
+
+id: 323
+	firstName: Nick
+	lastName: Maloney
+	username: nick.maloney
+	email: nick.maloney@thetriangle.org
+	role: 1
+
+id: 324
+	firstName: Blake
+	lastName: Emerich
+	username: blake.emerich
+	email: blake.emerich@thetriangle.org
+	role: 1
+
+id: 325
+	firstName: Kerrivah
+	lastName: Heard
+	username: kerrivah.heard
+	email: kerrivah.heard@thetriangle.org
+	role: 1
+
+id: 326
+	firstName: Noah
+	lastName: Alessi
+	username: noah.alessi
+	email: noah.alessi@thetriangle.org
+	role: 1
+
+id: 327
+	firstName: Ramsha
+	lastName: Ahmad
+	username: ramsha.ahmad
+	email: ramsha.ahmad@thetriangle.org
+	role: 1
+
+id: 328
+	firstName: Megan
+	lastName: Villarin
+	username: megan.villarin
+	email: Megan.Villarin@thetriangle.org
+	role: 1
+
+id: 329
+	firstName: Shruti
+	lastName: Khandelwal
+	username: shruti.khandelwal
+	email: shruti.khandelwal@thetriangle.org
+	role: 1
+
+id: 330
+	firstName: Shayla Joselle
+	lastName: De Leon
+	username: shayla joselle.de leon
+	email: Shayla.Joselle.De.Leon@thetriangle.org
+	role: 1
+
+id: 331
+	firstName: Erika
+	lastName: Pleskunas
+	username: erika.pleskunas
+	email: news@thetriangle.com
+	role: 1
+
+id: 332
+	firstName: Ruby
+	lastName: Payette
+	username: ruby.payette
+	email: ruby.payette@thetriangle.org
+	role: 1
+
+id: 333
+	firstName: Natasha
+	lastName: Hajo
+	username: natasha.hajo
+	email: natasha.hajo@thetriangle.org
+	role: 1
+
+id: 334
+	firstName: Linh
+	lastName: Ngo
+	username: linh.ngo
+	email: linh.ngo@thetriangle.org
+	role: 1
+
+id: 335
+	firstName: Daniel
+	lastName: Alessi
+	username: daniel.alessi
+	email: daniel.alessi@thetriangle.org
+	role: 1
+
+id: 336
+	firstName: Abdul
+	lastName: Rana
+	username: abdul.rana
+	email: abdul.rana@thetriangle.org
+	role: 1
+
+id: 337
+	firstName: Jane
+	lastName: O'Malley
+	username: jane.o'malley
+	email: jane.omalley@thetriangle.org
+	role: 1
+
+id: 338
+	firstName: Brendan
+	lastName: Stec
+	username: brendan.stec
+	email: brendan.stec@thetriangle.org
+	role: 1
+
+id: 339
+	firstName: Calvin
+	lastName: Sitati
+	username: calvin.sitati
+	email: calvin.sitati.kiniale@drexel.edu
+	role: 1
+
+id: 340
+	firstName: Colin
+	lastName: Peterson
+	username: colin.peterson
+	email: colin.peterson@thetriangle.org
+	role: 1
+
+id: 341
+	firstName: Alex
+	lastName: Konyk
+	username: alex.konyk
+	email: alexander.e.konyk@drexel.edu
+	role: 1
+
+id: 342
+	firstName: Caylie
+	lastName: Landerville
+	username: caylie.landerville
+	email: caylie.landerville@thetriangle.org
+	role: 1
+
+id: 343
+	firstName: Sharice
+	lastName: Maxwell
+	username: sharice.maxwell
+	email: sharice.e.maxwell@drexel.edu
+	role: 1
+
+id: 344
+	firstName: Walker
+	lastName: Alexander
+	username: walker.alexander
+	email: walker.alexander@thetriangle.org
+	role: 1
+
+id: 345
+	firstName: Jeremy
+	lastName: Snyder
+	username: jeremy.snyder
+	email: jeremy.snyder@thetriangle.org
+	role: 1
+
+id: 346
+	firstName: Virginia
+	lastName: Tanner
+	username: virginia.tanner
+	email: virginia.tanner@thetriangle.org
+	role: 1
+
+id: 347
+	firstName: Brian
+	lastName: Cruice
+	username: brian.cruice
+	email: brian.cruice@thetriangle.org
+	role: 1
+
+id: 348
+	firstName: Stan
+	lastName: Silverman
+	username: stan.silverman
+	email: stan.silverman@thetriangle.org
+	role: 1
+
+id: 349
+	firstName: Dahrah
+	lastName: Muhammad
+	username: dahrah.muhammad
+	email: dahrah.muhammad@thetriangle.org
+	role: 1
+
+id: 350
+	firstName: Lauren
+	lastName: Gross
+	username: lauren.gross
+	email: lauren.gross@thetriangle.org
+	role: 1
+
+id: 351
+	firstName: Ariana
+	lastName: Downs
+	username: ariana.downs
+	email: ariana.downs@thetriangle.org
+	role: 1
+
+id: 352
+	firstName: John
+	lastName: Gilligan
+	username: john.gilligan
+	email: john.gilligan@thetriangle.org
+	role: 1
+
+id: 353
+	firstName: John
+	lastName: Fry
+	username: john.fry
+	email: john@thetriangle.org
+	role: 1
+
+id: 354
+	firstName: Leander
+	lastName: Ransier
+	username: leander.ransier
+	email: leander.ransier@thetriangle.org
+	role: 1
+
+id: 355
+	firstName: Camille
+	lastName: Prairie
+	username: camille.prairie
+	email: camille.prairie@thetriangle.org
+	role: 1
+
+id: 356
+	firstName: Senura
+	lastName: Randeniye
+	username: senura.randeniye
+	email: senura.randeniye@thetriangle.org
+	role: 1
+
+id: 357
+	firstName: Devan
+	lastName: Suber
+	username: devan.suber
+	email: devan.suber@thetriangle.org
+	role: 1
+
+id: 358
+	firstName: Jacky
+	lastName: Tsang
+	username: jacky.tsang
+	email: jackie.tsang@thetriangle.org
+	role: 1
+
+id: 359
+	firstName: Catherine
+	lastName: White
+	username: catherine.white
+	email: catherine.white@thetriangle.org
+	role: 1
+
+id: 360
+	firstName: Flavio
+	lastName: Borquez
+	username: flavio.borquez
+	email: flavio.borquez@thetriangle.org
+	role: 1
+
+id: 361
+	firstName: Alexandra
+	lastName: Alsid
+	username: alexandra.alsid
+	email: alexandra.alsid@thetriangle.org
+	role: 1
+
+id: 362
+	firstName: Mary Carol
+	lastName: Garrity
+	username: mary carol.garrity
+	email: mary.carol.garrity@thetriangle.org
+	role: 1
+
+id: 363
+	firstName: Lexi
+	lastName: Shannon
+	username: lexi.shannon
+	email: lexi.shannon@thetriangle.org
+	role: 1
+
+id: 364
+	firstName: Kyle
+	lastName: Howey
+	username: kyle.howey
+	email: kyle.howey@thetriangle.org
+	role: 1
+
+id: 365
+	firstName: Virginia
+	lastName: Wardell
+	username: virginia.wardell
+	email: virginia.wardell@thetriangle.org
+	role: 1
+
+id: 366
+	firstName: Caroline
+	lastName: McFarland
+	username: caroline.mcfarland
+	email: caroline.mcfarland@thetriangle.org
+	role: 1
+
+id: 367
+	firstName: Zachary
+	lastName: Rhine
+	username: zachary.rhine
+	email: zachary.rhine@thetriangle.org
+	role: 1
+
+id: 368
+	firstName: Katie
+	lastName: Zamulinsky
+	username: katie.zamulinsky
+	email: katie.zamulinsky@thetriangle.org
+	role: 1
+
+id: 369
+	firstName: Martina
+	lastName: Calluori
+	username: martina.calluori
+	email: martina.calluori@thetriangle.org
+	role: 1
+
+id: 370
+	firstName: Ellie
+	lastName: Belcheff
+	username: ellie.belcheff
+	email: gabrielle.belcheff@thetriangle.org
+	role: 1
+
+id: 371
+	firstName: Hope
+	lastName: Dehnert
+	username: hope.dehnert
+	email: Hope.Dehnert@thetriangle.org
+	role: 1
+
+id: 372
+	firstName: Campus Election Engagement Project
+	lastName: None
+	username: None
+	email: sponsor-ceep@thetriangle.org
+	role: 1
+
+id: 373
+	firstName: Ernest
+	lastName: Volpe
+	username: ernest.volpe
+	email: ernest.volpe@thetriangle.org
+	role: 1
+
+id: 374
+	firstName: Jonah
+	lastName: Listokin
+	username: jonah.listokin
+	email: jonah.listokin@thetriangle.org
+	role: 1
+
+id: 375
+	firstName: Kennedy
+	lastName: Murphy
+	username: kennedy.murphy
+	email: kennedy.murphy@thetriangle.org
+	role: 1
+
+id: 376
+	firstName: Christina
+	lastName: Rossner
+	username: christina.rossner
+	email: christina.rossner@thetriangle.org
+	role: 1
+
+id: 377
+	firstName: Juli
+	lastName: McCue
+	username: juli.mccue
+	email: juli.mccue@thetriangle.org
+	role: 1
+
+id: 378
+	firstName: Praneeth
+	lastName: Meka
+	username: praneeth.meka
+	email: praneeth.meka@thetriangle.org
+	role: 1
+
+id: 379
+	firstName: Hayley
+	lastName: Roth
+	username: hayley.roth
+	email: hayley.roth@thetriangle.org
+	role: 1
+
+id: 380
+	firstName: Chase
+	lastName: Connell
+	username: chase.connell
+	email: chase.connell@thetriangle.org
+	role: 1
+
+id: 381
+	firstName: Donna
+	lastName: Kwon
+	username: donna.kwon
+	email: donna.kwon@thetriangle.org
+	role: 1
+
+id: 382
+	firstName: Sean
+	lastName: Simmons
+	username: sean.simmons
+	email: sean.simmons@thetriangle.org
+	role: 1
+
+id: 383
+	firstName: Amanda
+	lastName: Hinkelman
+	username: amanda.hinkelman
+	email: amanda.hinkelman@thetriangle.org
+	role: 1
+
+id: 384
+	firstName: Tiana
+	lastName: Tiana
+	username: tiana.tiana
+	email: tianajones30@gmail.com
+	role: 1
+
+id: 385
+	firstName: Tosh
+	lastName: Farrell
+	username: tosh.farrell
+	email: tosh.farrell@thetriangle.org
+	role: 1
+
+id: 386
+	firstName: Sean
+	lastName: McCole
+	username: sean.mccole
+	email: sean.mccole@thetriangle.org
+	role: 1
+
+id: 387
+	firstName: Taylor
+	lastName: Johnson
+	username: taylor.johnson
+	email: taylor.johnson@thetriangle.org
+	role: 1
+
+id: 388
+	firstName: Marien
+	lastName: Wilkinson
+	username: marien.wilkinson
+	email: marien.wilkinson@thetriangle.org
+	role: 1
+
+id: 389
+	firstName: Ethan
+	lastName: Meth
+	username: ethan.meth
+	email: ethan.meth@thetriangle.org
+	role: 1
+
+id: 390
+	firstName: Nick
+	lastName: Camarata
+	username: nick.camarata
+	email: nick.camarata@thetriangle.org
+	role: 1
+
+id: 391
+	firstName: Kevt'her
+	lastName: Hoxha
+	username: kevt'her.hoxha
+	email: kev.hoxha@thetriangle.org
+	role: 1
+
+id: 392
+	firstName: Tahmeed
+	lastName: Jawad
+	username: tahmeed.jawad
+	email: tahmeed.sdfd@thetriangle.org
+	role: 1
+
+id: 393
+	firstName: Rebecca
+	lastName: John
+	username: rebecca.john
+	email: rebecca.john@thetriangle.org
+	role: 1
+
+id: 394
+	firstName: Calvin
+	lastName: Kiniale
+	username: calvin.kiniale
+	email: calvin.kiniale@thetriangle.org
+	role: 1
+
+id: 395
+	firstName: Zachary
+	lastName: Snyder
+	username: zachary.snyder
+	email: zachary.snyder@thetriangle.org
+	role: 1
+
+id: 396
+	firstName: Emma
+	lastName: Casey
+	username: emma.casey
+	email: emma.casey@thetriangle.org
+	role: 1
+
+id: 397
+	firstName: Roy
+	lastName: Aguilar
+	username: roy.aguilar
+	email: roy.aguilar@thetriangle.org
+	role: 1
+
+id: 398
+	firstName: Erin
+	lastName: Gilchrist
+	username: erin.gilchrist
+	email: erin.gilchrist@thetriangle.org
+	role: 1
+
+id: 399
+	firstName: Alex
+	lastName: Nagy
+	username: alex.nagy
+	email: alex.nagy@thetriangle.org
+	role: 1
+
+id: 400
+	firstName: Mike
+	lastName: Avena
+	username: mike.avena
+	email: mike.avena@thetriangle.org
+	role: 1
+
+id: 401
+	firstName: Skyler
+	lastName: Verrone
+	username: skyler.verrone
+	email: skyler.verrone@thetriangle.org
+	role: 1
+
+id: 402
+	firstName: Jason
+	lastName: Sobieski
+	username: jason.sobieski
+	email: jason.sobieski@thetriangle.org
+	role: 1
+
+id: 403
+	firstName: Utkarsh
+	lastName: Panchal
+	username: utkarsh.panchal
+	email: utkarsh.panchal@thetriangle.org
+	role: 1
+
+id: 404
+	firstName: Brandon
+	lastName: Kolle
+	username: brandon.kolle
+	email: brandon.kolle@thetriangle.org
+	role: 1
+
+id: 405
+	firstName: Kiara
+	lastName: Santos
+	username: kiara.santos
+	email: kiara.santos@thetriangle.org
+	role: 1
+
+id: 406
+	firstName: Stefan
+	lastName: Kusmirek
+	username: stefan.kusmirek
+	email: slk343@drexel.edu
+	role: 1
+
+id: 407
+	firstName: Armon
+	lastName: Owlia
+	username: armon.owlia
+	email: armon.owlia@thetriangle.org
+	role: 1
+
+id: 408
+	firstName: Atticus Deeny
+	lastName: None
+	username: None
+	email: atticus.deeny@thetriangle.org
+	role: 1
+
+id: 409
+	firstName: Sophia
+	lastName: Mattia
+	username: sophia.mattia
+	email: sophia.mattia@thetriangle.org
+	role: 1
+
+id: 410
+	firstName: Michaela
+	lastName: Graf
+	username: michaela.graf
+	email: michaela.graf@thetriangle.org
+	role: 1
+
+id: 411
+	firstName: Maria Paula
+	lastName: Mijares Torres
+	username: maria paula.mijares torres
+	email: mapa.mijares@thetriangle.org
+	role: 1
+
+id: 412
+	firstName: Ioana
+	lastName: Racu
+	username: ioana.racu
+	email: ioana.racu@thetriangle.org
+	role: 1
+
+id: 413
+	firstName: Ibrahim
+	lastName: Kamara
+	username: ibrahim.kamara
+	email: ibrahim.kamara@thetriangle.org
+	role: 1
+
+id: 414
+	firstName: Prasham
+	lastName: Jobanputra
+	username: prasham.jobanputra
+	email: prasham.jobanputra@thetriangle.org
+	role: 1
+
+id: 415
+	firstName: Kejsi
+	lastName: Ruka
+	username: kejsi.ruka
+	email: kejsi.ruka@thetriangle.org
+	role: 1
+
+id: 416
+	firstName: Christian
+	lastName: DeBrady
+	username: christian.debrady
+	email: christian.debrady@thetriangle.org
+	role: 1
+
+id: 417
+	firstName: Paulie
+	lastName: Loscalzo
+	username: paulie.loscalzo
+	email: paulie.loscalzo@thetriangle.org
+	role: 1
+
+id: 418
+	firstName: Clev
+	lastName: Cong
+	username: clev.cong
+	email: clev@thetriangle.org
+	role: 1
+
+id: 419
+	firstName: Victoria
+	lastName: Harrigan
+	username: victoria.harrigan
+	email: victoria.harrigan@thetriangle.org
+	role: 1
+
+id: 420
+	firstName: Zaryab
+	lastName: Ahmed
+	username: zaryab.ahmed
+	email: za366@drexel.edu
+	role: 1
+
+id: 421
+	firstName: Nicole
+	lastName: Marie
+	username: nicole.marie
+	email: nicole.marie@thetriangle.org
+	role: 1
+
+id: 422
+	firstName: Krishna
+	lastName: Thaker
+	username: krishna.thaker
+	email: krishna.thaker@thetriangle.org
+	role: 1
+
+id: 423
+	firstName: Shreeya
+	lastName: Gounder
+	username: shreeya.gounder
+	email: shreeya.gounder@thetriangle.org
+	role: 1
+
+id: 424
+	firstName: Sam
+	lastName: Gregg
+	username: sam.gregg
+	email: sam.gregg@thetriangle.org
+	role: 1
+
+id: 425
+	firstName: Nicholas
+	lastName: Vann
+	username: nicholas.vann
+	email: nicholas.vann@thetriangle.org
+	role: 1
+
+id: 426
+	firstName: sarah
+	lastName: fiedorek
+	username: sarah.fiedorek
+	email: sarah.fiedorek@thetriangle.org
+	role: 1
+
+id: 427
+	firstName: Jyoti
+	lastName: Gupta
+	username: jyoti.gupta
+	email: jyoti.gupta@thetriangle.org
+	role: 1
+
+id: 428
+	firstName: Suhani
+	lastName: Dheer
+	username: suhani.dheer
+	email: suhani.dheer@thetriangle.org
+	role: 1
+
+id: 429
+	firstName: Kenneth
+	lastName: Blake
+	username: kenneth.blake
+	email: kgb66@drexel.edu
+	role: 1
+
+id: 430
+	firstName: Paulie
+	lastName: Loscalzo
+	username: paulie.loscalzo
+	email: pauliee@gmail.com
+	role: 1
+
+id: 431
+	firstName: Daniel
+	lastName: Epstein
+	username: daniel.epstein
+	email: de442@drexel.edu
+	role: 1
+

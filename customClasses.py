@@ -45,7 +45,10 @@ class wpArticle:
         self.tags = tags
         self.text = text
 
-    def printGenericAuthors(index):
+        wpArticle.generic_articleDict.update({self.id : self})
+
+
+    def printGenericArticle(index):
         result = ''
         dict = wpArticle.generic_articleDict[index]
         result += f'''id: {dict.id}\n'''
@@ -56,6 +59,21 @@ class wpArticle:
         result += f'''commentStatus: {dict.commentStatus}\n'''
         result += f'''tags: {dict.tags}\n'''
         result += f'''text: {dict.text}\n\n'''
+        return result
+    
+    def printArticles():
+        result = ''
+        for i in list(wpArticle.generic_articleDict.keys())[:2]:
+            dict = wpArticle.generic_articleDict[i]
+            result += f'''id: {dict.id}\n'''
+            result += f'''title: {dict.title}\n'''
+            result += f'''pubDate: {dict.pubDate}\n'''
+            result += f'''modDate: {dict.modDate}\n''' 
+            result += f'''description: {dict.description}\n'''
+            result += f'''commentStatus: {dict.commentStatus}\n'''
+            result += f'''tags: {dict.tags}\n'''
+            result += f'''text: {dict.text}\n\n'''
+            wpArticle.articleTemp += result
         return result
     
     

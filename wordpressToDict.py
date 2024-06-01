@@ -87,6 +87,7 @@ articleData = myDict.get('rss').get('channel').get('item')
 
 # Generate article name list.
 pb.printProgressBar(0, len(articleData), length = 20)
+
 for i, item in enumerate(articleData):
     title = '' #can never be none
     pubDate = '' #can never be none
@@ -104,8 +105,7 @@ for i, item in enumerate(articleData):
     modDate = util.charMorph(articleData[i].get('wp:post_modified_gmt'))
     description = util.charMorph(articleData[i].get('description'))
     comment_status = util.charMorph(articleData[i].get('wp:comment_status'))
-    # tags = util.processArticleTags(articleData[i].get('category'))
-    tags = 'test'
+    tags = util.processArticleTags(articleData[i].get('category'))
     # text = util.charMorph(articleData[i].get('content:encoded'))
     text = 'test'
    
@@ -116,9 +116,8 @@ for i, item in enumerate(articleData):
     pb.printProgressBar(i, len(articleData), length = 20)
 # print(c.wpArticle.generic_articleDict[1])
 print('Article List Generated')
-with open(file3_loc, "w") as file:
-    file.write(c.wpArticle.printArticles())
-    file.close()
+c.wpArticle.printArticles(file3_loc)
+
 
 
 

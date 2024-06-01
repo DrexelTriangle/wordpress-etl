@@ -61,21 +61,22 @@ class wpArticle:
         result += f'''text: {dict.text}\n\n'''
         return result
     
-    def printArticles():
-        result = ''
-        for i in list(wpArticle.generic_articleDict.keys())[:2]:
-            dict = wpArticle.generic_articleDict[i]
-            result += f'''id: {dict.id}\n'''
-            result += f'''title: {dict.title}\n'''
-            result += f'''pubDate: {dict.pubDate}\n'''
-            result += f'''modDate: {dict.modDate}\n''' 
-            result += f'''description: {dict.description}\n'''
-            result += f'''commentStatus: {dict.commentStatus}\n'''
-            result += f'''tags: {dict.tags}\n'''
-            result += f'''text: {dict.text}\n\n'''
-            wpArticle.articleTemp += result
-        return result
-    
+    def printArticles(file3_loc):
+        with open(file3_loc, "a") as file:
+            for i in list(wpArticle.generic_articleDict.keys()):
+                result = ''
+                dict = wpArticle.generic_articleDict[i]
+                result += f'''id: {dict.id}\n'''
+                result += f'''title: {dict.title}\n'''
+                result += f'''pubDate: {dict.pubDate}\n'''
+                result += f'''modDate: {dict.modDate}\n''' 
+                result += f'''description: {dict.description}\n'''
+                result += f'''commentStatus: {dict.commentStatus}\n'''
+                result += f'''tags: {dict.tags}\n'''
+                result += f'''text: {dict.text}\n\n'''
+                wpArticle.articleTemp += result
+                file.write(result)
+        file.close()    
     
 
 

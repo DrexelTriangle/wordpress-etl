@@ -53,17 +53,23 @@ def GMT_to_EST(gmtDate):
     now_time = datetime.now(timezone('US/Eastern'))
     return now_time.strftime(gmtDate)
 
-def processArticleTags(lst):
+def processArticleTags(myLst):
     result = []
-    
-    # temp = [item.get("#text") if (item.get('@domain') == 'post_tag') else '' for item in lst]
-    # temp.sort(reverse=True)
-    # return list(filter(lambda x: x != '', temp)) 
+    # for item in myLst:
+    #     temp = [item.get("#text") if (item.get('@domain') == 'post_tag') else '' for item in myLst]
+    #     temp.sort(reverse=True)
+    #     return list(filter(lambda x: x != '', temp)) 
+ 
 
-    for i in range(len(lst)):
-        if (lst[i].get('@domain') == 'post_tag'):
-            result.append(lst[i].get('#text'))
-    result.sort(reverse=True)
-    return result 
+    for i in range(len(myLst)):
+        try:
+            if (myLst[i].get('@domain') == 'post_tag'):
+                result.append(myLst[i].get('#text'))            
+                result.sort(reverse=True)
+        except KeyError:
+            result.append("Error, no tags given")
+            return result
+        
+    return result
 
     

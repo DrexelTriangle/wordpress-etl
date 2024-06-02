@@ -3,30 +3,21 @@
 # PURPOSE: Take a collection of wordpress posts and convert them to a Python Dictionary, as well as a JSON Object
 
 import xmltodict
-import pprint
-import json
 import time
 import progressBar as pb
 import utility as util
 import wpArticle as wpArt
 import wpAuthor as wpAuth
-import re
-
-
-# LOCAL FILE VARIABLES
-kenneth_wpFile = "C:\\Users\\kenne\\OneDrive\\Documents\\GitHub\\shkenanigans\\tri-wpdump_4-1-24.xml"
-kenneth_file2_loc = "C:\\Users\\kenne\OneDrive\\Documents\\GitHub\\shkenanigans\\test_dump.txt"
-kenneth_file3_loc = "C:\\Users\\kenne\\OneDrive\\Documents\\GitHub\\shkenanigans\\articleDump.txt"
-
-cole_wpFile = "C:\\Users\\Cole\\skennanigans\\shkenanigans\\tri-wpdump_4-1-24.xml"
-cole_file2_loc = "C:\\Users\\Cole\\skennanigans\\shkenanigans\\test_dump.txt"
-cole_file3_loc = "C:\\Users\\Cole\\skennanigans\\shkenanigans\\articleDump.txt"
 
 # ---------- INITIAL VARIABLES & FUNCTIONS ------------------------------------------------------------------------------
 wp_xmlContent = None
-wpFile = kenneth_wpFile
-file2_loc = kenneth_file2_loc
-file3_loc = kenneth_file3_loc
+myDict = {}
+authorData = {}
+articleData = {}
+
+wpFile = ".\\tri-wpdump_4-1-24.xml"
+file2_loc = ".\\test_dump.txt"
+file3_loc = ".\\articleDump.txt"
 
 def processAuthor(author):
     fName = ''
@@ -89,6 +80,37 @@ for i, item in enumerate(authorData):
 print('Author List Generated')
 
 # ---------- PART 3: PROCESS ARTICLES -----------------------------------------------------------------------------------
+'''
+TODO: Filter by Article Type [Articles, Crossword, Sudoku, ]
+    So the Triangle stores their comics, crossword, and sudoku puzzles as articles.
+    Now, it would be nice if they stored them in some consistent manner, right?
+    They don't...they don't at all.
+    
+    CROSSWORD/SUDOKU POSTS
+      - 'crossword'/'sudoku' in tag
+      - 'crossword'/'sudoku' in title
+      - 'crossword'/'sudoku' in embed (BEST BET)
+        - All of the crosswords are made using the PuzzleMe puzzle maker. 
+        - The embeds will look something like: 
+          - [puzzleme set=<set-string> id=<id-string> type=<"crossword" OR "sudoku">]
+          - We could use a regEx pattern to look for that pattern and that should find all the corresponding puzzles!
+    
+    We'll worry about grabbing the necessary data later.
+    Right now, we just need to worry about separating the articles into there appropriate lists.
+    Here was my initial solution:
+
+    ARTICLE SORTING SOLUTION (Ken's idea)
+        1. Add a new class field called [type]
+        2. Build the object, as usual.
+        3. Within the __init__ constructor, add a function that sets the [type] field accordingly.
+        4. Append the object to a different list, depending on the value in the [type] field
+
+    That was my initial idea, but feel free to think about something else.
+    The main issue with that answer is keeping track of ID numbers across the different lists. 
+    The other idea would be to parse through everything twice: Parse everything, then sort.
+    Once again, I'll let you decide how to go about doing this [o7 <- salute]
+'''
+
 pb.printProgressBar(0, len(articleData), length = 20)
 
 for i, item in enumerate(articleData):

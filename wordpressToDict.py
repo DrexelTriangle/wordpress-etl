@@ -28,6 +28,20 @@ wpFile = kenneth_wpFile
 file2_loc = kenneth_file2_loc
 file3_loc = kenneth_file3_loc
 
+def processAuthor(author):
+    fName = ''
+    lName = ''
+    if ( (authorData[i].get('wp:author_first_name') is None) and (author.get('wp:author_last_name') is None)):
+        name = util.charMorph(authorData[i].get('wp:author_display_name'))
+        newName = util.parseName(name)
+        fName = newName[0]
+        lName = newName[1]
+    else:
+        fName = util.charMorph(author.get('wp:author_first_name'))
+        lName = util.charMorph(author.get('wp:author_last_name'))
+        email = util.charMorph(author.get('wp:author_email'))
+        obj = wpAuth.wpAuthor(fName, lName, email)
+
 def processArticlePost(articlePost):
     title = '' #can never be none
     pubDate = '' #can never be none
@@ -67,11 +81,12 @@ articleData = myDict.get('rss').get('channel').get('item')
 
 # ---------- PART 2: PROCESS AUTHORS -----------------------------------------------------------------------------------
 
-
-
-
-
-
+pb.printProgressBar(0, len(authorData), length = 20)
+for i, item in enumerate(authorData):
+    processAuthor(authorData[i])
+    time.sleep(0.00001)
+    pb.printProgressBar(i, len(authorData), length = 20)
+print('Author List Generated')
 
 # ---------- PART 3: PROCESS ARTICLES -----------------------------------------------------------------------------------
 pb.printProgressBar(0, len(articleData), length = 20)

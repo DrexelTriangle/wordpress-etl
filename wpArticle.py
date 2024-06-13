@@ -1,3 +1,6 @@
+import progressBar as pb
+import time
+
 class wpArticle:
     articleCount = 0
     generic_articleDict = {}
@@ -20,7 +23,7 @@ class wpArticle:
         wpArticle.generic_articleDict.update({self.id : self})
 
 
-    def printGenericArticle(index):
+    def stringifyGenericArticle(index):
         result = ''
         dict = wpArticle.generic_articleDict[index]
         result += f'''id: {dict.id}\n'''
@@ -30,12 +33,15 @@ class wpArticle:
         result += f'''description: {dict.description}\n'''
         result += f'''commentStatus: {dict.commentStatus}\n'''
         result += f'''tags: {dict.tags}\n'''
-        result += f'''text: {dict.text}\n\n'''
+        result += f'''text: \n\n\n{dict.text}\n\n'''
         return result
     
     def printArticles(file3_loc):
+        print("┌── Writing Articles to File...")
+    
+        pb.printProgressBar(0, len(list(wpArticle.generic_articleDict.keys())), length = 20)
         with open(file3_loc, "a", encoding="utf-8") as file:
-            for i in list(wpArticle.generic_articleDict.keys()):
+            for i, item in enumerate(list(wpArticle.generic_articleDict.keys())):
                 result = ''
                 dict = wpArticle.generic_articleDict[i]
                 result += f'''id: {dict.id}\n'''
@@ -45,7 +51,14 @@ class wpArticle:
                 result += f'''description: {dict.description}\n'''
                 result += f'''commentStatus: {dict.commentStatus}\n'''
                 result += f'''tags: {dict.tags}\n'''
-                result += f'''text: {dict.text}\n\n'''
+                result += f'''text: \n\n{dict.text}\n\n'''
+                result += f'''----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n'''
                 wpArticle.articleTemp += result
                 file.write(result)
+            
+                time.sleep(0.00001)
+                pb.printProgressBar(i + 1, len(list(wpArticle.generic_articleDict.keys())), length = 20)
         file.close()   
+
+
+

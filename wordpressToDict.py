@@ -46,12 +46,12 @@ def processArticlePost(articlePost):
 
   
     title = util.charMorph(articlePost.get('title'))
-    pubDate = util.charMorph(articlePost.get('wp:post_date_gmt'))
-    modDate = util.charMorph(articlePost.get('wp:post_modified_gmt'))
+    pubDate = articlePost.get('wp:post_date_gmt')
+    modDate = articlePost.get('wp:post_modified_gmt')
     description = util.charMorph(articlePost.get('description'))
-    comment_status = util.charMorph(articlePost.get('wp:comment_status'))
+    comment_status = articlePost.get('wp:comment_status')
     tags = util.processArticleTags(articlePost.get('category'))
-    text = 'test'
+    text = str(util.charMorph(articlePost.get('content:encoded')))
    
     objArt = wpArt.wpArticle(i, title,pubDate,modDate,description,comment_status,tags,text)
 
@@ -71,14 +71,14 @@ authorData = myDict.get('rss').get('channel').get('wp:author')
 articleData = myDict.get('rss').get('channel').get('item')
 
 # ---------- PART 2: PROCESS AUTHORS -----------------------------------------------------------------------------------
-
+print()
+print("┌── Processing Authors...")
 pb.printProgressBar(0, len(authorData), length = 20)
 for i, item in enumerate(authorData):
     processAuthor(authorData[i])
     time.sleep(0.00001)
-    pb.printProgressBar(i, len(authorData), length = 20)
-print('Author List Generated')
-
+    pb.printProgressBar(i + 1, len(authorData), length = 20)
+print()
 # ---------- PART 3: PROCESS ARTICLES -----------------------------------------------------------------------------------
 '''
 TODO: Filter by Article Type [Articles, Crossword, Sudoku, ]
@@ -111,16 +111,21 @@ TODO: Filter by Article Type [Articles, Crossword, Sudoku, ]
     Once again, I'll let you decide how to go about doing this [o7 <- salute]
 '''
 
+print("┌── Processing Articles...")
 pb.printProgressBar(0, len(articleData), length = 20)
-
 for i, item in enumerate(articleData):
     processArticlePost(articleData[i])
 
     time.sleep(0.00001)
-    pb.printProgressBar(i, len(articleData), length = 20)
-
-print('Article List Generated' + '(' + str(len(articleData)) + ')')
+    pb.printProgressBar(i + 1, len(articleData), length = 20)
+print("")
 
 with open(file3_loc, "w") as file:
     wpArt.wpArticle.printArticles(file3_loc)
     file.close()
+
+
+
+# print(articleData[5])
+
+

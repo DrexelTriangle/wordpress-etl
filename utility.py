@@ -17,6 +17,7 @@ def charMorph(myStr):
     else:
         result = myStr
         result = result.replace('&amp;', '&')
+        result = result.replace('&nbsp;', ' ')
         return result
     
 
@@ -54,6 +55,9 @@ def GMT_to_EST(gmtDate):
     return now_time.strftime(gmtDate)
 
 def processArticleTags(myLst):
+    startColorCode = f"\033[38;2;255;234;0m"
+    endColorCode = f"\033[0m"
+    # print(f"{startColorCode}Error, no tags given{endColorCode}")
     result = []
     # for item in myLst:
     #     temp = [item.get("#text") if (item.get('@domain') == 'post_tag') else '' for item in myLst]
@@ -67,7 +71,7 @@ def processArticleTags(myLst):
                 result.append(myLst[i].get('#text'))            
                 result.sort(reverse=True)
         except KeyError:
-            result.append("Error, no tags given")
+            result.append(f"Error, no tags given")
             return result
         
     return result

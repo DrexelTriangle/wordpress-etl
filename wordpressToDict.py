@@ -73,11 +73,11 @@ articleData = myDict.get('rss').get('channel').get('item')
 # ---------- PART 2: PROCESS AUTHORS -----------------------------------------------------------------------------------
 print()
 print("┌── Processing Authors...")
-pb.printProgressBar(0, len(authorData), length = 20)
+pb.printProgressBar(0, len(authorData), length = 50)
 for i, item in enumerate(authorData):
     processAuthor(authorData[i])
     time.sleep(0.00001)
-    pb.printProgressBar(i + 1, len(authorData), length = 20)
+    pb.printProgressBar(i + 1, len(authorData), length = 50)
 print()
 # ---------- PART 3: PROCESS ARTICLES -----------------------------------------------------------------------------------
 '''
@@ -112,18 +112,23 @@ TODO: Filter by Article Type [Articles, Crossword, Sudoku, ]
 '''
 
 print("┌── Processing Articles...")
-pb.printProgressBar(0, len(articleData), length = 20)
+pb.printProgressBar(0, len(articleData), length = 50)
 for i, item in enumerate(articleData):
     processArticlePost(articleData[i])
 
     time.sleep(0.00001)
-    pb.printProgressBar(i + 1, len(articleData), length = 20)
+    pb.printProgressBar(i + 1, len(articleData), length = 50)
 print("")
 
 with open(file3_loc, "w") as file:
     wpArt.wpArticle.printArticles(file3_loc)
     file.close()
 
+
+'''
+TODO: SQL Generation
+
+'''
 
 
 # print(articleData[5])

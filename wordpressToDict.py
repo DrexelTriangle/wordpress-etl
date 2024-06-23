@@ -2,13 +2,9 @@
 # wordpressToDict
 # PURPOSE: Take a collection of wordpress posts and convert them to a Python Dictionary, as well as a JSON Object
 
-from xmltodict import *
-from progressBar import *
-from utility import *
-from wpArticle import *
-from wpAuthor import *
+from imports import *
 
-# ---------- INITIAL VARIABLES & FUNCTIONS ------------------------------------------------------------------------------
+
 wp_xmlContent = None
 myDict = {}
 authorData = {}
@@ -18,51 +14,6 @@ wpFile = ".\\rawdata\\tri-wpdump_4-1-24.xml"
 file2_loc = ".\\Dumps\\test_dump.txt"
 file3_loc = ".\\Dumps\\articleDump.txt"
 file4_loc = ".\\Output\\wpSQL.txt"
-
-def processAuthor(author):
-    fName = ''
-    lName = ''
-    email = ''
-    if ( (authorData[i].get('wp:author_first_name') is None) and (author.get('wp:author_last_name') is None)):
-        name = charMorph(authorData[i].get('wp:author_display_name'))
-        newName = parseName(name)
-        fName = newName[0]
-        lName = newName[1]
-    else:
-        fName = charMorph(author.get('wp:author_first_name'))
-        lName = charMorph(author.get('wp:author_last_name'))
-
-    if ( (author.get('wp:author_email') is not None) ):
-        email = charMorph(author.get('wp:author_email'))
-
-    obj = wpAuthor(fName, lName, email)
-
-def processArticlePost(articlePost):
-    title = '' #can never be none
-    pubDate = '' #can never be none
-    modDate = '' #can never be none. Can be in gmt / est
-    description = '' #can be none
-    comment_status = '' #can never be none
-    priority = False
-    breaking_news = False 
-    tags = []
-    text = '' 
-
-  
-    title = charMorph(articlePost.get('title'))
-    pubDate = articlePost.get('wp:post_date_gmt')
-    modDate = articlePost.get('wp:post_modified_gmt')
-    description = charMorph(articlePost.get('description'))
-    comment_status = articlePost.get('wp:comment_status')
-    tags = processArticleTags(articlePost.get('category'))
-    text = str(charMorph(articlePost.get('content:encoded')))
-   
-    objArt = wpArticle(i, title,pubDate,modDate,description,comment_status,tags,text)
-
-    
-# -----------------------------------------------------------------------------------------------------------------------
-# PART 1: SETUP
-
 
 # Grab XML Content, convert to dictionary, grab author & article data  
 print("Converting XML to Dictionary...")
@@ -74,22 +25,13 @@ myDict = parse(wp_xmlContent)
 authorData = myDict.get('rss').get('channel').get('wp:author')
 articleData = myDict.get('rss').get('channel').get('item')
 
-# ---------- PART 2: PROCESS AUTHORS -----------------------------------------------------------------------------------
-print()
+# Process Authors, Articles
 print("┌── Processing Authors...")
-printProgressBar(0, len(authorData), length = 50)
-for i, item in enumerate(authorData):
-    processAuthor(authorData[i])
-    printProgressBar(i + 1, len(authorData), length = 50)
-print()
-# ---------- PART 3: PROCESS ARTICLES -----------------------------------------------------------------------------------
+processAuthors(authorData)
 
 print("┌── Processing Articles...")
-printProgressBar(0, len(articleData), length = 50)
-for i, item in enumerate(articleData):
-    processArticlePost(articleData[i])
-    printProgressBar(i + 1, len(articleData), length = 50)
-print("")
+processArticles(articleData)
+
 
 with open(file3_loc, "w") as file:
     wpArticle.printArticles(file3_loc)

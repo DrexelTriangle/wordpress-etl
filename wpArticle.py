@@ -1,4 +1,5 @@
 from progressBar import *
+from utility import *
 
 class wpArticle:
     articleCount = 0
@@ -45,5 +46,32 @@ class wpArticle:
                 printProgressBar(i + 1, len(list(wpArticle.generic_articleDict.keys())), length = 50)
         file.close()   
 
+def processArticles(articleData):
+    title = '' #can never be none
+    pubDate = '' #can never be none
+    modDate = '' #can never be none. Can be in gmt / est
+    description = '' #can be none
+    comment_status = '' #can never be none
+    priority = False
+    breaking_news = False 
+    tags = []
+    text = '' 
 
+    printProgressBar(0, len(articleData), length = 50)
+    for i, item in enumerate(articleData):
+        articlePost = articleData[i]
+
+        title = charMorph(articlePost.get('title'))
+        pubDate = articlePost.get('wp:post_date_gmt')
+        modDate = articlePost.get('wp:post_modified_gmt')
+        description = charMorph(articlePost.get('description'))
+        comment_status = articlePost.get('wp:comment_status')
+        tags = processArticleTags(articlePost.get('category'))
+        text = str(charMorph(articlePost.get('content:encoded')))
+    
+        objArt = wpArticle(i, title,pubDate,modDate,description,comment_status,tags,text)
+
+
+        printProgressBar(i + 1, len(articleData), length = 50)
+    print()
 

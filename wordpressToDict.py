@@ -2,12 +2,12 @@
 # wordpressToDict
 # PURPOSE: Take a collection of wordpress posts and convert them to a Python Dictionary, as well as a JSON Object
 
-import xmltodict
+from xmltodict import *
 import time
-import progressBar as pb
-import utility as util
-import wpArticle as wpArt
-import wpAuthor as wpAuth
+from progressBar import *
+from utility import *
+from wpArticle import *
+from wpAuthor import *
 
 # ---------- INITIAL VARIABLES & FUNCTIONS ------------------------------------------------------------------------------
 wp_xmlContent = None
@@ -25,18 +25,18 @@ def processAuthor(author):
     lName = ''
     email = ''
     if ( (authorData[i].get('wp:author_first_name') is None) and (author.get('wp:author_last_name') is None)):
-        name = util.charMorph(authorData[i].get('wp:author_display_name'))
-        newName = util.parseName(name)
+        name = charMorph(authorData[i].get('wp:author_display_name'))
+        newName = parseName(name)
         fName = newName[0]
         lName = newName[1]
     else:
-        fName = util.charMorph(author.get('wp:author_first_name'))
-        lName = util.charMorph(author.get('wp:author_last_name'))
+        fName = charMorph(author.get('wp:author_first_name'))
+        lName = charMorph(author.get('wp:author_last_name'))
 
     if ( (author.get('wp:author_email') is not None) ):
-        email = util.charMorph(author.get('wp:author_email'))
+        email = charMorph(author.get('wp:author_email'))
 
-    obj = wpAuth.wpAuthor(fName, lName, email)
+    obj = wpAuthor(fName, lName, email)
 
 def processArticlePost(articlePost):
     title = '' #can never be none
@@ -50,15 +50,15 @@ def processArticlePost(articlePost):
     text = '' 
 
   
-    title = util.charMorph(articlePost.get('title'))
+    title = charMorph(articlePost.get('title'))
     pubDate = articlePost.get('wp:post_date_gmt')
     modDate = articlePost.get('wp:post_modified_gmt')
-    description = util.charMorph(articlePost.get('description'))
+    description = charMorph(articlePost.get('description'))
     comment_status = articlePost.get('wp:comment_status')
-    tags = util.processArticleTags(articlePost.get('category'))
-    text = str(util.charMorph(articlePost.get('content:encoded')))
+    tags = processArticleTags(articlePost.get('category'))
+    text = str(charMorph(articlePost.get('content:encoded')))
    
-    objArt = wpArt.wpArticle(i, title,pubDate,modDate,description,comment_status,tags,text)
+    objArt = wpArticle(i, title,pubDate,modDate,description,comment_status,tags,text)
 
     
 # -----------------------------------------------------------------------------------------------------------------------
@@ -71,45 +71,38 @@ with open(wpFile, "+r", encoding='utf-8') as file:
     wp_xmlContent = file.read()
     file.close()
 
-myDict = xmltodict.parse(wp_xmlContent)
+myDict = parse(wp_xmlContent)
 authorData = myDict.get('rss').get('channel').get('wp:author')
 articleData = myDict.get('rss').get('channel').get('item')
 
 # ---------- PART 2: PROCESS AUTHORS -----------------------------------------------------------------------------------
 print()
 print("┌── Processing Authors...")
-pb.printProgressBar(0, len(authorData), length = 50)
+printProgressBar(0, len(authorData), length = 50)
 for i, item in enumerate(authorData):
     processAuthor(authorData[i])
     time.sleep(0.00001)
-    pb.printProgressBar(i + 1, len(authorData), length = 50)
+    printProgressBar(i + 1, len(authorData), length = 50)
 print()
 # ---------- PART 3: PROCESS ARTICLES -----------------------------------------------------------------------------------
 
 print("┌── Processing Articles...")
-pb.printProgressBar(0, len(articleData), length = 50)
+printProgressBar(0, len(articleData), length = 50)
 for i, item in enumerate(articleData):
     processArticlePost(articleData[i])
 
     time.sleep(0.00001)
-    pb.printProgressBar(i + 1, len(articleData), length = 50)
+    printProgressBar(i + 1, len(articleData), length = 50)
 print("")
 
 with open(file3_loc, "w") as file:
-    wpArt.wpArticle.printArticles(file3_loc)
+    wpArticle.printArticles(file3_loc)
     file.close()
 
 
 with open(file4_loc, "a+", encoding="utf-8") as file:
     file.write("CREATE TABLE authors (id INT, first_name VARCHAR(256), last_name VARCHAR(256), email VARCHAR(256), role int);\n")
-    for i in wpAuth.wpAuthor.authorDict:
-        itm = wpAuth.wpAuthor.authorDict[i]
+    for i in wpAuthor.authorDict:
+        itm = wpAuthor.authorDict[i]
         file.write(f"INSERT INTO authors (id, first_name, last_name, email, role) VALUES ({itm.id}, {itm.firstName}, {itm.lastName}, {itm.email}, {itm.role});\n")
     file.close()
-
-
-
-
-# print(articleData[5])
-
-

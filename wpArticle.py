@@ -1,4 +1,4 @@
-import progressBar as pb
+from progressBar import *
 import time
 
 class wpArticle:
@@ -26,7 +26,7 @@ class wpArticle:
     def printArticles(file3_loc):
         print("┌── Writing Articles to File...")
     
-        pb.printProgressBar(0, len(list(wpArticle.generic_articleDict.keys())), length = 50)
+        printProgressBar(0, len(list(wpArticle.generic_articleDict.keys())), length = 50)
         with open(file3_loc, "a", encoding="utf-8") as file:
             for i, item in enumerate(list(wpArticle.generic_articleDict.keys())):
                 result = ''
@@ -44,7 +44,7 @@ class wpArticle:
                 file.write(result)
             
                 time.sleep(0.00001)
-                pb.printProgressBar(i + 1, len(list(wpArticle.generic_articleDict.keys())), length = 50)
+                printProgressBar(i + 1, len(list(wpArticle.generic_articleDict.keys())), length = 50)
         file.close()   
 
 

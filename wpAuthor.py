@@ -1,4 +1,4 @@
-import utility as util
+from utility import *
 
 class wpAuthor:
     authorCount = 0
@@ -11,7 +11,7 @@ class wpAuthor:
         self.id = wpAuthor.authorCount
         self.firstName = firstName
         self.lastName = lastName
-        self.username = util.generateUsername(self.firstName, self.lastName)
+        self.username = generateUsername(self.firstName, self.lastName)
         self.email = email
         self.role = role
         

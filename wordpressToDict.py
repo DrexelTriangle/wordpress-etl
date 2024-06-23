@@ -15,13 +15,15 @@ myDict = {}
 authorData = {}
 articleData = {}
 
-wpFile = ".\\tri-wpdump_4-1-24.xml"
-file2_loc = ".\\test_dump.txt"
-file3_loc = ".\\articleDump.txt"
+wpFile = ".\\rawdata\\tri-wpdump_4-1-24.xml"
+file2_loc = ".\\Dumps\\test_dump.txt"
+file3_loc = ".\\Dumps\\articleDump.txt"
+file4_loc = ".\\Output\\wpSQL.txt"
 
 def processAuthor(author):
     fName = ''
     lName = ''
+    email = ''
     if ( (authorData[i].get('wp:author_first_name') is None) and (author.get('wp:author_last_name') is None)):
         name = util.charMorph(authorData[i].get('wp:author_display_name'))
         newName = util.parseName(name)
@@ -30,8 +32,11 @@ def processAuthor(author):
     else:
         fName = util.charMorph(author.get('wp:author_first_name'))
         lName = util.charMorph(author.get('wp:author_last_name'))
+
+    if ( (author.get('wp:author_email') is not None) ):
         email = util.charMorph(author.get('wp:author_email'))
-        obj = wpAuth.wpAuthor(fName, lName, email)
+
+    obj = wpAuth.wpAuthor(fName, lName, email)
 
 def processArticlePost(articlePost):
     title = '' #can never be none
@@ -80,36 +85,6 @@ for i, item in enumerate(authorData):
     pb.printProgressBar(i + 1, len(authorData), length = 50)
 print()
 # ---------- PART 3: PROCESS ARTICLES -----------------------------------------------------------------------------------
-'''
-TODO: Filter by Article Type [Articles, Crossword, Sudoku, ]
-    So the Triangle stores their comics, crossword, and sudoku puzzles as articles.
-    Now, it would be nice if they stored them in some consistent manner, right?
-    They don't...they don't at all.
-    
-    CROSSWORD/SUDOKU POSTS
-      - 'crossword'/'sudoku' in tag
-      - 'crossword'/'sudoku' in title
-      - 'crossword'/'sudoku' in embed (BEST BET)
-        - All of the crosswords are made using the PuzzleMe puzzle maker. 
-        - The embeds will look something like: 
-          - [puzzleme set=<set-string> id=<id-string> type=<"crossword" OR "sudoku">]
-          - We could use a regEx pattern to look for that pattern and that should find all the corresponding puzzles!
-    
-    We'll worry about grabbing the necessary data later.
-    Right now, we just need to worry about separating the articles into there appropriate lists.
-    Here was my initial solution:
-
-    ARTICLE SORTING SOLUTION (Ken's idea)
-        1. Add a new class field called [type]
-        2. Build the object, as usual.
-        3. Within the __init__ constructor, add a function that sets the [type] field accordingly.
-        4. Append the object to a different list, depending on the value in the [type] field
-
-    That was my initial idea, but feel free to think about something else.
-    The main issue with that answer is keeping track of ID numbers across the different lists. 
-    The other idea would be to parse through everything twice: Parse everything, then sort.
-    Once again, I'll let you decide how to go about doing this [o7 <- salute]
-'''
 
 print("┌── Processing Articles...")
 pb.printProgressBar(0, len(articleData), length = 50)
@@ -125,10 +100,14 @@ with open(file3_loc, "w") as file:
     file.close()
 
 
-'''
-TODO: SQL Generation
+with open(file4_loc, "a+", encoding="utf-8") as file:
+    file.write("CREATE TABLE authors (id INT, first_name VARCHAR(256), last_name VARCHAR(256), email VARCHAR(256), role int);\n")
+    for i in wpAuth.wpAuthor.authorDict:
+        itm = wpAuth.wpAuthor.authorDict[i]
+        file.write(f"INSERT INTO authors (id, first_name, last_name, email, role) VALUES ({itm.id}, {itm.firstName}, {itm.lastName}, {itm.email}, {itm.role});\n")
+    file.close()
 
-'''
+
 
 
 # print(articleData[5])

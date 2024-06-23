@@ -1,4 +1,5 @@
-tri-wpdump_4-1-24.xml
-wpDict.txt
-articleDump.txt
+output/*
+dumps/*
+rawdata/*
 */__pycache__/*
+wordpressToDict.py

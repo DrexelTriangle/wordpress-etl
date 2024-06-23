@@ -23,19 +23,6 @@ class wpArticle:
         wpArticle.generic_articleDict.update({self.id : self})
 
 
-    def stringifyGenericArticle(index):
-        result = ''
-        dict = wpArticle.generic_articleDict[index]
-        result += f'''id: {dict.id}\n'''
-        result += f'''title: {dict.title}\n'''
-        result += f'''pubDate: {dict.pubDate}\n'''
-        result += f'''modDate: {dict.modDate}\n''' 
-        result += f'''description: {dict.description}\n'''
-        result += f'''commentStatus: {dict.commentStatus}\n'''
-        result += f'''tags: {dict.tags}\n'''
-        result += f'''text: \n\n\n{dict.text}\n\n'''
-        return result
-    
     def printArticles(file3_loc):
         print("┌── Writing Articles to File...")
     

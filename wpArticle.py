@@ -1,5 +1,4 @@
 from progressBar import *
-import time
 
 class wpArticle:
     articleCount = 0
@@ -43,7 +42,6 @@ class wpArticle:
                 wpArticle.articleTemp += result
                 file.write(result)
             
-                time.sleep(0.00001)
                 printProgressBar(i + 1, len(list(wpArticle.generic_articleDict.keys())), length = 50)
         file.close()   
 

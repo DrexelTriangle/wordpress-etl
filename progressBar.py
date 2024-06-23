@@ -1,5 +1,8 @@
+import time
+
 # Print iterations progress
 def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '▊', printEnd = "\r"):
+    time.sleep(0.00001)
     if iteration == total: 
         fill = '█'
     """

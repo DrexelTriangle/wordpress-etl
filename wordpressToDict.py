@@ -3,7 +3,6 @@
 # PURPOSE: Take a collection of wordpress posts and convert them to a Python Dictionary, as well as a JSON Object
 
 from xmltodict import *
-import time
 from progressBar import *
 from utility import *
 from wpArticle import *
@@ -81,7 +80,6 @@ print("┌── Processing Authors...")
 printProgressBar(0, len(authorData), length = 50)
 for i, item in enumerate(authorData):
     processAuthor(authorData[i])
-    time.sleep(0.00001)
     printProgressBar(i + 1, len(authorData), length = 50)
 print()
 # ---------- PART 3: PROCESS ARTICLES -----------------------------------------------------------------------------------
@@ -90,8 +88,6 @@ print("┌── Processing Articles...")
 printProgressBar(0, len(articleData), length = 50)
 for i, item in enumerate(articleData):
     processArticlePost(articleData[i])
-
-    time.sleep(0.00001)
     printProgressBar(i + 1, len(articleData), length = 50)
 print("")
 

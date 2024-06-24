@@ -27,10 +27,8 @@ processAuthors(authorData)
 print("┌── Processing Articles...")
 processArticles(articleData)
 
-
-with open(file3_loc, "w") as file:
-    wpArticle.printArticles(file3_loc)
-    file.close()
+# Additional Testing 
+writeArticlesToFile(file3_loc)
 
 
 with open(file4_loc, "a+", encoding="utf-8") as file:

@@ -3,6 +3,7 @@ from progressBar import *
 from utility import *
 from classes.wpArticle import *
 from classes.wpAuthor import *
+from testing import *
 
 wpFile = ".\\rawdata\\tri-wpdump_4-1-24.xml"
 file2_loc = ".\\Dumps\\test_dump.txt"

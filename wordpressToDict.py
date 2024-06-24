@@ -16,7 +16,7 @@ file3_loc = ".\\Dumps\\articleDump.txt"
 file4_loc = ".\\Output\\wpSQL.txt"
 
 # Grab XML Content, convert to dictionary, grab author & article data  
-print("Converting XML to Dictionary...")
+print("Converting Posts XML to Dictionary...")
 with open(wpFile, "+r", encoding='utf-8') as file:
     wp_xmlContent = file.read()
     file.close()

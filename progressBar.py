@@ -23,7 +23,7 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     
     spaceBuffer = " " * (len("100.0") - len(percent))
 
-    print(f'\r{prefix} ┤{bar}| {suffix} [{spaceBuffer}\033[0;33m{percent}%\033[0m]', end = printEnd)
+    print(f'\r{prefix}└┤{bar}| {suffix} [{spaceBuffer}\033[0;33m{percent}%\033[0m]', end = printEnd)
     # Print New Line on Complete
     if iteration == total: 
         print(f'\r{prefix}└┤\x1b[38;2;82;105;64m{bar}\x1b[0m| {suffix} [{spaceBuffer}\033[0;33m{percent}%\033[0m]', end = printEnd)

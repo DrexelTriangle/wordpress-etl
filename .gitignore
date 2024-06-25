@@ -1,5 +1,6 @@
 output/wpDict.txt
 output/wpSQL.txt
+output/wpGuestAuthors.txt
 dumps/articleDump.txt
 dumps/authorDump.txt
 rawdata/thetriangle.WordPress.2024-06-22 (1).xml

@@ -4,21 +4,33 @@
 
 from imports import *
 
-
-wp_xmlContent = None
-myDict = {}
+wp_xmlPostContent = None
+wp_xmlGuestAuthors = None
+wpPostsDict = {}
+wpGuestAuthorsDict = {}
 authorData = {}
 articleData = {}
 
+
 # Grab XML Content, convert to dictionary, grab author & article data  
 print("Converting Posts XML to Dictionary...")
-with open(wpFile, "+r", encoding='utf-8') as file:
-    wp_xmlContent = file.read()
+with open(wp_postsExportFile, "+r", encoding='utf-8') as file:
+    wp_xmlPostContent = file.read()
     file.close()
 
-myDict = parse(wp_xmlContent)
-authorData = myDict.get('rss').get('channel').get('wp:author')
-articleData = myDict.get('rss').get('channel').get('item')
+with open(wp_guestAuthorsExportFile, "+r", encoding='utf-8') as file:
+    wp_xmlGuestAuthors = file.read()
+    file.close()
+
+print("Parsing wordpress posts...")
+wpPostsDict = parse(wp_xmlPostContent)
+authorData = wpPostsDict.get('rss').get('channel').get('wp:author')
+articleData = wpPostsDict.get('rss').get('channel').get('item')
+
+print("Parsing wordpress guest authors...")
+wpGuestAuthorsDict = parse(wp_xmlGuestAuthors)
+
+
 
 # Process Authors, Articles
 print("┌── Processing Authors...")

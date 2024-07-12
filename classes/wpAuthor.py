@@ -50,3 +50,49 @@ def processAuthors(authorData):
 
         printProgressBar(i + 1, len(authorData), length = 50)
     print()
+
+
+def processGuestAuthors(guestAuthorData):
+    fName = ''
+    lName = ''
+    email = ''
+
+    
+    for i, item in enumerate(guestAuthorData):
+        fName = ''
+        lName = ''
+        email = ''
+        displayName = ''
+        data = guestAuthorData[i].get('wp:postmeta')
+        for j in range(len(data)):
+            #print(data[j])
+            value = data[j]
+            if (value.get('wp:meta_key') == 'cap-first_name'):
+                if not(value.get('wp:meta_value') is None):
+                    fName = value.get('wp:meta_value')
+            if (value.get('wp:meta_key') == 'cap-last_name'):
+                if not(value.get('wp:meta_value') is None):
+                    lName = value.get('wp:meta_value')
+            
+            if (value.get('wp:meta_key') == 'cap-user_email'):
+                if not(value.get('wp:meta_value') is None):
+                    email = value.get('wp:meta_value')
+
+            if (value.get('wp:meta_key') == 'cap-display_name'):
+                displayName = value.get('wp:meta_value')
+
+        if (fName == '' and lName == '' and email == ''):
+            print(displayName)
+            if (len(displayName.split(' ')) == 2):
+                temp2 = displayName.split(' ')
+                fName = temp2[0]
+                lName = temp2[1]
+            else:
+                fName = displayName 
+            
+        # print(f"{fName} {lName}  \033[0;30m\x1B[3m({email})\x1B[0m\033[0m")
+        obj = wpAuthor(fName.lower().capitalize(), lName.lower().capitalize(), email)
+           
+
+        
+    print()

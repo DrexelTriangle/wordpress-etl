@@ -3,6 +3,7 @@
 # PURPOSE: Take a collection of wordpress posts and convert them to a Python Dictionary, as well as a JSON Object
 
 from imports import *
+from pprint import *
 
 wp_xmlPostContent = None
 wp_xmlGuestAuthors = None
@@ -29,6 +30,9 @@ articleData = wpPostsDict.get('rss').get('channel').get('item')
 
 print("Parsing wordpress guest authors...")
 wpGuestAuthorsDict = parse(wp_xmlGuestAuthors)
+guestAuthorData = wpGuestAuthorsDict.get('rss').get('channel').get('item')
+
+visualizeDictionary(wpGuestAuthorsDict, file6_loc)
 
 
 
@@ -36,13 +40,23 @@ wpGuestAuthorsDict = parse(wp_xmlGuestAuthors)
 print("┌── Processing Authors...")
 processAuthors(authorData)
 
+print("┌── Processing Guest Authors...")
+processGuestAuthors(guestAuthorData)
+
 print("┌── Processing Articles...")
 processArticles(articleData)
 
 # Additional Testing 
 writeArticlesToFile(file3_loc)
 
+print("Writing Authors...")
+wpAuthor.printAuthors()
+with open(file7_loc, "w+", encoding="utf-8") as file:
+    file.write(wpAuthor.authorTemp)
+    file.close()
+    
 
+print("Writing SQL...")
 with open(file4_loc, "a+", encoding="utf-8") as file:
     file.write("CREATE TABLE authors (id INT, first_name VARCHAR(256), last_name VARCHAR(256), email VARCHAR(256), role int);\n")
     for i in wpAuthor.authorDict:

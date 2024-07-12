@@ -6,9 +6,11 @@ from classes.wpAuthor import *
 from testing import *
 
 wp_postsExportFile = ".\\rawdata\\tri-wpdump_4-1-24.xml"
-wp_guestAuthorsExportFile = ".\\rawdata\\thetriangle.WordPress.2024-06-22 (1).xml"
+wp_guestAuthorsExportFile = ".\\rawdata\\thetriangle.WordPress.2024-07-10.xml"
 
 file2_loc = ".\\dumps\\test_dump.txt"
 file3_loc = ".\\dumps\\articleDump.txt"
 file4_loc = ".\\output\\wpSQL.txt"
 file5_loc = ".\\output\\wpGuestAuthors.txt"
+file6_loc = ".\\dumps\\guestArticleDump.txt"
+file7_loc = ".\\dumps\\authorDump.txt"

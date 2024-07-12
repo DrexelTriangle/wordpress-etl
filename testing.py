@@ -7,7 +7,8 @@ def writeArticlesToFile(fileLoc):
         file.close()
 
 def visualizeDictionary(myDict, fileLoc):
-    output = pprint.pformat(myDict)
+    output = pformat(myDict)
     with open(fileLoc, 'w+') as file:
         file.write(output)
         file.close()
+

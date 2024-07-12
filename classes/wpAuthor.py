@@ -57,7 +57,7 @@ def processGuestAuthors(guestAuthorData):
     lName = ''
     email = ''
 
-    
+    printProgressBar(0, len(guestAuthorData), length = 50)
     for i, item in enumerate(guestAuthorData):
         fName = ''
         lName = ''
@@ -82,7 +82,7 @@ def processGuestAuthors(guestAuthorData):
                 displayName = value.get('wp:meta_value')
 
         if (fName == '' and lName == '' and email == ''):
-            print(displayName)
+            #print(displayName)
             if (len(displayName.split(' ')) == 2):
                 temp2 = displayName.split(' ')
                 fName = temp2[0]
@@ -92,6 +92,7 @@ def processGuestAuthors(guestAuthorData):
             
         # print(f"{fName} {lName}  \033[0;30m\x1B[3m({email})\x1B[0m\033[0m")
         obj = wpAuthor(fName.lower().capitalize(), lName.lower().capitalize(), email)
+        printProgressBar(i + 1, len(guestAuthorData), length = 50)
            
 
         

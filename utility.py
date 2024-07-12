@@ -59,6 +59,8 @@ def processArticleTags(myLst):
     endColorCode = f"\033[0m"
     # print(f"{startColorCode}Error, no tags given{endColorCode}")
     result = []
+    tags = []
+    articleAuthors = []
     # for item in myLst:
     #     temp = [item.get("#text") if (item.get('@domain') == 'post_tag') else '' for item in myLst]
     #     temp.sort(reverse=True)
@@ -68,12 +70,16 @@ def processArticleTags(myLst):
     for i in range(len(myLst)):
         try:
             if (myLst[i].get('@domain') == 'post_tag'):
-                result.append(myLst[i].get('#text'))            
-                result.sort(reverse=True)
+                tags.append(myLst[i].get('#text'))            
+                tags.sort(reverse=True)
+            if (myLst[i].get('@domain') == 'author'):
+                articleAuthors.append(myLst[i].get('@nicename'))            
+                articleAuthors.sort(reverse=True)
         except KeyError:
-            result.append(f"Error, no tags given")
-            return result
-        
+            tags.append(f"Error, no tags given")
+            
+    result.append(tags)
+    result.append(articleAuthors)
     return result
 
     

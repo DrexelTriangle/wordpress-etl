@@ -49,13 +49,6 @@ processArticles(articleData)
 # Additional Testing 
 writeArticlesToFile(file3_loc)
 
-print("Writing Authors...")
-wpAuthor.printAuthors()
-with open(file7_loc, "w+", encoding="utf-8") as file:
-    file.write(wpAuthor.authorTemp)
-    file.close()
-    
-
 print("Writing SQL...")
 with open(file4_loc, "a+", encoding="utf-8") as file:
     file.write("CREATE TABLE authors (id INT, first_name VARCHAR(256), last_name VARCHAR(256), email VARCHAR(256), role int);\n")

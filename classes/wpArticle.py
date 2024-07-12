@@ -7,7 +7,7 @@ class wpArticle:
     misc_articleDict = {}
     articleTemp = ''
 
-    def __init__(self, id, title, pubDate, modDate, description, commentStatus, tags, text):
+    def __init__(self, id, title, pubDate, modDate, description, commentStatus, tags, authors, text):
         wpArticle.articleCount += 1
         self.priotity = False
         self.breakingNews = False
@@ -18,6 +18,7 @@ class wpArticle:
         self.description = description
         self.commentStatus = commentStatus
         self.tags = tags
+        self.authors = authors
         self.text = text
 
         wpArticle.generic_articleDict.update({self.id : self})
@@ -38,6 +39,7 @@ class wpArticle:
                 result += f'''description: {dict.description}\n'''
                 result += f'''commentStatus: {dict.commentStatus}\n'''
                 result += f'''tags: {dict.tags}\n'''
+                result += f'''authors: {dict.authors}\n'''
                 result += f'''text: \n\n{dict.text}\n\n'''
                 result += f'''----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n'''
                 wpArticle.articleTemp += result
@@ -55,6 +57,7 @@ def processArticles(articleData):
     priority = False
     breaking_news = False 
     tags = []
+    authors = []
     text = '' 
 
     printProgressBar(0, len(articleData), length = 50)
@@ -66,10 +69,11 @@ def processArticles(articleData):
         modDate = articlePost.get('wp:post_modified_gmt')
         description = charMorph(articlePost.get('description'))
         comment_status = articlePost.get('wp:comment_status')
-        tags = processArticleTags(articlePost.get('category'))
+        metaTags =  processArticleTags(articlePost.get('category'))
+        tags = metaTags[0]
+        authors = metaTags[1]
         text = str(charMorph(articlePost.get('content:encoded')))
-    
-        objArt = wpArticle(i, title,pubDate,modDate,description,comment_status,tags,text)
+        objArt = wpArticle(i, title,pubDate,modDate,description,comment_status,tags, authors, text)
 
 
         printProgressBar(i + 1, len(articleData), length = 50)

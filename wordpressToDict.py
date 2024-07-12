@@ -47,7 +47,8 @@ print("┌── Processing Articles...")
 processArticles(articleData)
 
 # Additional Testing 
-writeArticlesToFile(file3_loc)
+# writeArticlesToFile(file3_loc)
+locateAllAuthors()
 
 print("Writing SQL...")
 with open(file4_loc, "a+", encoding="utf-8") as file:

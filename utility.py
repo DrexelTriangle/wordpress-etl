@@ -73,7 +73,8 @@ def processArticleTags(myLst):
                 tags.append(myLst[i].get('#text'))            
                 tags.sort(reverse=True)
             if (myLst[i].get('@domain') == 'author'):
-                articleAuthors.append(myLst[i].get('@nicename'))            
+                nicename = myLst[i].get('@nicename')
+                articleAuthors.append(nicename.replace('cap-', '').replace('_', '-'))            
                 articleAuthors.sort(reverse=True)
         except KeyError:
             tags.append(f"Error, no tags given")

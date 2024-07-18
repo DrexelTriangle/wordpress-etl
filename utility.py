@@ -47,6 +47,8 @@ def generateUsername(first, last):
         return None
     if (last is None):
         return None
+    first = first.replace(' ', "").replace('-', "")
+    last = last.replace(' ', "").replace('-', "")
     return first.lower() + '.' + last.lower()
 
 

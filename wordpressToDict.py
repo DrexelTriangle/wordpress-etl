@@ -48,6 +48,11 @@ processArticles(articleData)
 
 # Additional Testing 
 # writeArticlesToFile(file3_loc)
+wpAuthor.printAuthors()
+with open(file7_loc, "w+", encoding="utf-8") as file:
+    file.write(wpAuthor.authorTemp)
+    file.close()
+
 locateAllAuthors()
 wpAuthor.printAuthors()
 with open(file7_loc, "w+", encoding="utf-8") as file:

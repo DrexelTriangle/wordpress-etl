@@ -16,6 +16,7 @@ class wpAuthor:
         self.username = generateUsername(self.firstName, self.lastName)
         self.email = email
         self.role = role
+        self.alias = ""
         
         wpAuthor.authorDict.update({self.id : self})
         wpAuthor.authorUsernames.append(self.username)
@@ -107,6 +108,35 @@ def loopList(lst):
     lst.pop(0)
     return lst
 
+def bindAlias(alias):
+    print('\033[1A\033[K' * (6), end='')
+    print(f"BINDING [\033[0;33m{alias}\033[0m] TO EXISTING AUTHOR")
+    condition = True
+    while(condition):
+        authorID = int(input("      \033[0;30m(Enter ID for existing author)\033[0m\n\n\n\n\n\n> "))
+        auth = wpAuthor.authorDict[authorID]
+        _name = f"{auth.firstName} {auth.lastName}"
+        _email = f"{auth.email}"
+        _alias = f"{auth.alias}"
+        bodyWidth = max(len(_name), len(_email), len(_alias))
+        print('\033[1A\033[K' * (7), end='')
+        print("      ┌" + ("─" * (bodyWidth + 2)) +"┐" )
+        print(f"      │ {_name} {" " * (bodyWidth - len(_name))}│")
+        print(f"      │ {authorID} {" " * (bodyWidth - len(str(authorID)))}│")
+        print(f"      │ {_email} {" " * (bodyWidth - len(_email))}│")
+        print(f"      │ {_alias} {" " * (bodyWidth - len(_alias))}│")
+        print("      └" + ("─" * ((bodyWidth) + 2)) +"┘" )
+        print()
+        print("")
+        usrChoice = input(f"Bind [\033[0;33m{alias}\033[0m] to this author (y/n)?> ")
+        match usrChoice:
+            case 'y':
+                exit(7)
+            case 'n':
+                condition = False
+                print('\033[1A\033[K' * (10), end='')
+                break
+        exit(7)
 
 def mendUnfoundAuthors(unfound):
     bottomMsgCount = 0
@@ -156,6 +186,8 @@ def mendUnfoundAuthors(unfound):
                                     continue
                         options = False
                         break
+                    case 1:
+                        bindAlias(unfound[0])
                     case _:
                         exit(7)
                         

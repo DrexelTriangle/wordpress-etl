@@ -87,6 +87,7 @@ def locateAllAuthors():
 
             if (db_authName == newAuthorName):
                 authorExists = True
+                auth.alias = uniqueAuthors[i]
                 break
         
         if (authorExists):

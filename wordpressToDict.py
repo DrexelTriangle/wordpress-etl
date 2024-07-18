@@ -48,11 +48,11 @@ processArticles(articleData)
 
 # Additional Testing 
 # writeArticlesToFile(file3_loc)
+locateAllAuthors()
 wpAuthor.printAuthors()
 with open(file7_loc, "w+", encoding="utf-8") as file:
     file.write(wpAuthor.authorTemp)
     file.close()
-locateAllAuthors()
 
 print("Writing SQL...")
 with open(file4_loc, "a+", encoding="utf-8") as file:

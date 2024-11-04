@@ -123,8 +123,6 @@ class Article:
       metaTags =  Article.processTags(articlePost.get('category'))
       tags = metaTags[0]
       authors = metaTags[1]
-      # tags = metaTags[0]
-      # authors = metaTags[1]
       # text = str(charMorph(articlePost.get('content:encoded')))
       obj = Article(i, title,pubDate,modDate,description,comment_status, tags, authors, text)
     

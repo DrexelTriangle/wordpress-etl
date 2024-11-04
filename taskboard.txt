@@ -12,10 +12,11 @@ THINGS TO DO
     [ ] investigate processGuestAuthors Bug
     [x] clean visualize()
 
-  [ ] --- Article.py 
-  [ ] --- newUtility.py
-  [ ] --- progressBar.py
-  [ ] --- Auxillary Files
+  Article.py
+    [x] clean processArticles()  
+    [ ] fleshOut manualMapping menu
+        - Make Menu Class for future reference?
+
 
 
 _________________________________________________________

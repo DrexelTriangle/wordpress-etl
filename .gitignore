@@ -2,5 +2,5 @@ dumps/wpDict.txt
 output/*
 dumps/*
 rawdata/*
-__pycache__/
+__pycache__/*
 

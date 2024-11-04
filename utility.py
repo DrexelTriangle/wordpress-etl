@@ -1,5 +1,7 @@
 from datetime import datetime
 from pytz import timezone
+from difflib import SequenceMatcher
+import pprint
 
 def grabTags(tagObjectList):
     result = []
@@ -36,20 +38,23 @@ def parseName(name):
             
 
         if (len(result) == 1):
-            return [result[0], None]
+            return [result[0], None]    
         else:
             return result
     except:
-        return [name, 'PARSE_FAIL']
+        if (name is None):
+            return ['PARSE_FAIL', 'PARSE_FAIL']
+        else:
+          return [name, 'PARSE_FAIL']
 
-def generateUsername(first, last):
-    if (first is None):
-        return None
-    if (last is None):
-        return None
-    first = first.replace(' ', "").replace('-', "")
-    last = last.replace(' ', "").replace('-', "")
-    return first.lower() + '.' + last.lower()
+def generateUsername(first, last): 
+    result = ''
+    
+    if (not (first is None)):
+        result += first.replace(' ', "").replace('-', "").replace('.', '').replace("'", '').lower() 
+    if (not (last is None)):
+        result += '.' + last.replace(' ', "").replace('-', "").replace('.', '').replace("'", '').lower()
+    return result
 
 
 def GMT_to_EST(gmtDate):
@@ -85,4 +90,11 @@ def processArticleTags(myLst):
     result.append(articleAuthors)
     return result
 
-    
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
+
+def visualizeDictionary(dict, fileName):
+    result = pprint.pformat(dict)
+    with open(fileName, 'w+') as file:
+        file.write(result)
+        file.close()

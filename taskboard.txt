@@ -6,12 +6,13 @@ THINGS TO DO
       [x] make function for dumping data 
       [x] move to Controller file?  
 
-  Article.py
+  Author.py
     [x] clean processAuthors()
-    [] clean processGuestAuthors 
+    [x] clean processGuestAuthors 
+    [ ] investigate processGuestAuthors Bug
     [x] clean visualize()
 
-  [ ] --- Author.py 
+  [ ] --- Article.py 
   [ ] --- newUtility.py
   [ ] --- progressBar.py
   [ ] --- Auxillary Files

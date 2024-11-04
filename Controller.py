@@ -56,3 +56,16 @@ def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
     return [authorData, articleData, guestAuthorData]
 
 
+##############################################################################
+
+def getDictValue(myDict, key):
+  result = ''
+  if (myDict.get('wp:meta_key') == key):
+      if not(myDict.get('wp:meta_value') is None):
+          result = myDict.get('wp:meta_value')
+  return result
+
+
+
+
+

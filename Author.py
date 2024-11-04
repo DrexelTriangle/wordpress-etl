@@ -1,5 +1,6 @@
 from newUtility import *
 from progressBar import *
+from Controller import getDictValue
 
 class Author:
   authorCount = 0
@@ -49,8 +50,16 @@ class Author:
         file.write(str(Author.getAuthor(i)))
       file.close()
     
+  def addAuthor(fName, lName, email, debugLst=None):
+    username = generateUsername(fName, lName)
+    isAllValuesEmpty = (fName == 'NO_FIRST') and (lName == 'NO_LAST') and (email == 'NO_EMAIL') 
+    bySomeone = (fName == 'By')
     
-      
+    if not(username in Author.usernames or isAllValuesEmpty or bySomeone):
+      obj = Author(fName, lName, email)
+    else:
+      if (debugLst != None):
+        debugLst.append([fName, lName, email])
 
   def processAuthors(authorData):
     print('> [author.process-authors] processing authors...')
@@ -78,14 +87,7 @@ class Author:
           email = charMorph(authorEmail)
         
         # Only add user if not already inside object dictionary. 
-        username = generateUsername(fName, lName)
-        isAllValuesEmpty = (fName == 'NO_FIRST') and (lName == 'NO_LAST') and (email == 'NO_EMAIL') 
-        bySomeone = (fName == 'By')
-        
-        if not(username in Author.usernames or isAllValuesEmpty or bySomeone):
-          obj = Author(fName, lName, email)
-        else:
-          authorDupes.append([fName, lName, email])
+        Author.addAuthor(fName, lName, email)
 
         # dupAuthor(authorDupes)
 
@@ -100,16 +102,18 @@ class Author:
     total = len(authorData)
 
     for i, item in enumerate(authorData):
+      # TODO: Something fishy is going on here...
+      # fName, lName, email, displayName = '', '', '', ''
       data = authorData[i].get('wp:postmeta')
       for j in range(len(data)): 
         value = data[j]
+        
         if (value.get('wp:meta_key') == 'cap-first_name'):
             if not(value.get('wp:meta_value') is None):
                 fName = value.get('wp:meta_value')
         if (value.get('wp:meta_key') == 'cap-last_name'):
             if not(value.get('wp:meta_value') is None):
-                lName = value.get('wp:meta_value')
-        
+                lName = value.get('wp:meta_value')  
         if (value.get('wp:meta_key') == 'cap-user_email'):
             if not(value.get('wp:meta_value') is None):
                 email = value.get('wp:meta_value')
@@ -127,17 +131,8 @@ class Author:
                 fName = displayName 
 
         # Only add user if not already inside object dictionary. 
-        tempUsername = generateUsername(fName, lName)
-        isAllValuesEmpty = (fName == 'NO_FIRST') and (lName == 'NO_LAST') and (email == 'NO_EMAIL') 
+        Author.addAuthor(fName, lName, email)
         
-        if not(tempUsername in Author.usernames or isAllValuesEmpty):
-            obj = Author(fName, lName, email)
-        else:
-            authorDupes.append([fName, lName, email])
-        
-
-    
-
     # TODO: Visualize authors
     Author.visualize()
     print('> [author.process-guest-authors] done.')

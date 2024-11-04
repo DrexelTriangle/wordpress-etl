@@ -1,6 +1,8 @@
-dumps/wpDict.txt
-output/*
+__pycache__/
 dumps/*
+output/*
 rawdata/*
-__pycache__/*
+visualizations/*
+temp.txt
+result.txt
 

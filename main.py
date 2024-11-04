@@ -4,6 +4,7 @@ from Author import *
 from Article import *
 from json import *
 import os as OS 
+from Controller import parseDictionary
 
 def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
     wp_xmlPostContent, wp_xmlGuestAuthors = None, None
@@ -11,17 +12,9 @@ def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
 
     # Grab XML Content, convert to dictionary, grab author & article data  
     print("Converting Posts XML to Dictionary...")
-    with open(wp_postsExportFile, "+r", encoding='utf-8') as file:
-      wp_xmlPostContent = file.read()
-      file.close()
-
-    with open(wp_guestAuthorsExportFile, "+r", encoding='utf-8') as file:
-      wp_xmlGuestAuthors = file.read()
-      file.close()
     
-    print("> [xml-setup] Parsing wordpress posts and guest authors...")
-    wpPostsDict = parse(wp_xmlPostContent)
-    wpGuestAuthorsDict = parse(wp_xmlGuestAuthors)
+    wpPostsDict = parseDictionary(wp_postsExportFile)
+    wpGuestAuthorsDict = parseDictionary(wp_guestAuthorsExportFile)
 
     authorData = wpPostsDict.get('rss').get('channel').get('wp:author')
     articleData = wpPostsDict.get('rss').get('channel').get('item')
@@ -47,8 +40,8 @@ def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
     return [authorData, articleData, guestAuthorData]
 
 
-file1 = "..\\rawdata\\tri-wpdump_4-1-24.xml"
-file2 = "..\\rawdata\\thetriangle.WordPress.2024-07-10.xml"
+file1 = ".\\rawdata\\tri-wpdump_4-1-24.xml"
+file2 = ".\\rawdata\\thetriangle.WordPress.2024-07-10.xml"
 authorData, articleData, guestAuthorData = XmlSetup(file1, file2)
 
 

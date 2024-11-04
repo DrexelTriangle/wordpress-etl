@@ -1,12 +1,6 @@
 dumps/wpDict.txt
-output/wpSQL.txt
-output/wpGuestAuthors.txt
-dumps/articleDump.txt
-dumps/authorDump.txt
-dumps/guestAuthorDump.txt
-rawdata/thetriangle.WordPress.2024-06-22 (1).xml
-rawdata/tri-wpdump_4-1-24.xml
+output/*
+dumps/*
+rawdata/*
 __pycache__/
-wordpressToDict.py
-wordpressToDict.py
-rawdata/thetriangle.WordPress.2024-07-10.xml
+

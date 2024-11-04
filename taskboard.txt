@@ -9,7 +9,7 @@ THINGS TO DO
   Article.py
     [x] clean processAuthors()
     [] clean processGuestAuthors 
-    [] clean visualize()
+    [x] clean visualize()
 
   [ ] --- Author.py 
   [ ] --- newUtility.py

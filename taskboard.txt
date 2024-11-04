@@ -18,7 +18,29 @@ THINGS TO DO
         - Make Menu Class for future reference?
 
 
+_________________________________________________________ 
+MENU LOOP
 
+ 1. Yes, this is an existing author.
+    i. Enter author number:
+       a. Confirm 
+ 2. No, this is not an existing author.
+    i. Enter first name 
+    ii. Enter last name
+    iii. Enter email 
+    iv. Confirm all information
+        a. Confirm
+ 3. This author is actually multiple authors.
+    i. New Author, existing authors
+    i. Enter author numbers, separated by dashes
+ 4. Skip for now.
+ 5. Exit 
+ 6. Back
+ 7. Invalid character
+ 
+ *Any invalid character should restart current loop.
+ *Exit terminates entire loop 
+ *Back exits sub-menu, and returns you to the parent menu
 _________________________________________________________
 
 APP STRUCTURE

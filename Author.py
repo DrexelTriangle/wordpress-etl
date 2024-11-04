@@ -101,56 +101,39 @@ class Author:
     print('> [author.process-authors] processing authors...')
     fName, lName, email = '', '', ''
     authorDupes = []
-    total = len(authorData)
 
     for i, item in enumerate(authorData):
-        authorName = ''
-        authorDisplayName = ''
-        authorEmail = ''
-        email = ''
-
+        authorName, authorDisplayName, authorEmail = '', '', '', 
+        email = 'NO_EMAIL'
         authorObj = authorData[i]
         authorName = [authorObj.get('wp:author_first_name'), authorObj.get('wp:author_last_name')]
         authorDisplayName = authorObj.get('wp:author_display_name')
         authorEmail = authorObj.get('wp:author_email')
 
 
-        # if !(first && last), attempt to parse email for namef 
+        # if !(first && last), attempt to parse email for name 
         if ((authorName[0] == None) and (authorName[0] == None)):
-            name = charMorph(authorDisplayName)
-            newName = attemptNameParse(name)
+            newName = attemptNameParse(charMorph(authorDisplayName))
             fName = newName[0]
             lName = newName[1]
         else:
             fName = charMorph(authorName[0])
             lName = charMorph(authorName[1])
-
         if (authorEmail != None):
           email = charMorph(authorEmail)
-        else:
-          email = 'NO_EMAIL'
         
-
         # Only add user if not already inside object dictionary. 
-        tempUsername = generateUsername(fName, lName)
+        username = generateUsername(fName, lName)
         isAllValuesEmpty = (fName == 'NO_FIRST') and (lName == 'NO_LAST') and (email == 'NO_EMAIL') 
-        bySomeone = fName == 'By'
+        bySomeone = (fName == 'By')
         
-        if not(tempUsername in Author.usernames or isAllValuesEmpty or bySomeone):
-            obj = Author(fName, lName, email)
+        if not(username in Author.usernames or isAllValuesEmpty or bySomeone):
+          obj = Author(fName, lName, email)
         else:
-            authorDupes.append([fName, lName, email])
+          authorDupes.append([fName, lName, email])
 
-    # grab data about duplicate authors
-    with open('.\\stats\\duplicate-authors.csv', 'w+', encoding='utf-8') as file:
-      file.write(f"first, last, email,\n")
-      for dup in authorDupes:
-        file.write(f"{dup[0]}, {dup[1]}, {dup[2]},\n")
-      file.close()
-    print("> [author.process-authors] wrote duplicate authors to \\stats\\duplicate-authors.csv")
+        # dupAuthor(authorDupes)
 
-
-    # TODO: Visualize authors
     Author.visualize()
     
     print('> [author.process-authors] done.')

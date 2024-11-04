@@ -1,0 +1,216 @@
+from newUtility import *
+from progressBar import *
+
+class Author:
+  authorCount = 0
+  authorDict = {}
+  usernames = []
+  unique_emails = []
+  authorsVisualized = ''
+
+
+  def __init__(self, firstName:str, lastName:str, email:str, role:int = 1):
+    Author.authorCount += 1
+    self.id = Author.authorCount
+    self.firstName = firstName
+    self.lastName = lastName
+    self.username = generateUsername(self.firstName, self.lastName)
+    self.meshname = generateMeshname(self.firstName, self.lastName)
+    self.email = email
+    self.role = role
+    self.alias = ""
+    
+    
+    Author.authorDict.update({self.id : self})
+    Author.usernames.append(self.username)
+    if not (self.email in Author.unique_emails):
+      Author.unique_emails.append(self.email)
+  
+  def __str__(self):
+    result = ""
+    result += f"id: {self.id}\n"
+    result += f"\tFirst Name: {self.firstName}\n"
+    result += f"\tLast Name: {self.lastName}\n"
+    result += f"\tusername: {self.username}\n"
+    result += f"\tmeshname: {self.meshname}\n"
+    result += f"\temail: {self.email}\n"
+    result += f"\trole: {self.role}\n\n"
+
+    return result
+      
+  def getAuthor(index: int) -> "Author":
+    return Author.authorDict[index + 1]
+  
+  def visualize():
+    # visualized authors
+
+    noFirst, noLast, noEmail, normal = 0, 0, 0, 0
+    isNoFirst, isNoLast, isNoEmail, isNormal = False, False, False, False
+
+    with open('.\\visualizations\\visualized-authors.txt', 'w+', encoding='utf-8') as file:
+      result = ''
+      for i in range(len(Author.authorDict)):
+        file.write(str(Author.getAuthor(i)))
+      file.close()
+    
+    with open('.\\stats\\authors-no-first-name.txt', 'w+', encoding='utf-8') as file_1, \
+      open('.\\stats\\authors-no-last-name.txt', 'w+', encoding='utf-8') as file_2, \
+      open('.\\stats\\authors-no-email.txt', 'w+', encoding='utf-8') as file_3, \
+      open('.\\stats\\authors-normal.txt', 'w+', encoding='utf-8') as file_4:
+      result = ''
+      for i in range(len(Author.authorDict)):
+        author = Author.getAuthor(i)
+        isNoFirst = author.firstName == 'NO_FIRST'
+        isNoLast = author.lastName == 'NO_LAST'
+        isNoEmail = author.email == 'NO_EMAIL'
+        isNormal = not(isNoFirst or isNoLast or isNoEmail)
+        
+        if isNoFirst:
+          file_1.write(str(Author.getAuthor(i)))
+          noFirst += 1
+
+        if isNoLast:
+          file_2.write(str(Author.getAuthor(i)))
+          noLast += 1
+
+        if isNoEmail:
+          file_3.write(str(Author.getAuthor(i)))
+          noEmail += 1
+        
+        if isNormal:
+          file_4.write(str(Author.getAuthor(i)))
+          normal += 1
+            
+
+      file_1.close()
+      file_2.close()
+      file_3.close()
+      file_4.close()
+      # print(f'> [author.process-authors] stats:')
+      # if noFirst > 0:
+      #    print(f'\t\t\t  {noFirst} with no first name')
+      # if noLast > 0:
+      #    print(f'\t\t\t  {noLast} with no last name')
+      # if noEmail > 0:
+      #    print(f'\t\t\t  {noEmail} with no email')
+      # if normal > 0:
+      #    print(f'\t\t\t  {normal} normal')
+      # print(f'\t\t\t  {len(Author.authorDict)} total')
+
+  def processAuthors(authorData):
+    print('> [author.process-authors] processing authors...')
+    fName, lName, email = '', '', ''
+    authorDupes = []
+    total = len(authorData)
+
+    for i, item in enumerate(authorData):
+        authorName = ''
+        authorDisplayName = ''
+        authorEmail = ''
+        email = ''
+
+        authorObj = authorData[i]
+        authorName = [authorObj.get('wp:author_first_name'), authorObj.get('wp:author_last_name')]
+        authorDisplayName = authorObj.get('wp:author_display_name')
+        authorEmail = authorObj.get('wp:author_email')
+
+
+        # if !(first && last), attempt to parse email for namef 
+        if ((authorName[0] == None) and (authorName[0] == None)):
+            name = charMorph(authorDisplayName)
+            newName = attemptNameParse(name)
+            fName = newName[0]
+            lName = newName[1]
+        else:
+            fName = charMorph(authorName[0])
+            lName = charMorph(authorName[1])
+
+        if (authorEmail != None):
+          email = charMorph(authorEmail)
+        else:
+          email = 'NO_EMAIL'
+        
+
+        # Only add user if not already inside object dictionary. 
+        tempUsername = generateUsername(fName, lName)
+        isAllValuesEmpty = (fName == 'NO_FIRST') and (lName == 'NO_LAST') and (email == 'NO_EMAIL') 
+        bySomeone = fName == 'By'
+        
+        if not(tempUsername in Author.usernames or isAllValuesEmpty or bySomeone):
+            obj = Author(fName, lName, email)
+        else:
+            authorDupes.append([fName, lName, email])
+
+    # grab data about duplicate authors
+    with open('.\\stats\\duplicate-authors.csv', 'w+', encoding='utf-8') as file:
+      file.write(f"first, last, email,\n")
+      for dup in authorDupes:
+        file.write(f"{dup[0]}, {dup[1]}, {dup[2]},\n")
+      file.close()
+    print("> [author.process-authors] wrote duplicate authors to \\stats\\duplicate-authors.csv")
+
+
+    # TODO: Visualize authors
+    Author.visualize()
+    
+    print('> [author.process-authors] done.')
+
+  def processGuestAuthors(authorData):
+    print('> [author.process-guest-authors] processing guest authors...')
+    fName, lName, email, displayName = '', '', '', ''
+    authorDupes = []
+    total = len(authorData)
+
+    for i, item in enumerate(authorData):
+      data = authorData[i].get('wp:postmeta')
+      for j in range(len(data)): 
+        value = data[j]
+        if (value.get('wp:meta_key') == 'cap-first_name'):
+            if not(value.get('wp:meta_value') is None):
+                fName = value.get('wp:meta_value')
+        if (value.get('wp:meta_key') == 'cap-last_name'):
+            if not(value.get('wp:meta_value') is None):
+                lName = value.get('wp:meta_value')
+        
+        if (value.get('wp:meta_key') == 'cap-user_email'):
+            if not(value.get('wp:meta_value') is None):
+                email = value.get('wp:meta_value')
+
+        if (value.get('wp:meta_key') == 'cap-display_name'):
+            displayName = value.get('wp:meta_value')
+
+        if (fName == '' and lName == '' and email == ''):
+            #print(displayName)
+            if (len(displayName.split(' ')) == 2):
+                temp2 = displayName.split(' ')
+                fName = charMorph(temp2[0])
+                lName = charMorph(temp2[1])
+            else:
+                fName = displayName 
+
+        # Only add user if not already inside object dictionary. 
+        tempUsername = generateUsername(fName, lName)
+        isAllValuesEmpty = (fName == 'NO_FIRST') and (lName == 'NO_LAST') and (email == 'NO_EMAIL') 
+        
+        if not(tempUsername in Author.usernames or isAllValuesEmpty):
+            obj = Author(fName, lName, email)
+        else:
+            authorDupes.append([fName, lName, email])
+        
+
+    
+
+    # TODO: Visualize authors
+    Author.visualize()
+    print('> [author.process-guest-authors] done.')
+
+  def SQLifiy():
+    print("> [author.sqlify] writing SQL for authors...")
+    with open('.\\output\\authors-sql.txt', "w+", encoding="utf-8") as file:
+      file.write("CREATE TABLE authors (id, first_name VARCHAR(256), last_name VARCHAR(256), email VARCHAR(256), role int);\n")
+      for i in range(len(Author.authorDict)):
+          itm = Author.getAuthor(i)
+          file.write(f"INSERT INTO authors (id, first_name, last_name, email, role) VALUES ({itm.id}, {itm.firstName}, {itm.lastName}, {itm.email}, {itm.role});\n")
+      file.close()
+    print("> [author.sqlify] done.")
+

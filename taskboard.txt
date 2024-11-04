@@ -4,7 +4,7 @@ THINGS TO DO
       [x] make function for parsing XML content
       [x] make function for dict querying?
       [x] make function for dumping data 
-      [] move to Controller file?  
+      [x] move to Controller file?  
 
   [ ] --- Article.py
   [ ] --- Author.py 

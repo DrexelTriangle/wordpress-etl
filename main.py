@@ -4,30 +4,7 @@ from Author import *
 from Article import *
 from json import *
 import os as OS 
-from Controller import parseDictionary, dictQuery, dataDumping
-
-def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
-    wpPostsDict, wpGuestAuthorsDict, authorData, articleData = {}, {}, {}, {}
-
-    # Grab XML Content, convert to dictionary, grab author & article data  
-    print("Converting Posts XML to Dictionary...")
-    
-    wpPostsDict = parseDictionary(wp_postsExportFile)
-    wpGuestAuthorsDict = parseDictionary(wp_guestAuthorsExportFile)
-
-    authorData = dictQuery(wpPostsDict, ['rss', 'channel', 'wp:author'])
-    articleData = dictQuery(wpPostsDict, ['rss', 'channel', 'item'])
-    guestAuthorData = dictQuery(wpGuestAuthorsDict, ['rss', 'channel', 'item'])
-
-    print("> [xml-setup] Visualizing author dictionary...")
-    visualizeDictionary(authorData, '.\\visualizations\\author-data.json')
-    
-    dataDumping(authorData, 'author-data.json')
-    dataDumping(authorData, 'guest-author-data.json')
-    dataDumping(authorData, 'article-data.json')
-
-    print("> [xml-setup]: done.")
-    return [authorData, articleData, guestAuthorData]
+from Controller import XmlSetup
 
 
 file1 = ".\\rawdata\\tri-wpdump_4-1-24.xml"

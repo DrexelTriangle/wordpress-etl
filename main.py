@@ -6,24 +6,20 @@ from json import *
 import os as OS 
 from Controller import XmlSetup
 
-
+# Setup
 file1 = ".\\rawdata\\tri-wpdump_4-1-24.xml"
 file2 = ".\\rawdata\\thetriangle.WordPress.2024-07-10.xml"
 authorData, articleData, guestAuthorData = XmlSetup(file1, file2)
-
-
-# # TODO: visualize dictionaries
 
 # Process Authors
 Author.processAuthors(authorData)
 Author.processGuestAuthors(guestAuthorData)
 Author.SQLifiy()
 
-# TODO: Process the guest authors
-# TODO: add a report file for the authors grabbed from the 
-
+# Process Articles
 Article.processArticles(articleData)
 
+# TODO: Mending
 print('> [main] author mapping.')
 with open('result.txt', 'w+', encoding='utf-8') as file:
   longestStr = max(Article.map, key=len)
@@ -100,6 +96,7 @@ with open('result.txt', 'w+', encoding='utf-8') as file:
 
   file.close()
 
+# TODO: SQLify Authors and Articles
 print()
 
 

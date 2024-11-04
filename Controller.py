@@ -15,6 +15,18 @@ def parseDictionary(xml_file):
   parsedDict = parse(content)
   return parsedDict
 
+def dictQuery(myDict, queryLst):
+  result = myDict
+  failsafe = "ERROR"
+  for query in queryLst:
+    if (result == failsafe):
+      return None
+    else:
+      result = result.get(query, failsafe)
+  return result
+    
+
+
 def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
     wp_xmlPostContent, wp_xmlGuestAuthors = None, None
     wpPostsDict, wpGuestAuthorsDict, authorData, articleData = {}, {}, {}, {}

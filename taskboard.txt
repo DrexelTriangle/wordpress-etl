@@ -2,7 +2,7 @@ THINGS TO DO
   main.py 
     - reformat XmlSetup() 
       [x] make function for parsing XML content
-      [] make function for dict querying?
+      [x] make function for dict querying?
       [] make function for dumping data 
       [] move to Controller file?  
 

@@ -4,7 +4,7 @@ from Author import *
 from Article import *
 from json import *
 import os as OS 
-from Controller import parseDictionary
+from Controller import parseDictionary, dictQuery
 
 def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
     wp_xmlPostContent, wp_xmlGuestAuthors = None, None
@@ -16,9 +16,10 @@ def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
     wpPostsDict = parseDictionary(wp_postsExportFile)
     wpGuestAuthorsDict = parseDictionary(wp_guestAuthorsExportFile)
 
-    authorData = wpPostsDict.get('rss').get('channel').get('wp:author')
-    articleData = wpPostsDict.get('rss').get('channel').get('item')
-    guestAuthorData = wpGuestAuthorsDict.get('rss').get('channel').get('item')
+    authorData = dictQuery(wpPostsDict, ['rss', 'channel', 'wp:author'])
+    articleData = dictQuery(wpPostsDict, ['rss', 'channel', 'item'])
+    guestAuthorData = dictQuery(wpGuestAuthorsDict, ['rss', 'channel', 'item'])
+
 
     print("> [xml-setup] Visualizing author dictionary...")
     visualizeDictionary(authorData, '.\\visualizations\\author-data.json')

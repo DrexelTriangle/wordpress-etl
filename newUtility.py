@@ -1,7 +1,8 @@
 import pprint
 import re
 from difflib import SequenceMatcher
-# import Article 
+from datetime import datetime
+from pytz import timezone
 
 def charMorph(myStr):
   if (myStr == None):
@@ -62,4 +63,7 @@ def visualizeDictionary(dict, fileName):
 def similar(a, b):
   return SequenceMatcher(None, a, b).ratio()
 
+def GMT_to_EST(gmtDate):
+  now_time = datetime.now(timezone('US/Eastern'))
+  return now_time.strftime(gmtDate)
 

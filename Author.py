@@ -27,7 +27,7 @@ class Author:
     Author.usernames.append(self.username)
     if not (self.email in Author.unique_emails):
       Author.unique_emails.append(self.email)
-      Author.meshnames.append(self.meshname : )
+      Author.meshnames.update(self.meshname : self.id)
   
   def __str__(self):
     result = ""

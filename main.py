@@ -5,6 +5,7 @@ from Article import *
 from json import *
 import os as OS 
 from Controller import XmlSetup
+from Menu import *
 
 # Setup
 file1 = ".\\rawdata\\tri-wpdump_4-1-24.xml"
@@ -34,7 +35,7 @@ with open('result.txt', 'w+', encoding='utf-8') as file:
       lines = file2.readlines()
       for i in range(len(lines)):
         temp = lines[i].strip().split(', ')
-        temp[1] = int(temp[1])
+        temp[1] = Author.meshnames.index(temp)
         lines[i] = temp
         names.append(temp[0])
         numbers.append(temp[1])
@@ -90,7 +91,7 @@ with open('result.txt', 'w+', encoding='utf-8') as file:
   print(f"> [main] type in 'start' to start mappping process...")
   usrInput = input('> [main] ')
   if (usrInput.strip() == 'start'):
-    Article.manualMapping(unmapped)
+    manualMapping(unmapped)
   else:
     exit(7)
 

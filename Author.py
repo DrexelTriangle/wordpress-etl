@@ -8,6 +8,7 @@ class Author:
   usernames = []
   unique_emails = []
   authorsVisualized = ''
+  meshnames = {}
 
 
   def __init__(self, firstName:str, lastName:str, email:str, role:int = 1):
@@ -26,6 +27,7 @@ class Author:
     Author.usernames.append(self.username)
     if not (self.email in Author.unique_emails):
       Author.unique_emails.append(self.email)
+      Author.meshnames.append(self.meshname : )
   
   def __str__(self):
     result = ""

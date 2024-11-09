@@ -30,19 +30,7 @@ def manualMapping(myLst):
             
 
           case 3:  
-            multipleAuthors = input('> Enter author numbers, separated by dashes: ').strip()
-            tempLst = multipleAuthors.strip().split('-')
-            for j in tempLst:
-              itm = Author.getAuthor(int(j) - 1)
-              print(f'{j} - {itm.firstName} {itm.lastName}')
-            
-            confirmation = input('> ')
-            match(int(confirmation.strip())):
-              case 0:
-                print('result: yes')
-                mappings.append(f'{myLst[i]}, {tempLst}')
-              case 1:
-                print('result: no')
+            mapMultiple(myLst[i])
           
           case 4:
             continue
@@ -122,6 +110,61 @@ def createAuthor(newAuthors):
         case 2:
             print("\033c")
             print('Aborted')
+        case _:
+          print("\033c")
+          print('Invalid Input')
+    except ValueError:
+      print("\033c")
+      print('Invalid Input')
+
+
+def mapMultiple(authorStr):
+  print("\033c")
+  multiple = []
+  usrPrompt = f"Do we need to create any new authors for {authorStr}?"
+  option = confirmationPrompt(usrPrompt)
+  match(option):
+    case 1:
+      while True:
+        # createAuthor(...)
+        print('TEMP')
+        multiple.append(len(Author.authorDict))
+        option = confirmationPrompt(f'Are there any more authors we need to create?')
+        if (option == 2):
+          break 
+        else:
+          print('\033c')
+  print('end match')
+  print(f"New authors have been added to the session database. Make sure to add these new numbers to your following string: {multiple}")
+  multipleAuthors = input('> Enter author numbers, separated by dashes: ').strip()
+  tempLst = multipleAuthors.strip().split('-')
+  for j in tempLst:
+    itm = Author.getAuthor(int(j) - 1)
+    print(f'{j} - {itm.firstName} {itm.lastName}')
+    
+    # confirmation = input('> ')
+    # match(int(confirmation.strip())):
+    #   case 0:
+    #     print('result: yes')
+    #     mappings.append(f'{myLst[i]}, {tempLst}')
+    #   case 1:
+    #     print('result: no')
+
+
+def confirmationPrompt(prompt):
+  while True:
+    print(prompt)
+    print(f'  1. Yes')
+    print(f'  2. No')
+    print()
+
+    confirmation = input('> ')
+    try:
+      match(int(confirmation.strip())):
+        case 1:
+          return 1
+        case 2:
+          return 2
         case _:
           print("\033c")
           print('Invalid Input')

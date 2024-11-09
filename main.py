@@ -31,15 +31,15 @@ with open('result.txt', 'w+', encoding='utf-8') as file:
   if (OS.path.isfile('.\\output\\oldMappings.txt')):
     lines = []
     
-    with open('.\\output\\oldMappings.txt', 'r+', encoding='utf-8') as file2:
-      lines = file2.readlines()
-      for i in range(len(lines)):
-        temp = lines[i].strip().split(', ')
-        temp[1] = Author.meshnames.index(temp)
-        lines[i] = temp
-        names.append(temp[0])
-        numbers.append(temp[1])
-      file2.close()
+    # with open('.\\output\\oldMappings.txt', 'r+', encoding='utf-8') as file2:
+    #   lines = file2.readlines()
+    #   for i in range(len(lines)):
+    #     temp = lines[i].strip().split(', ')
+    #     temp[1] = Author.meshnames.index(temp)
+    #     lines[i] = temp
+    #     names.append(temp[0])
+    #     numbers.append(temp[1])
+    #   file2.close()
     for i in range(len(lines)):
       author = Author.getAuthor(lines[i][1] - 1)
       fName, lName = '', ''

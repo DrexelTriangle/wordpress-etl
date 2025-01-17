@@ -30,7 +30,7 @@ def manualMapping(myLst):
             
 
           case 3:  
-            mapMultiple(myLst[i])
+            mapMultiple(myLst[i], newAuthors, mappings)
           
           case 4:
             continue
@@ -49,10 +49,10 @@ def manualMapping(myLst):
   if (choice.strip() == '1'):
     with open('.\\output\\oldMappings.txt', 'w+', encoding='utf-8') as file:
       for i in mappings:
-        file.write(i)
+        file.write(str(i) + '\n')
     with open('.\\output\\newAuthorMappings.txt', 'w+', encoding='utf-8') as file:
       for i in newAuthors:
-        file.write(i)
+        file.write(str(i) + '\n')
 
 def singleAuthor(itm, mappings):
   while True:
@@ -106,6 +106,8 @@ def createAuthor(newAuthors):
         case 1:
           print('result: yes')
           newAuthors.append(f'{firstName}, {lastName}, {email}')
+          obj = Author(firstName, lastName, email)
+          Author.visualize()
           break
         case 2:
             print("\033c")
@@ -115,10 +117,9 @@ def createAuthor(newAuthors):
           print('Invalid Input')
     except ValueError:
       print("\033c")
-      print('Invalid Input')
+      print('Invalid Input')      
 
-
-def mapMultiple(authorStr):
+def mapMultiple(authorStr, newAuthors, mappings):
   print("\033c")
   multiple = []
   usrPrompt = f"Do we need to create any new authors for {authorStr}?"
@@ -126,9 +127,7 @@ def mapMultiple(authorStr):
   match(option):
     case 1:
       while True:
-        # createAuthor(...)
-        print('TEMP')
-        multiple.append(len(Author.authorDict))
+        createAuthor(newAuthors)
         option = confirmationPrompt(f'Are there any more authors we need to create?')
         if (option == 2):
           break 
@@ -138,18 +137,19 @@ def mapMultiple(authorStr):
   print(f"New authors have been added to the session database. Make sure to add these new numbers to your following string: {multiple}")
   multipleAuthors = input('> Enter author numbers, separated by dashes: ').strip()
   tempLst = multipleAuthors.strip().split('-')
+  aggregate = []
   for j in tempLst:
     itm = Author.getAuthor(int(j) - 1)
     print(f'{j} - {itm.firstName} {itm.lastName}')
-    
-    # confirmation = input('> ')
-    # match(int(confirmation.strip())):
-    #   case 0:
-    #     print('result: yes')
-    #     mappings.append(f'{myLst[i]}, {tempLst}')
-    #   case 1:
-    #     print('result: no')
-
+    aggregate.append(itm.meshname)
+  option = confirmationPrompt(f"map {authorStr} to {str(aggregate)}?")
+  match(option):
+    case 1:
+      print('result: yes')
+      mappings.append(f'{authorStr}, {str(aggregate)}')
+    case 2:
+      print('result: no')
+  
 
 def confirmationPrompt(prompt):
   while True:

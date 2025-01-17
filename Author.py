@@ -99,13 +99,12 @@ class Author:
 
   def processGuestAuthors(authorData):
     print('> [author.process-guest-authors] processing guest authors...')
-    fName, lName, email, displayName = '', '', '', ''
     authorDupes = []
     total = len(authorData)
 
     for i, item in enumerate(authorData):
       # TODO: Something fishy is going on here...
-      # fName, lName, email, displayName = '', '', '', ''
+      fName, lName, email, displayName = '', '', '', ''
       data = authorData[i].get('wp:postmeta')
       for j in range(len(data)): 
         value = data[j]
@@ -132,6 +131,10 @@ class Author:
             else:
                 fName = displayName 
 
+        if (lName == ''):
+           lName = 'NO_LAST'
+        if (email == ''):
+           email = 'NO_EMAIL'
         # Only add user if not already inside object dictionary. 
         Author.addAuthor(fName, lName, email)
         

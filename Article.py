@@ -124,13 +124,23 @@ class Article:
       metaTags =  Article.processTags(articlePost.get('category'))
       tags = metaTags[0]
       authors = metaTags[1]
-      # text = str(charMorph(articlePost.get('content:encoded')))
+      text = str(charMorph(articlePost.get('content:encoded')))
       obj = Article(i, title,pubDate,modDate,description,comment_status, tags, authors, text)
     
     Article.visualize()
     print('> [article.process-article] done.')
   
-
+  def SQLifiy():
+    print("> [article.sqlify] writing SQL for articles...")
+    with open('.\\output\\articles-sql.txt', "w+", encoding="utf-8") as file:
+      file.write("CREATE TABLE articles (id, title VARCHAR(256), pub_date DATETIME, mod_date DATETIME, description VARCHAR(256), comment_status VARCHAR(256), priority BOOLEAN, breaking_news BOOLEAN, tags VARCHAR(256), authors TEXT, text TEXT));\n")
+      for i in range(len(Article.articleDict)):
+          itm = Article.getArticle(i)
+          insertStatement = 'INSERT INTO articles (id, title, pub_date, mod_date, description, comment_status, priority, breaking_news, tags, authors, text)'
+          insertValues = f'{itm.id}, {itm.title}, {itm.pubDate}, {itm.modDate}, {itm.description}, {itm.commentStatus}, {itm.priotity}, {itm.breakingNews}, {itm.tags}, {itm.authors}, {itm.text}'
+          file.write(f"{insertStatement} VALUES ({insertValues});\n")
+      file.close()
+    print("> [author.sqlify] done.")
 
 
       

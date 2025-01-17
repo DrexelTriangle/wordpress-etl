@@ -38,6 +38,8 @@ def attemptNameParse(name):
     
 def generateUsername(first, last): 
   result = ''
+  if (last == 'NO_LAST'):
+    return first
   
   if (not (first is None)):
     result += first.replace(' ', "").replace('-', "").replace('.', '').replace("'", '').lower() 
@@ -47,6 +49,8 @@ def generateUsername(first, last):
 
 def generateMeshname(first, last): 
   result = ''
+  if (last == 'NO_LAST' or (last != None and 'NO_LAST' in last)):
+    return first
   
   if (not (first is None)):
     result += first.replace(' ', "").replace('-', "").replace('.', '').replace("'", '').lower() 

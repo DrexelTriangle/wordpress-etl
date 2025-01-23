@@ -1,5 +1,6 @@
 from newUtility import *
 from Author import *
+import os as OS
 
 class Article:
   articleCount = 0
@@ -12,7 +13,7 @@ class Article:
   def __init__(self, id, title, pubDate, modDate, description, commentStatus, tags, authors, text):
     Article.articleCount += 1
     self.priotity = False
-    self.breakingNews = False
+    self.breakingNews = 'null'
     self.id = Article.articleCount
     self.title = title
     self.pubDate = pubDate
@@ -22,6 +23,8 @@ class Article:
     self.tags = tags
     self.authors = authors
     self.text = text
+    self.authorIDs = []
+    self.featuredImgID = -1
 
     Article.articleDict.update({self.id : self})
     
@@ -117,34 +120,33 @@ class Article:
       articlePost = articleData[i]
 
       title = charMorph(articlePost.get('title'))
+      if (title is not None):
+        title = title.replace('"', '\\"')
       pubDate = articlePost.get('wp:post_date_gmt')
       modDate = articlePost.get('wp:post_modified_gmt')
       description = charMorph(articlePost.get('description'))
       comment_status = articlePost.get('wp:comment_status')
-      metaTags =  Article.processTags(articlePost.get('category'))
-      tags = metaTags[0]
-      authors = metaTags[1]
-      text = str(charMorph(articlePost.get('content:encoded')))
+      text = str(charMorph(articlePost.get('content:encoded'))).replace('"', '\\"')
+      try:
+        metaTags =  Article.processTags(articlePost.get('category'))
+        tags = metaTags[0]
+        authors = metaTags[1]
+      except TypeError:
+        if (metaTags is None or text is None):
+          continue
+      
       obj = Article(i, title,pubDate,modDate,description,comment_status, tags, authors, text)
-    
     Article.visualize()
     print('> [article.process-article] done.')
   
   def SQLifiy():
     print("> [article.sqlify] writing SQL for articles...")
     with open('.\\output\\articles-sql.txt', "w+", encoding="utf-8") as file:
-      file.write("CREATE TABLE articles (id, title VARCHAR(256), pub_date DATETIME, mod_date DATETIME, description VARCHAR(256), comment_status VARCHAR(256), priority BOOLEAN, breaking_news BOOLEAN, tags VARCHAR(256), authors TEXT, text TEXT));\n")
       for i in range(len(Article.articleDict)):
           itm = Article.getArticle(i)
-          insertStatement = 'INSERT INTO articles (id, title, pub_date, mod_date, description, comment_status, priority, breaking_news, tags, authors, text)'
-          insertValues = f'{itm.id}, {itm.title}, {itm.pubDate}, {itm.modDate}, {itm.description}, {itm.commentStatus}, {itm.priotity}, {itm.breakingNews}, {itm.tags}, {itm.authors}, {itm.text}'
-          file.write(f"{insertStatement} VALUES ({insertValues});\n")
+          insertFields = 'article_id, title, pub_date, mod_date, description, priority, breaking_end_date, text, featured_img_id'
+          insertValues = f'''{itm.id}, "{itm.title}", '{itm.pubDate}', '{itm.modDate}', "{itm.description}", {itm.priotity}, {itm.breakingNews}, "{itm.text}", {itm.featuredImgID}'''
+          file.write(f"INSERT INTO tr_articles ({insertFields}) VALUES ({insertValues});\n")
       file.close()
     print("> [author.sqlify] done.")
-
-
-      
-
-
-
 

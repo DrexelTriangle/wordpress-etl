@@ -1,9 +1,11 @@
 from xmltodict import *
-from progressBar import *
-from utility import *
-from classes.wpArticle import *
-from classes.wpAuthor import *
-from testing import *
+from newUtility import *
+from Author import *
+from Article import *
+from json import *
+import os as OS 
+from Controller import XmlSetup
+from Menu import *
 
 wp_postsExportFile = ".\\rawdata\\tri-wpdump_4-1-24.xml"
 wp_guestAuthorsExportFile = ".\\rawdata\\thetriangle.WordPress.2024-07-10.xml"

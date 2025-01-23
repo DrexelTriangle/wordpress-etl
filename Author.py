@@ -11,7 +11,7 @@ class Author:
   meshnames = {}
 
 
-  def __init__(self, firstName:str, lastName:str, email:str, role:int = 1):
+  def __init__(self, firstName:str, lastName:str, email:str, role:int = 0):
     Author.authorCount += 1
     self.id = Author.authorCount
     self.firstName = firstName
@@ -145,10 +145,12 @@ class Author:
   def SQLifiy():
     print("> [author.sqlify] writing SQL for authors...")
     with open('.\\output\\authors-sql.txt', "w+", encoding="utf-8") as file:
-      file.write("CREATE TABLE authors (id, first_name VARCHAR(256), last_name VARCHAR(256), email VARCHAR(256), role int);\n")
+      file.write("author_id, first_name, last_name, email, role_id\n")
       for i in range(len(Author.authorDict)):
           itm = Author.getAuthor(i)
-          file.write(f"INSERT INTO authors (id, first_name, last_name, email, role) VALUES ({itm.id}, {itm.firstName}, {itm.lastName}, {itm.email}, {itm.role});\n")
+          insertFields = 'author_id, first_name, last_name, email, role_id'
+          insertValues = f'''{itm.id}, "{itm.firstName}", "{itm.lastName}", "{itm.email}", {itm.role}'''
+          file.write(f"INSERT INTO tr_authors({insertFields}) VALUES ({insertValues});\n")
       file.close()
     print("> [author.sqlify] done.")
 

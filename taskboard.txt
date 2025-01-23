@@ -9,12 +9,12 @@ THINGS TO DO
   Author.py
     [x] clean processAuthors()
     [x] clean processGuestAuthors 
-    [ ] investigate processGuestAuthors Bug
+    [x] investigate processGuestAuthors Bug
     [x] clean visualize()
 
   Article.py
     [x] clean processArticles()  
-    [ ] fleshOut manualMapping menu
+    [x] fleshOut manualMapping menu
         - Make Menu Class for future reference?
 
 
@@ -55,3 +55,23 @@ ARTICLE TOOL        | AUTHOR TOOL
   - processArticles |   - processAuthors
   - manualMapping   |   
   - SQLify          |   - SQLify
+
+_________________________________________________________ 
+APP REFACTOR
+  [] Welcome Screen
+  [] Menu
+     [] - load in database from
+          [] raw-data 
+             [] my script
+                [x] organize 
+                [] clean
+                [] optimize 
+          [] db save
+             [] figure out how to save db (JSON?)
+     [] - create SQL data
+          [] article 
+          [] author 
+          [] article-author linking 
+          [] - NOTE: when generating, break into smaller chunks
+     [] - edit articles' XML data, create new XML files  
+         

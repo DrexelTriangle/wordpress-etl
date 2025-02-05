@@ -2,6 +2,7 @@ from Author import *
 from Article import *
 
 def mapping(mustReplace):
+  # mapping: checks that every ArticleAuthor name exiists in the local database
   print('> [menu.mapping] author mapping.')
   with open('result.txt', 'w+', encoding='utf-8') as file:
     longestStr = max(Article.map, key=len)
@@ -11,6 +12,7 @@ def mapping(mustReplace):
     for i in Article.map:
       mapped = '' 
       dashes = '-' * (len(longestStr) - len(i) + 3)
+
       for j in range(len(Author.authorDict)):
         mapped = ''
         obj = Author.getAuthor(j)
@@ -37,6 +39,7 @@ def mapping(mustReplace):
   file.close()
           
 def checkForMending():
+  # checkForMending: if script has been ran before, check files to see if we need to add authors
   existing = []
   mustReplace = []
   newAuthors = '.\\output\\newAuthorMappings.txt'
@@ -69,6 +72,7 @@ def checkForMending():
 
 def binding(existing, mustReplace):
   print(f'> [article.binding] Double checking all article authors having a map...')
+  # FIXME: add a function to Author script that returns sub list of authors with the same starting character
   count = 0
   for i in range(len(Article.articleDict)):
     articleObj = Article.getArticle(i)

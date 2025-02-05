@@ -4,26 +4,11 @@ from Author import *
 from Article import *
 from json import *
 import os as OS 
-
-
-def parseDictionary(xml_file):
-  content = None 
-  print("Converting XML to Dictionary...")
-  with open(xml_file, "+r", encoding='utf-8') as file:
-      content = file.read()
-      file.close()
-  parsedDict = parse(content)
-  return parsedDict
-
-def dictQuery(myDict, queryLst):
-  result = myDict
-  failsafe = "ERROR"
-  for query in queryLst:
-    if (result == failsafe):
-      return None
-    else:
-      result = result.get(query, failsafe)
-  return result
+import pprint
+import re
+from difflib import SequenceMatcher
+from datetime import datetime
+from pytz import timezone
 
 def dataDumping(data, filename):
   print(f"> [data-dump] mending <{filename}>...")
@@ -54,13 +39,32 @@ def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
   return [authorData, articleData, guestAuthorData]
 
 
-##############################################################################
+# UTILITY #########################################################################
 
 def getDictValue(myDict, key):
   result = ''
   if (myDict.get('wp:meta_key') == key):
       if not(myDict.get('wp:meta_value') is None):
           result = myDict.get('wp:meta_value')
+  return result
+
+def parseDictionary(xml_file):
+  content = None 
+  print("Converting XML to Dictionary...")
+  with open(xml_file, "+r", encoding='utf-8') as file:
+      content = file.read()
+      file.close()
+  parsedDict = parse(content)
+  return parsedDict
+
+def dictQuery(myDict, queryLst):
+  result = myDict
+  failsafe = "ERROR"
+  for query in queryLst:
+    if (result == failsafe):
+      return None
+    else:
+      result = result.get(query, failsafe)
   return result
 
 

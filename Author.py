@@ -1,5 +1,4 @@
 from newUtility import *
-from progressBar import *
 from Controller import getDictValue
 
 class Author:

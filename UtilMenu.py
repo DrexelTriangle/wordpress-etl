@@ -25,9 +25,13 @@ class Menu:
     for i in range(len(options)):
       menuOption = self.detectOptionType(options[i], len(options), self.title, self.titleBlock)
       self.options.append(menuOption)
-      
-    def swapMenu(self, newOptions):
-      self.options = newOptions
+  
+  def setOptions(self, value):
+    self.options = []
+    for i in range(len(value)):
+      menuOption = self.detectOptionType(value[i], len(value), self.title, self.titleBlock)
+      self.options.append(menuOption)
+
 
   def detectOptionType(self, optObj, menuLen, title, titleBlock):
     # Text class (mainItm, self.action() = none)
@@ -66,7 +70,8 @@ class Menu:
     choice = 0
     direction = ''
 
-    print(f'{Menu.HIDE_CURSOR} {self.titleBlock} {self.title}')
+    sys.stdout.flush()
+    print(f'\r{Menu.HIDE_CURSOR} {self.titleBlock} {self.title}')
     while True:
       self.printOptions(choice, tab=len(self.titleBlock) + 2, animSpd=animSpd)
       direction = Menu.dir_keys()
@@ -116,6 +121,9 @@ class Menu:
 
     for i in range(lineNum):
       sys.stdout.write("\x1b[1A\x1b[2K")
+  
+  def clearMenu(self):
+    self.clearOptions(len(self.options) + 2)
 
   def dir_keys():   
     while True:

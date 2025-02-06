@@ -15,7 +15,7 @@ def dataDumping(data, filename):
   with open(f'.\\visualizations\\{filename}', 'w+', encoding='utf-8') as file:
     dump(data, file, ensure_ascii=False, indent=2)
     
-def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
+def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile, visualize=False):
   wpPostsDict, wpGuestAuthorsDict, authorData, articleData = {}, {}, {}, {}
 
   # Grab XML Content, convert to dictionary, grab author & article data  
@@ -28,14 +28,14 @@ def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile):
   articleData = dictQuery(wpPostsDict, ['rss', 'channel', 'item'])
   guestAuthorData = dictQuery(wpGuestAuthorsDict, ['rss', 'channel', 'item'])
 
-  print("> [xml-setup] Visualizing author dictionary...")
-  visualizeDictionary(authorData, '.\\visualizations\\author-data.json')
-  
-  dataDumping(authorData, 'author-data.json')
-  dataDumping(authorData, 'guest-author-data.json')
-  dataDumping(authorData, 'article-data.json')
+  if (visualize):
+    print("> [xml-setup] Visualizing data...")
+    visualizeDictionary(authorData, '.\\visualizations\\author-data.json')
+    
+    dataDumping(authorData, 'author-data.json')
+    dataDumping(authorData, 'guest-author-data.json')
+    dataDumping(authorData, 'article-data.json')
 
-  print("> [xml-setup]: done.")
   return [authorData, articleData, guestAuthorData]
 
 
@@ -50,7 +50,6 @@ def getDictValue(myDict, key):
 
 def parseDictionary(xml_file):
   content = None 
-  print("Converting XML to Dictionary...")
   with open(xml_file, "+r", encoding='utf-8') as file:
       content = file.read()
       file.close()

@@ -31,8 +31,6 @@ def mapping(mustReplace):
         if mapped == '':
           unmapped.append(i)
           file.write(f'{i} {dashes}\n')
-      
-
         unique.append(i)
 
     return unmapped

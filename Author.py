@@ -63,7 +63,6 @@ class Author:
         debugLst.append([fName, lName, email])
 
   def processAuthors(authorData):
-    print('> [author.process-authors] processing authors...')
     fName, lName, email = '', '', ''
     authorDupes = []
 
@@ -93,11 +92,8 @@ class Author:
         # dupAuthor(authorDupes)
 
     Author.visualize()
-    
-    print('> [author.process-authors] done.')
 
   def processGuestAuthors(authorData):
-    print('> [author.process-guest-authors] processing guest authors...')
     authorDupes = []
     total = len(authorData)
 
@@ -139,7 +135,6 @@ class Author:
         
     # TODO: Visualize authors
     Author.visualize()
-    print('> [author.process-guest-authors] done.')
 
   def SQLifiy():
     print("> [author.sqlify] writing SQL for authors...")

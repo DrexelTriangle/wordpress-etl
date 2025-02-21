@@ -99,7 +99,6 @@ class Article:
     # ['.', '-', '_']
 
   def processArticles(articleData):
-    print('> [article.process-article] processing articles...')
     # Insertion
     # Visualize
 
@@ -136,8 +135,6 @@ class Article:
           continue
       
       obj = Article(i, title,pubDate,modDate,description,comment_status, tags, authors, text)
-    Article.visualize()
-    print('> [article.process-article] done.')
   
   def SQLifiy():
     print("> [article.sqlify] writing SQL for articles...")

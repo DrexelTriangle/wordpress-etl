@@ -64,6 +64,8 @@ class Article:
     try:
       for i in range(len(myLst)):
         temp = myLst[i]
+        if (temp.get('@nicename') == 'crossword'):
+          return -1
         if (temp.get('@domain') == 'post_tag'):  
           tags.append(temp.get("#text"))
           ...
@@ -102,20 +104,22 @@ class Article:
     # Insertion
     # Visualize
 
-    title = '' #can never be none
-    pubDate = '' #can never be none
-    modDate = '' #can never be none. Can be in gmt / est
-    description = '' #can be none
-    comment_status = '' #can never be none
-    priority = False
-    breaking_news = False 
-    metaTags = []
-    tags = []
-    authors = []
-    text = '' 
-
-
     for i, item in enumerate(articleData):
+      title = '' #can never be none
+      pubDate = '' #can never be none
+      modDate = '' #can never be none. Can be in gmt / est
+      description = '' #can be none
+      comment_status = '' #can never be none
+      priority = False
+      breaking_news = False 
+      metaTags = []
+      tags = []
+      authors = []
+      photoCred = ''
+      text = '' 
+
+
+    
       articlePost = articleData[i]
 
       title = charMorph(articlePost.get('title'))
@@ -126,16 +130,32 @@ class Article:
       description = charMorph(articlePost.get('description'))
       comment_status = articlePost.get('wp:comment_status')
       text = str(charMorph(articlePost.get('content:encoded'))).replace('"', '\\"')
+      photoCred = re.findall(r"(\/wp-content\/uploads\/.*\/)((.*)\.(jpg|png|jpeg))", text)
+
       try:
         metaTags =  Article.processTags(articlePost.get('category'))
+        if (metaTags == -1):
+          continue 
         tags = metaTags[0]
         authors = metaTags[1]
       except TypeError:
         if (metaTags is None or text is None):
           continue
       
-      obj = Article(i, title,pubDate,modDate,description,comment_status, tags, authors, text)
+      if (text != "None" and len(text) > 100 and title != None and not ('_' in title) and not ('sudoku' in title)):
+        obj = Article(i, title,pubDate,modDate,description,comment_status, tags, authors, text)
   
+        with open('.\\dumps\\temp.txt', 'a+', encoding='utf-8') as file:
+
+          if (obj.text != "None"):
+            result = ''
+            result += f"{obj.title} -> {photoCred}\n"
+            file.write(f"{result}")
+            file.close()
+    with open('.\\dumps\\temp.txt', 'a+', encoding='utf-8') as file: 
+      file.write(f"\n\n{len(Article.articleDict)}")
+      file.close()
+
   def SQLifiy():
     print("> [article.sqlify] writing SQL for articles...")
     with open('.\\output\\articles-sql.txt', "w+", encoding="utf-8") as file:

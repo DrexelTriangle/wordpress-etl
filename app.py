@@ -26,8 +26,8 @@ if (not OS.path.exists('./visualizations')):
 
 options = ['Load Data ', 'Exit']
 app = Menu(options, 'Wordpress Data Tool')
-file1 = ".\\rawdata\\tri-wpdump_4-1-24.xml"
-file2 = ".\\rawdata\\thetriangle.WordPress.2024-07-10.xml"
+file1 = ".\\rawdata\\tri-rawdata-[2025-04-02].xml" # ".\\rawdata\\tri-wpdump_4-1-24.xml"
+file2 = ".\\rawdata\\tri-guest-authors-[2025-04-02].xml" # ".\\rawdata\\thetriangle.WordPress.2024-07-10.xml"
 authorData, articleData, guestAuthorData = [], [], []
 existing, mustReplace, unmapped = [], [], []
 authorData, articleData, guestAuthorData = [], [], []
@@ -47,6 +47,7 @@ def process():
   Author.processAuthors(authorData)
   Author.processGuestAuthors(guestAuthorData)
   Article.processArticles(articleData)
+  Article.visualize()
 
 
 

@@ -30,6 +30,7 @@ def XmlSetup(wp_postsExportFile, wp_guestAuthorsExportFile, visualize=False):
 
   if (visualize):
     print("> [xml-setup] Visualizing data...")
+    visualizeDictionary(wpPostsDict, '.\\dumps\\wpDict.txt')
     visualizeDictionary(authorData, '.\\visualizations\\author-data.json')
     
     dataDumping(authorData, 'author-data.json')

@@ -66,6 +66,8 @@ class Article:
         temp = myLst[i]
         if (temp.get('@nicename') == 'crossword'):
           return -1
+        if (temp.get('@nicename') == 'comics'): #get these comics outta here
+          return -1
         if (temp.get('@domain') == 'post_tag'):  
           tags.append(temp.get("#text"))
           ...

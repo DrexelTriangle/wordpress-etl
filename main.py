@@ -10,4 +10,4 @@ Utility.unzip(ZIP_FILE)
 # STEP 1: Extraction
 extractor = Extractor(POSTS_FILE, GUEST_AUTH_FILE)
 result = extractor.getData()
-print(result)
+print(result["auth"][0])

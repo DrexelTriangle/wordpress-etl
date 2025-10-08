@@ -1,4 +1,4 @@
-class Author:
+class GuestAuthor:
 
     def __init__(self, auid, login=None, email=None, display_name=None, first_name=None, last_name=None):
         self._auid = auid
@@ -9,13 +9,13 @@ class Author:
         self._last_name = last_name
 
     @property
-    def auid(self):
-        return self._auid
+    def guid(self):
+        return self._guid
 
     @auid.setter
     def auid(self, new_auid):
         if not isinstance(new_auid, string):
-            raise ValueError("Author ID must be an int")
+            raise ValueError("Guest Author ID must be an int")
         self._auid = new_auid
 
     @property
@@ -25,7 +25,7 @@ class Author:
     @login.setter
     def login(self, new_login):
         if not isinstance(new_login, string):
-            raise ValueError("Author Login must be a string")
+            raise ValueError("Guest Author Login must be a string")
         self._login = new_login
 
     @property
@@ -35,7 +35,7 @@ class Author:
     @email.setter
     def email(self, new_email):
         if not isinstance(new_email, string):
-            raise ValueError("Author Email must be a string")
+            raise ValueError("Guest Author Email must be a string")
         self._email = new_email
 
     @property
@@ -45,7 +45,7 @@ class Author:
     @display_name.setter
     def display_name(self, new_display_name):
         if not isinstance(new_display_name, string):
-            raise ValueError("Author Display Name must be a string")
+            raise ValueError("Guest Author Display Name must be a string")
         self._display_name = new_display_name
 
     @property
@@ -55,7 +55,7 @@ class Author:
     @first_name.setter
     def first_name(self, new_first_name):
         if not isinstance(new_first_name, string):
-            raise ValueError("Author First Name must be a string")
+            raise ValueError("Guest Author First Name must be a string")
         self._first_name = new_first_name
 
     @property
@@ -65,16 +65,18 @@ class Author:
     @last_name.setter
     def last_name(self, new_last_name):
         if not isinstance(new_login, string):
-            raise ValueError("Author Last Name must be a string")
+            raise ValueError("Guest Author Last Name must be a string")
         self._last_name = new_last_name
 
     def __str__(self):
         result = ''
         result += f'Author\n'
-        result += f'\tauid: {self.auid}\n'
+        result += f'\tauid: {self.guid}\n'
         result += f'\tlogin: {self.login}\n'
         result += f'\temail: {self.email}\n'
         result += f'\tdisplay_name: {self.display_name}\n'
         result += f'\tfirst_name: {self.first_name}\n'
         result += f'\tlast_name: {self.last_name}\n'
         return result
+
+print(GuestAuthor(314))

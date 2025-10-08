@@ -1,4 +1,5 @@
 from Extractor import Extractor
+from Translator import *
 from Utility import *
 from Constants import *
 
@@ -10,4 +11,5 @@ Utility.unzip(ZIP_FILE)
 # STEP 1: Extraction
 extractor = Extractor(POSTS_FILE, GUEST_AUTH_FILE)
 result = extractor.getData()
-print(result["auth"][0])
+authorTranslator = AuthorTranslator(result['auth'])
+print(authorTranslator.translate()[5])

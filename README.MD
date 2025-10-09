@@ -126,7 +126,40 @@ As stated in the summary above, the task at hand is to take our WP database and 
 # General Idea
 Here is rough diagram we have set up:
 
-[![](https://mermaid.ink/img/pako:eNptkE9v2zAMxb-KwNMGuEHi__ZhWNFuu7SHrQUKTCoGxlJsY5ZkUDLqNch3r-Im3QqMN76HHx_JPTRWKqhhN9inpkPy7OaHMCyU3PIPD5bkSMo5do0ePz6ys8UuLj4xNfMv82jJK3p8NdS8GBr5LfbmJGpcxDZ-1-40v_t-w75a0uj_TtjpxW20_LxnrsNR1UzaxkVswK0aaiYgYL-urNZopFv52Qs4CCOMm7Yt4diFIB6HabIn1fjemreLPPF7QuMG9Pac52nJw4lfTr6z5N7rLfJvk3Ke_ddF4pfk-2ZQR0MZKUwbv3LJvwslPDmBDvkdmt73z8vFC-Lw9DSIoKVeQu1pUhFoFV5zbGF_hAX4Tmkl4PgDifRbgDCHwIxoflqrzxjZqe2g3uHgQjeNEr267jGsot9UCsGKruxkPNRJtUmWKVDvYYZ6U-SrNMnSdZWlWVmVaRrBnyBXxaqoiizf5GmWrYvyEMHzkrte5XFSVkmalnmWZ3FWHF4A0l27wg?type=png)](https://mermaid.live/edit#pako:eNptkE9v2zAMxb-KwNMGuEHi__ZhWNFuu7SHrQUKTCoGxlJsY5ZkUDLqNch3r-Im3QqMN76HHx_JPTRWKqhhN9inpkPy7OaHMCyU3PIPD5bkSMo5do0ePz6ys8UuLj4xNfMv82jJK3p8NdS8GBr5LfbmJGpcxDZ-1-40v_t-w75a0uj_TtjpxW20_LxnrsNR1UzaxkVswK0aaiYgYL-urNZopFv52Qs4CCOMm7Yt4diFIB6HabIn1fjemreLPPF7QuMG9Pac52nJw4lfTr6z5N7rLfJvk3Ke_ddF4pfk-2ZQR0MZKUwbv3LJvwslPDmBDvkdmt73z8vFC-Lw9DSIoKVeQu1pUhFoFV5zbGF_hAX4Tmkl4PgDifRbgDCHwIxoflqrzxjZqe2g3uHgQjeNEr267jGsot9UCsGKruxkPNRJtUmWKVDvYYZ6U-SrNMnSdZWlWVmVaRrBnyBXxaqoiizf5GmWrYvyEMHzkrte5XFSVkmalnmWZ3FWHF4A0l27wg)
+```mermaid
+flowchart LR
+    db[(Wordpress Data)] 
+    db --> g1
+    g1 --> ma[Main]
+    ma --> g2
+    ma --> g4
+    g4 --> cmd@{ shape: docs, label: "SQL_Commands.txt"}
+
+subgraph g1[1]
+    ex[Exporter]
+end
+
+subgraph g2[2]
+direction LR
+    tr[Translator]
+    tr --> au[Authors]
+    tr --> ga[Guest Authors]
+    tr --> ar[Articles]
+end
+
+g2 --> g3
+
+subgraph g3[3]
+    sa[Sanitizer]
+end
+
+sa --> ma
+
+subgraph g4[4]
+    fm[SQL Formatter]
+end
+
+```
 
 1. The Extractor brings in .xml files into a Python dictionaries.
 2. The Translator parses the dictionaries into objects for easier editing.

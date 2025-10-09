@@ -11,5 +11,4 @@ Utility.unzip(ZIP_FILE)
 # STEP 1: Extraction
 extractor = Extractor(POSTS_FILE, GUEST_AUTH_FILE)
 result = extractor.getData()
-authorTranslator = AuthorTranslator(result['auth'])
-print(authorTranslator.translate()[5])
+print(result["guestAuth"][0])

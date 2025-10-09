@@ -1,6 +1,7 @@
 from Author import *
 class Translator:
-    
+    translation = 'rawr xD'
+
     def __init__(self, source):
         self.source = source
 
@@ -15,6 +16,12 @@ class AuthorTranslator(Translator):
     def translate(self):
         authors = []
         for author in self.source:
-            authorObject = Author(int(author['wp:author_id']), author['wp:author_login'], author['wp:author_email'], author['wp:author_display_name'], author['wp:author_first_name'], author['wp:author_last_name'])
+            authorObject = Author(int(author['wp:author_id']), 
+                                  author['wp:author_login'], 
+                                  author['wp:author_email'],
+                                  author['wp:author_display_name'], 
+                                  author['wp:author_first_name'], 
+                                  author['wp:author_last_name'])
             authors.append(authorObject)
         return authors
+

@@ -4,7 +4,7 @@ TASK: construct a maintainable script to handle the transfer of WordPress data i
 ___
 # SQL Database Schema
 Here is the database structure that lives on PRISM:
-```columns
+columns
 id: kjRksejKCecRQLxGB8DLo
 ===
 ## ARTICLES
@@ -120,7 +120,7 @@ id: kjRksejKCecRQLxGB8DLo
 
 
 
-```
+
 As stated in the summary above, the task at hand is to take our WP database and manipulate all of its data to fit this schema. Now, we won't have to deal with all of this data at first. Our main mission is to import over the Authors, Articles, and images. This is enough data to get everything else working.
 
 # General Idea

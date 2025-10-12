@@ -161,11 +161,12 @@ subgraph g4[4]
 end
 
 ```
-
 1. The Extractor brings in .xml files into a Python dictionaries.
 2. The Translator parses the dictionaries into objects for easier editing.
 3. The Sanitizer parses all of our data and unifies all of our data.
 4. The Formatter formats our data to fit into SQL tables.
-5. The Exporter generates the texts into easy to parse `.txt` files
+5. The Exporter generates the SQL commands and exports them as `.txt` files
 
-The concept is very manageable, the tricky part is handling all of the data uniforming. Making sure all of the data looks the same is the interesting task. However, with this design, we will cross that bridge when we get there.
+Potential improvements to this design could involve adding a "Retriever" that fetches the .xml files from WordPress automatically(step 0) and adding an "Injector" that automatically updates the SQL database(step 6).
+
+This concept is very manageable, the tricky part is handling all of the data uniforming. Making sure all of the data looks the same is the interesting task. However, with this design, we will cross that bridge when we get there.

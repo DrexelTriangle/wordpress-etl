@@ -48,9 +48,14 @@ class Extractor:
     guestAuthDict = self._eparse(guestAuths)
     postsDict = self._equery(postsDict, ['rss', 'channel'])
 
+    # OG, kept just in case
+    # self._setData('auth', self._equery(postsDict, ['wp:author']))
+    # self._setData('guestAuth', self._equery(postsDict, ['item']))
+    # self._setData('art', self._equery(guestAuthDict, ['rss', 'channel', 'item']))
+    
     self._setData('auth', self._equery(postsDict, ['wp:author']))
-    self._setData('guestAuth', self._equery(postsDict, ['item']))
-    self._setData('art', self._equery(guestAuthDict, ['rss', 'channel', 'item']))
+    self._setData('art', self._equery(postsDict, ['item']))
+    self._setData('guestAuth', self._equery(guestAuthDict, ['rss', 'channel', 'item']))
 
 
 

@@ -1,14 +1,69 @@
 from Author import *
+from GuestAuthor import *
+from Articles import *
 class Translator:
-    translation = 'rawr xD'
 
     def __init__(self, source):
         self.source = source
 
     def translate(self):
+        translation = []
         return translation
 
 class AuthorTranslator(Translator):
+
+    def __init__(self, source):
+        super().__init__(source)
+    
+    def translate(self):
+        authors = []
+        for author in self.source:
+            authorObject = Author(int(author['wp:author_id']), 
+                                  author['wp:author_login'], 
+                                  author['wp:author_email'],
+                                  author['wp:author_display_name'], 
+                                  author['wp:author_first_name'], 
+                                  author['wp:author_last_name'])
+            authors.append(authorObject)
+        return authors
+
+class GuestAuthorTranslator(Translator):
+
+    def __init__(self, source):
+        super().__init__(source)
+    
+    def translate(self):
+        guestAuthors = []
+        for guestAuthor in self.source:
+            guestAuthorObject = GuestAuthor(guestAuthor['title'], 
+                                  guestAuthor['dc:creator'], 
+                                  guestAuthor['link'],
+                                  guestAuthor['pub_date'], 
+                                  guestAuthor['guid'], 
+                                  guestAuthor['description'],
+                                  guestAuthor['content:encoded'],
+                                  guestAuthor['excerpt:encoded'],
+                                  guestAuthor['wp:post_id'],
+                                  guestAuthor['wp:post_date'],
+                                  guestAuthor['wp:post_date_gmt'],
+                                  guestAuthor['wp:post_modified'], 
+                                  guestAuthor['wp:post_modified_gmt'], 
+                                  guestAuthor['wp:comment_status'], 
+                                  guestAuthor['wp:ping_status'], 
+                                  guestAuthor['wp:post_name'], 
+                                  guestAuthor['wp:status'],
+                                  guestAuthor['wp:post_parent'],
+                                  guestAuthor['wp:menu_order'], 
+                                  guestAuthor['wp:post_type'],
+                                  guestAuthor['wp:post_password'],
+                                  guestAuthor['wp:is_sticky'],
+                                  guestAuthor['wp:category'],
+                                  guestAuthor['wp:postmeta']
+                                  )
+            guestAuthors.append(guestAuthorObject)
+        return guestAuthors
+
+class ArticleTranslator(Translator):
 
     def __init__(self, source):
         super().__init__(source)

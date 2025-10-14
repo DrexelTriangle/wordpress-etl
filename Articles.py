@@ -1,4 +1,4 @@
-from newUtility import *
+from Utility import *
 from Author import *
 import os as OS
 
@@ -129,7 +129,7 @@ class Article:
         "priority": False,
         "modDate": articlePost.get('wp:post_modified_gmt'),
         "photoCred": re.findall(r"(\/wp-content\/uploads\/.*\/)((.*)\.(jpg|png|jpeg))", text),
-        "pubDate": pubDate = articlePost.get('wp:post_date_gmt'),
+        "pubDate": articlePost.get('wp:post_date_gmt'),
         "tags": [],
         "text": str(charMorph(articlePost.get('content:encoded'))).replace('"', '\\"'),
         "title": charMorph(articlePost.get('title')), 

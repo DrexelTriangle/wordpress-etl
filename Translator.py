@@ -64,19 +64,37 @@ class GuestAuthorTranslator(Translator):
         return guestAuthors
 
 class ArticleTranslator(Translator):
-
+    # Nguyen - it might be a very bad idea to store every single article cause they have like 18K articles
     def __init__(self, source):
         super().__init__(source)
     
+    # Nguyen - commenting out for now
+    # def translate(self):
+    #     authors = []
+    #     for author in self.source:
+    #         authorObject = Author(int(author['wp:author_id']), 
+    #                               author['wp:author_login'], 
+    #                               author['wp:author_email'],
+    #                               author['wp:author_display_name'], 
+    #                               author['wp:author_first_name'], 
+    #                               author['wp:author_last_name'])
+    #         authors.append(authorObject)
+    #     return authors
+    
     def translate(self):
-        authors = []
-        for author in self.source:
-            authorObject = Author(int(author['wp:author_id']), 
-                                  author['wp:author_login'], 
-                                  author['wp:author_email'],
-                                  author['wp:author_display_name'], 
-                                  author['wp:author_first_name'], 
-                                  author['wp:author_last_name'])
-            authors.append(authorObject)
-        return authors
+        articles = []
+        for article in self.source: 
+            articleObject = Article(
+                title = article['title'],
+                pubDate=article['wp:post_date'],
+                modDate=article['wp:post_modified'],
+                description= article['description'],
+                commentStatus=article['wp:comment_status'],
+                tags = article['category'],
+                authors= article['dc:creator'], # for later: maybe link with Author object
+                text= article['content:encoded'], # sth's wrong with the article extractor it couldn't extract text
+            )
+            articles.append(articleObject)
+        return articles
+            
 

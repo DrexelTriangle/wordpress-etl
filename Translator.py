@@ -35,31 +35,11 @@ class GuestAuthorTranslator(Translator):
     def translate(self):
         guestAuthors = []
         for guestAuthor in self.source:
-            guestAuthorObject = GuestAuthor(guestAuthor['title'], 
-                                  guestAuthor['dc:creator'], 
-                                  guestAuthor['link'],
-                                  guestAuthor['pub_date'], 
-                                  guestAuthor['guid'], 
-                                  guestAuthor['description'],
-                                  guestAuthor['content:encoded'],
-                                  guestAuthor['excerpt:encoded'],
-                                  guestAuthor['wp:post_id'],
-                                  guestAuthor['wp:post_date'],
-                                  guestAuthor['wp:post_date_gmt'],
-                                  guestAuthor['wp:post_modified'], 
-                                  guestAuthor['wp:post_modified_gmt'], 
-                                  guestAuthor['wp:comment_status'], 
-                                  guestAuthor['wp:ping_status'], 
-                                  guestAuthor['wp:post_name'], 
-                                  guestAuthor['wp:status'],
-                                  guestAuthor['wp:post_parent'],
-                                  guestAuthor['wp:menu_order'], 
-                                  guestAuthor['wp:post_type'],
-                                  guestAuthor['wp:post_password'],
-                                  guestAuthor['wp:is_sticky'],
-                                  guestAuthor['wp:category'],
-                                  guestAuthor['wp:postmeta']
-                                  )
+            guestAuthorObject = GuestAuthor(
+                                guestAuthor['title'],
+                                guestAuthor['title'].split(' ')[0],
+                                guestAuthor['title'].split(' ')[1]
+                                )
             guestAuthors.append(guestAuthorObject)
         return guestAuthors
 
@@ -80,6 +60,32 @@ class ArticleTranslator(Translator):
     #                               author['wp:author_last_name'])
     #         authors.append(authorObject)
     #     return authors
+
+    # guestAuthor['title'], 
+    #                               guestAuthor['dc:creator'], 
+    #                               guestAuthor['link'],
+    #                               guestAuthor['pub_date'], 
+    #                               guestAuthor['guid'], 
+    #                               guestAuthor['description'],
+    #                               guestAuthor['content:encoded'],
+    #                               guestAuthor['excerpt:encoded'],
+    #                               guestAuthor['wp:post_id'],
+    #                               guestAuthor['wp:post_date'],
+    #                               guestAuthor['wp:post_date_gmt'],
+    #                               guestAuthor['wp:post_modified'], 
+    #                               guestAuthor['wp:post_modified_gmt'], 
+    #                               guestAuthor['wp:comment_status'], 
+    #                               guestAuthor['wp:ping_status'], 
+    #                               guestAuthor['wp:post_name'], 
+    #                               guestAuthor['wp:status'],
+    #                               guestAuthor['wp:post_parent'],
+    #                               guestAuthor['wp:menu_order'], 
+    #                               guestAuthor['wp:post_type'],
+    #                               guestAuthor['wp:post_password'],
+    #                               guestAuthor['wp:is_sticky'],
+    #                               guestAuthor['wp:category'],
+    #                               guestAuthor['wp:postmeta']
+                                  
     
     def translate(self):
         articles = []

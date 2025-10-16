@@ -12,13 +12,16 @@ class ArticleTranslator(Translator):
     
   def translate(self):
     for i, item in enumerate(self.source):
+      # create blank object, try to set data
       obj = Article()
       obj.setData(self.objCount, self.source[i])
+      
+      # handle title
       title = obj["title"]
-
       if (title is not None):
         obj["title"] = title.replace('"', '\\"')
       
+      # tag object ->  
       obj.processTags()
       if (not obj.dataSanityCheck() or obj["tags"] == -1):
         continue

@@ -3,6 +3,7 @@ from Translator.Translator import Translator
 
 class Article():  
   # Constructor - blank object
+  defaultValue = "None"
   def __init__(self):
     self.data = {
       "authorIDs": [],
@@ -47,14 +48,14 @@ class Article():
       "authors": [],
       "authorCleanNames": [],
       "breakingNews": False,
-      "commentStatus": data.get('wp:comment_status'),
+      "commentStatus": data.get('wp:comment_status', Article.defaultValue),
       "description": U._html_text_norm(data.get('description')),
       "featuredImgID": -1,
       "id": count,
       "priority": False,
-      "modDate": data.get('wp:post_modified_gmt'),
+      "modDate": data.get('wp:post_modified_gmt', Article.defaultValue),
       "photoCred": None,
-      "pubDate": data.get('wp:post_date_gmt'),
+      "pubDate": data.get('wp:post_date_gmt', Article.defaultValue),
       "tags": data.get('category'),
       "text": str(U._html_text_norm(data.get('content:encoded'))).replace('"', '\\"'),
       "title": U._html_text_norm(data.get('title')), 
@@ -66,26 +67,31 @@ class Article():
   def dataSanityCheck(self):
     text = self["text"]
     title = self["title"]
-    isTextNotNull = text != "None" and len(text) > 100 
-    isTitleNotNull = title != None 
+    isTextNotNull = text != Article.defaultValue and len(text) > 100 
+    isTitleNotNull = title != Article.defaultValue 
     isTextNotSudoku = isTextNotNull and ('sudoku' not in text)
     isTitleNotUnderscore = isTitleNotNull and ('_' not in title) 
 
     return isTextNotSudoku and isTitleNotUnderscore
 
 
+  # processTags: tags are stored in the 'category' WP key where its value should be a list of dict objects
   def processTags(self):
     resultTags = []
     try:
       for i in range(len(self.data["tags"])):
-        temp = self.data["tags"][i]
-        nicename = temp.get("@nicename")
-        domain = temp.get("@domain")
-        text = temp.get("#text")
+        # Grab tag data [KEYS-> author name: "@nicename" tag data: "@domain"]
+        temp = self["tags"][i]
+        nicename = temp.get("@nicename", Article.defaultValue)
+        domain = temp.get("@domain", Article.defaultValue)
+        text = temp.get("#text", Article.defaultValue)
 
+        # Check whether or not we're dealing with crossowrd/comics post
+        # TODO: implement handling these later, for now just flag for 
+        #       skipping, along with any empty posts
         isCrosswordOrComics = nicename in {"crossword", "comics"}
-        isNoTags = self["tags"] is None 
-        isNoText = self["text"] is None
+        isNoTags = self["tags"] == "None" 
+        isNoText = self["text"] == "None"
         if (isCrosswordOrComics or isNoTags or isNoText):
           self.data["tags"] = -1
           return
@@ -97,6 +103,7 @@ class Article():
           self["authorCleanNames"].append(cleanName)
           self["authors"].append(text)
 
+    # Handle invalid key access and other NoneType-related errors 
     except (KeyError, TypeError):
       resultTags.append('NO_TAGS')
 

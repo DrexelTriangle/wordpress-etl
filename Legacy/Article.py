@@ -1,5 +1,5 @@
 from newUtility import *
-from Author import *
+from Translator.Author import *
 import os as OS
 
 class Article:

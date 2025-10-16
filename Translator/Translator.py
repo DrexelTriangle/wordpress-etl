@@ -1,9 +1,10 @@
-from Author import *
-from GuestAuthor import *
-from Articles import *
+from Translator.Author import *
+from Translator.GuestAuthor import *
+
 class Translator:
 
     def __init__(self, source):
+        self.source = {}
         self.source = source
 
     def translate(self):

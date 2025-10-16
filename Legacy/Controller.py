@@ -1,6 +1,6 @@
 from xmltodict import *
 from newUtility import *
-from Author import *
+from Translator.Author import *
 from Article import *
 from json import *
 import os as OS 

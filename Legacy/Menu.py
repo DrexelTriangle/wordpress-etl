@@ -1,4 +1,4 @@
-from Author import * 
+from Translator.Author import * 
 from Article import *
 
 def mapping(mustReplace):

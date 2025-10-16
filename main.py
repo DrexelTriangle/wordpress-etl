@@ -1,7 +1,8 @@
 from Extractor import Extractor
-from Translator import *
+from Translator.Translator import *
 from Utility import *
 from Constants import *
+from Translator.ArticleTranslator import *
 
 # TODO: python library dependency checks
 
@@ -13,5 +14,5 @@ extractor = Extractor(POSTS_FILE, GUEST_AUTH_FILE)
 extracted = extractor.getData() 
 
 translatedData = {
-  "articles": Article.processArticles(extracted["art"])
+  "articles": ArticleTranslator.processArticles(extracted["art"])
 }

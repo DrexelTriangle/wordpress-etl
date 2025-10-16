@@ -1,10 +1,10 @@
 from Utility import Utility as U
-from Author import *
+from Translator.Translator import Translator
 import os as OS
 import re
 import json
 
-class Article:
+class ArticleTranslator(Translator):
   articleCount = 0
   articleDict = {}
   map = set()
@@ -12,23 +12,23 @@ class Article:
   
   # Constructor
   def __init__(self, incomingData):
-    self.data = {}
-    self.data.update(incomingData)
-    Article.articleDict.update({self.data["id"] : self.data})
-    Article.articleCount += 1
+    super().__init__(incomingData)
+    self.source.update(incomingData)
+    ArticleTranslator.articleDict.update({self.source["id"] : self.source})
+    ArticleTranslator.articleCount += 1
   
   
-  def processArticles(articleData):
+  def translate(articleData):
     for i, item in enumerate(articleData):
-      metaTags, data = [], Article._blankArticle()
-      data = Article._setData(articleData[i])
+      metaTags, data = [], ArticleTranslator._blankArticle()
+      data = ArticleTranslator._setData(articleData[i])
 
       if (data["title"] is not None):
         data["title"] = data["title"].replace('"', '\\"')
       
       tagsObj = articleData[i].get('category')
       try:
-        metaTags =  Article.processTags(tagsObj)
+        metaTags =  ArticleTranslator.processTags(tagsObj)
         if (metaTags == -1):
           continue 
         data["tags"] = metaTags[0]
@@ -37,12 +37,12 @@ class Article:
         if (metaTags is None or data["text"] is None):
           continue
       
-      if (Article._dataSanityCheck(data)):
-        obj = Article(data)
+      if (ArticleTranslator._dataSanityCheck(data)):
+        obj = ArticleTranslator(data)
     
   def __str__(self):
     result = ""
-    for key, value in self.data.items():
+    for key, value in self.source.items():
       result += f"{key}: {value}\n"
     result += "\n"
     return result 
@@ -84,7 +84,7 @@ class Article:
       "commentStatus": data.get('wp:comment_status'),
       "description": U._html_text_norm(data.get('description')),
       "featuredImgID": -1,
-      "id": Article.articleCount,
+      "id": ArticleTranslator.articleCount,
       "priority": False,
       "modDate": data.get('wp:post_modified_gmt'),
       "photoCred": None,
@@ -96,8 +96,8 @@ class Article:
    
   def _visualize():
     with open('articles.json', 'w+', encoding='utf-8') as file:
-      # json.dump(Article.articleDict, file, indent=2)
-      json.dump(Article.articleDict, file, indent=2)
+      # json.dump(ArticleTranslator.articleDict, file, indent=2)
+      json.dump(ArticleTranslator.articleDict, file, indent=2)
       file.close()
 
   def processTags(myLst):
@@ -117,7 +117,7 @@ class Article:
         elif (domain == "author"):
           cleanName = temp.get("#text").translate(str.maketrans('', '', '.-_ ')).lower()
           articleAuthors.append(temp.get("#text"))
-          Article.map.add(cleanName)
+          ArticleTranslator.map.add(cleanName)
 
     except KeyError:
       tags.append('NO_TAGS')

@@ -1,4 +1,4 @@
-from Author import *
+from Translator.Author import *
 
 def dupAuthors(myLst):
   # grab data about duplicate authors

@@ -13,7 +13,21 @@ Utility.unzip(ZIP_FILE)
 extractor = Extractor(POSTS_FILE, GUEST_AUTH_FILE)
 extracted = extractor.getData() 
 
-translatedData = {
-  "articles": ArticleTranslator.translate(extracted["art"])
+translators = {
+  "articles": ArticleTranslator(extracted["art"])
 }
+
+translators["articles"].translate()
+translators["articles"]._visualize()
+names = sorted(list(translators["articles"].uniqueAuthorCleanNames))
+longestName = len(max(names, key=len))
+
+
+for i in range(len(names)):
+  authorName = names[i]
+  spaces = longestName - len(authorName)
+  buf = (' ' * spaces) + authorName
+  print(buf, end=' ')
+  if (i + 1) % 4 == 0:
+    print()
 

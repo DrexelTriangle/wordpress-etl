@@ -14,5 +14,6 @@ extractor = Extractor(POSTS_FILE, GUEST_AUTH_FILE)
 extracted = extractor.getData() 
 
 translatedData = {
-  "articles": ArticleTranslator.processArticles(extracted["art"])
+  "articles": ArticleTranslator.translate(extracted["art"])
 }
+

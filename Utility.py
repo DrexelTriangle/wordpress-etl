@@ -18,3 +18,12 @@ class Utility:
     with open(fileName, 'w+', encoding='utf-8') as file:
       file.write(result)
       file.close()
+  
+  def _html_text_norm(text):
+    result = ''
+    
+    if (text == None):
+      return None 
+    result = text.replace('&amp;', '&')
+    result = result.replace('&nbsp;', ' ')
+    return result

@@ -17,3 +17,5 @@ translatedData = {
   "articles": ArticleTranslator.translate(extracted["art"])
 }
 
+# ArticleTranslator._visualize()
+print(ArticleTranslator.byteSize)

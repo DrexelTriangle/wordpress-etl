@@ -3,8 +3,10 @@ from Translator.Translator import Translator
 import os as OS
 import re
 import json
+import sys
 
 class ArticleTranslator(Translator):
+  byteSize = 0
   articleCount = 0
   articleDict = {}
   map = set()
@@ -39,6 +41,7 @@ class ArticleTranslator(Translator):
       
       if (ArticleTranslator._dataSanityCheck(data)):
         obj = ArticleTranslator(data)
+        ArticleTranslator.byteSize += sys.getsizeof(obj)
     
   def __str__(self):
     result = ""
@@ -97,7 +100,7 @@ class ArticleTranslator(Translator):
   def _visualize():
     with open('articles.json', 'w+', encoding='utf-8') as file:
       # json.dump(ArticleTranslator.articleDict, file, indent=2)
-      json.dump(ArticleTranslator.articleDict, file, indent=2)
+      json.dump(ArticleTranslator.articleDict, file, indent=4)
       file.close()
 
   def processTags(myLst):

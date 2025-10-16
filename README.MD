@@ -137,7 +137,7 @@ flowchart LR
     g4 --> cmd@{ shape: docs, label: "SQL_Commands.txt"}
 
 subgraph g1[1]
-    ex[Exporter]
+    ex[Extractor]
 end
 
 subgraph g2[2]

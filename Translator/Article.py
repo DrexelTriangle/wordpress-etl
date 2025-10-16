@@ -81,10 +81,10 @@ class Article():
     try:
       for i in range(len(self.data["tags"])):
         # Grab tag data [KEYS-> author name: "@nicename" tag data: "@domain"]
-        temp = self["tags"][i]
-        nicename = temp.get("@nicename", Article.defaultValue)
-        domain = temp.get("@domain", Article.defaultValue)
-        text = temp.get("#text", Article.defaultValue)
+        tagData = self["tags"][i]
+        nicename = tagData.get("@nicename", Article.defaultValue)
+        domain = tagData.get("@domain", Article.defaultValue)
+        text = tagData.get("#text", Article.defaultValue)
 
         # Check whether or not we're dealing with crossowrd/comics post
         # TODO: implement handling these later, for now just flag for 

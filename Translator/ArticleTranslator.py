@@ -37,5 +37,3 @@ class ArticleTranslator(Translator):
       file.close()
 
 
-
-

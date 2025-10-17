@@ -13,12 +13,6 @@ class Utility:
     shutil.rmtree(dir)
 
   
-  def _visualize(dict, fileName):
-    result = pprint.pformat(dict)
-    with open(fileName, 'w+', encoding='utf-8') as file:
-      file.write(result)
-      file.close()
-  
   def _html_text_norm(text):
     result = ''
     

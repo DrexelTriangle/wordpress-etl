@@ -19,17 +19,8 @@ translators = {
 
 translators["articles"].translate()
 translators["articles"]._visualize()
-names = sorted(list(translators["articles"].uniqueAuthorCleanNames))
-longestName = len(max(names, key=len))
 
 
-for i in range(len(names)):
-  authorName = names[i]
-  spaces = longestName - len(authorName)
-  buf = (' ' * spaces) + authorName
-  print(buf, end=' ')
-  if (i + 1) % 4 == 0:
-    print()
 
 
 

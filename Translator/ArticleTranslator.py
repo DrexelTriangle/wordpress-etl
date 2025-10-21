@@ -1,6 +1,6 @@
-from Utility import Utility as U
 from Translator.Translator import Translator
 from Translator.Article import Article
+import os as OS
 import json
 
 class ArticleTranslator(Translator):  
@@ -36,4 +36,20 @@ class ArticleTranslator(Translator):
       json.dump(self.objDataDict, file, indent=4)
       file.close()
 
+  def _printUniqueAuthors(self):
+    terminal_size = OS.get_terminal_size()
+    names = sorted(list(self.uniqueAuthorCleanNames))
+    longestName = len(max(names, key=len))
+    columns = terminal_size.columns // longestName
+
+    for i in range(len(names)):
+      authorName = names[i]
+      spaces = longestName - len(authorName)
+      buf = (' ' * spaces) + authorName
+      print(buf, end=' ')
+      if (i + 1) % columns == 0:
+        print()
+    print('\n')
+
+  
 

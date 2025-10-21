@@ -27,13 +27,6 @@ class ArticleTranslator(Translator):
       self.uniqueAuthorCleanNames.update(obj["authorCleanNames"])
       self.objCount += 1
 
-
-  def _log(self):
-    # Log data into json
-    with open('log\\articles.json', 'w+', encoding='utf-8') as file:
-      json.dump(self.objDataDict, file, indent=4)
-      file.close()
-
   def _printUniqueAuthors(self):
     terminal_size = OS.get_terminal_size()
     names = sorted(list(self.uniqueAuthorCleanNames))

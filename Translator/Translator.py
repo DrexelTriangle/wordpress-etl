@@ -1,5 +1,6 @@
 from Translator.Author import *
 from Translator.GuestAuthor import *
+import json
 
 class Translator:
 
@@ -11,6 +12,12 @@ class Translator:
     def translate(self):
         translation = []
         return translation
+    
+    def _log(self, fileDestination):
+        # Log data into json
+        with open(fileDestination, 'w+', encoding='utf-8') as file:
+          json.dump(self.objDataDict, file, indent=4)
+          file.close()
 
 
 

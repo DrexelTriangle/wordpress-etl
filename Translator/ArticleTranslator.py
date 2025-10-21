@@ -31,8 +31,9 @@ class ArticleTranslator(Translator):
       self.objCount += 1
 
 
-  def _visualize(self):
-    with open('articles.json', 'w+', encoding='utf-8') as file:
+  def _log(self):
+    # Log data into json
+    with open('log\\articles.json', 'w+', encoding='utf-8') as file:
       json.dump(self.objDataDict, file, indent=4)
       file.close()
 

@@ -17,4 +17,7 @@ class AuthorTranslator(Translator):
             authors.append(authorObject)
         return authors
     
+    def _log(self):
+        # Log data into json
+        pass
     

@@ -57,8 +57,8 @@ class Article():
       "photoCred": None,
       "pubDate": data.get('wp:post_date_gmt', Article.defaultValue),
       "tags": data.get('category'),
-      "text": str(U._html_text_norm(data.get('content:encoded'))).replace('"', '\\"'),
-      "title": U._html_text_norm(data.get('title')), 
+      "text": str(U._html_text_norm(data.get('content:encoded', Article.defaultValue))).replace('"', '\\"'),
+      "title": U._html_text_norm(data.get('title', Article.defaultValue)), 
     })
 
     
@@ -107,7 +107,8 @@ class Article():
     except (KeyError, TypeError):
       resultTags.append('NO_TAGS')
 
-    self["tags"] = resultTags.sort(reverse=True)
+    resultTags.sort(reverse=True)
+    self["tags"] = resultTags
 
 
 

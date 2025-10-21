@@ -12,18 +12,15 @@ class ArticleTranslator(Translator):
     
   def translate(self):
     for i, item in enumerate(self.source):
-      # create blank object, try to set data
       obj = Article()
       obj.setData(self.objCount, self.source[i])
-      
-      # handle title
       title = obj["title"]
+
       if (title is not None):
         obj["title"] = title.replace('"', '\\"')
       
-      # tag object ->  
       obj.processTags()
-      if (not obj.dataSanityCheck() or obj["tags"] == -1):
+      if (obj["title"] is None or not obj.dataSanityCheck() or obj["tags"] == -1):
         continue
     
       self.objDataDict.update({obj["id"]: obj.data})
@@ -42,6 +39,7 @@ class ArticleTranslator(Translator):
     longestName = len(max(names, key=len))
     columns = terminal_size.columns // longestName
 
+
     for i in range(len(names)):
       authorName = names[i]
       spaces = longestName - len(authorName)
@@ -52,4 +50,6 @@ class ArticleTranslator(Translator):
     print('\n')
 
   
+
+
 

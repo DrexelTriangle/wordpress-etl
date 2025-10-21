@@ -15,25 +15,23 @@ Utility.unzip(ZIP_FILE)
 extractor = Extractor(POSTS_FILE, GUEST_AUTH_FILE)
 extracted = extractor.getData() 
 
-'''
-FORMAT OF EXTRACTED DATA
-{
-  auth: ...
-  guestAuth: ...
-  art: ...
-}
-'''
 
+# Step 2: Translation
 translators = {
   "articles": ArticleTranslator(extracted["art"]),
   "gAuth": GuestAuthorTranslator(extracted["guestAuth"]),
   "auth": AuthorTranslator(extracted["auth"])
 }
 
+for key in translators:
+  translators[key].translate()
 
 
-translators["gAuth"].translate()
-translators["gAuth"]._log()
+# DEBUG: logging
+translators["articles"]._log('log\\articles.json')
+translators["gAuth"]._log('log\\gAuth.json')
+
+
 
 
 

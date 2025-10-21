@@ -14,6 +14,7 @@ Utility.unzip(ZIP_FILE)
 # STEP 1: Extraction
 extractor = Extractor(POSTS_FILE, GUEST_AUTH_FILE)
 extracted = extractor.getData() 
+
 '''
 FORMAT OF EXTRACTED DATA
 {
@@ -22,14 +23,21 @@ FORMAT OF EXTRACTED DATA
   art: ...
 }
 '''
+
 translators = {
   "articles": ArticleTranslator(extracted["art"]),
   "gAuth": GuestAuthorTranslator(extracted["guestAuth"]),
   "auth": AuthorTranslator(extracted["auth"])
 }
 
-translators["gAuthor"].translate()
-translators["gAuthor"]._log()
+
+# for t in translators:
+#   translators[t].translate()
+#   translators[t]._log()
+
+translators["gAuth"].translate()
+translators["gAuth"]._log()
+
 # names = sorted(list(translators["articles"].uniqueAuthorCleanNames))
 # longestName = len(max(names, key=len))
 

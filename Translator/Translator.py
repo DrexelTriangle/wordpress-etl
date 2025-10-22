@@ -19,6 +19,9 @@ class Translator:
           json.dump(self.objDataDict, file, indent=4)
           file.close()
 
+    def __str__(self):
+        log = json.dump(self.objDataDict, file, indent=4)
+        print(log)
 
 
 

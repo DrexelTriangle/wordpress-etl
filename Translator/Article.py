@@ -1,5 +1,6 @@
 from Utility import Utility as U
 from Translator.Translator import Translator
+import json
 
 class Article():  
   # Constructor - blank object
@@ -23,15 +24,10 @@ class Article():
       "title": '', 
     }
   
-  # CLASS OVERLOADS
-  # printing
   def __str__(self):
-    result = ""
-    for key, value in self.source.items():
-      result += f"{key}: {value}\n"
-    result += "\n"
-    return result 
-  
+    log = json.dump(self.objDataDict, file, indent=4)
+    print(log)
+
   # dictionary overloads (convenience)
   def __getitem__(self, key):
     return self.data[key]

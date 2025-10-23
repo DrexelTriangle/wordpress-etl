@@ -29,5 +29,4 @@ class GuestAuthorTranslator(Translator):
         for guestAuthorData in self.source:
             metadata = self._extractMetadata(guestAuthorData['wp:postmeta'])
             guestAuthorObject = GuestAuthor(*metadata)
-            self.objDataDict.update({guestAuthorObject.data["id"]: guestAuthorObject.data})
-            self.objCount += 1
+            self.addObject(guestAuthorObject)

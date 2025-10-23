@@ -1,7 +1,6 @@
 from Constants import *
 import zipfile
 import shutil
-import pprint
 
 class Utility:
   def unzip(zipPath):

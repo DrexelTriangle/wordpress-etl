@@ -9,7 +9,14 @@ class ArticleTranslator(Translator):
     super().__init__(incomingData)
     self.uniqueAuthorCleanNames = set()
 
-  def _getArticleData(self, data):
+  def _getArticleData(self, data, noTextGrab=False):
+    textData = ''
+    
+    if (noTextGrab):
+      textData = 'TEST'
+    else:
+      textData = str(U._html_text_norm(data.get('content:encoded', Article.defaultValue))).replace('"', '\\"')
+    
     authorIDs = []
     authors = []
     authorCleanNames = []
@@ -23,7 +30,7 @@ class ArticleTranslator(Translator):
     photoCred = None
     pubDate = data.get('wp:post_date_gmt', Article.defaultValue)
     tags = data.get('category')
-    text = str(U._html_text_norm(data.get('content:encoded', Article.defaultValue))).replace('"', '\\"')
+    text = textData
     title = U._html_text_norm(data.get('title', Article.defaultValue))
 
     chunk1 = [authorIDs, authors, authorCleanNames]
@@ -36,21 +43,22 @@ class ArticleTranslator(Translator):
 
 
   # NOTE: using to only load 9k of the article data
-  def _shouldSkip(self, obj:Article):
+  def _shouldSkip(self, obj:Article, debugMode):
     title = obj["title"]
-    if (title is None or not obj.dataSanityCheck() or obj["tags"] == -1):
-      return False 
+    if (title is None or not obj.dataSanityCheck(debugMode) or obj["tags"] == -1):
+      return True 
     obj["title"] = title.replace('"', '\\"')
-    return True
+    return False
 
 
   def translate(self):
+    debugMode = False
     for i, itm in enumerate(self.source):
-      objData = self._getArticleData(itm)
+      objData = self._getArticleData(itm, debugMode)
       obj = Article(*objData)
       obj.processTags()
       # NOTE: using to only load 9k of the article data
-      if self._shouldSkip(obj):
+      if self._shouldSkip(obj, debugMode):
         continue
       else:
         self.objDataDict.update({obj["id"]: obj.data})

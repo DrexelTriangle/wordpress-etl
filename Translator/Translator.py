@@ -22,6 +22,9 @@ class Translator:
         self.objDataDict.update({object.data["id"]: object.data})
         self.objCount += 1
         
+    def batchTranslate(translators:dict):
+      for key in translators:
+        translators[key].translate()
 
 
 

@@ -5,29 +5,32 @@ import json
 class Article():  
   # Constructor - blank object
   defaultValue = "None"
-  def __init__(self):
+  def __init__(
+    self, 
+    authorIDs, authors, authorCleanNames,
+    breakingNews, commentStatus, description,
+    featuredImgID, id, priority, modDate, 
+    photoCred, pubDate, tags, text, title
+  ):
     self.data = {
-      "authorIDs": [],
-      "authors": [],
-      "authorCleanNames": [],
-      "breakingNews": False,
-      "commentStatus": '',
-      "description": '',
-      "featuredImgID": -1,
-      "id": -1,
-      "priority": False,
-      "modDate": '',
-      "photoCred": '',
-      "pubDate": '',
-      "tags": [],
-      "text": '',
-      "title": '', 
+      "authorIDs": authorIDs,
+      "authors": authors,
+      "authorCleanNames": authorCleanNames,
+      "breakingNews": breakingNews,
+      "commentStatus": commentStatus,
+      "description": description,
+      "featuredImgID": featuredImgID,
+      "id": id,
+      "priority": priority,
+      "modDate": modDate,
+      "photoCred": photoCred,
+      "pubDate": pubDate,
+      "tags": tags,
+      "text": text,
+      "title": title, 
     }
   
-  def __str__(self):
-    log = json.dump(self.objDataDict, file, indent=4)
-    print(log)
-
+  
   # dictionary overloads (convenience)
   def __getitem__(self, key):
     return self.data[key]
@@ -35,29 +38,6 @@ class Article():
     self.data[key] = value
   def __delitem__(self, key):
     del self.data[key]
-    
-  
-  
-  def setData(self, count, data:dict):
-    self.data.update({
-      "authorIDs": [], # for author/article linking (author<->linking)
-      "authors": [],
-      "authorCleanNames": [],
-      "breakingNews": False,
-      "commentStatus": data.get('wp:comment_status', Article.defaultValue),
-      "description": U._html_text_norm(data.get('description')),
-      "featuredImgID": -1,
-      "id": count,
-      "priority": False,
-      "modDate": data.get('wp:post_modified_gmt', Article.defaultValue),
-      "photoCred": None,
-      "pubDate": data.get('wp:post_date_gmt', Article.defaultValue),
-      "tags": data.get('category'),
-      "text": str(U._html_text_norm(data.get('content:encoded', Article.defaultValue))).replace('"', '\\"'),
-      "title": U._html_text_norm(data.get('title', Article.defaultValue)), 
-    })
-
-    
   
 
   def dataSanityCheck(self):

@@ -12,7 +12,7 @@ from Translator.AuthorTranslator import *
 Utility.unzip(ZIP_FILE)
 
 # STEP 1: Extraction
-extractor = Extractor(POSTS_FILE, GUEST_AUTH_FILE)
+extractor = Extractor(*UNZIPPED_FILES)
 extracted = extractor.getData() 
 
 

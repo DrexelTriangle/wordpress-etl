@@ -257,3 +257,23 @@ I HIHLY recommend cleaning the authors and gAuthors first before dealing with th
 
 Once you get through the articles, people should work together to try and identify errors. Don't spend too much time identifying errors here, as this being perfect isn't necessary for our tables. Catch any weird stuff, and then move on. 
 
+4. The Formatter
+
+This just takes all of the objects we have crafted and form SQL statements for injection into our tables. Specifically, PRISM is using MariaDB. As we are only dealing with articles and authors for now, the goal will be to inject data into tables that only concern this data. Here is an example from the last iteration of this code:
+```python
+def SQLifiy():
+  with open('.\\output\\articles-sql.txt', "w+", encoding="utf-8") as file:
+    for i in range(len(Article.articleDict)):
+      itm = Article.getArticle(i)
+      insertFields = 'article_id, title, pub_date, mod_date, description, priority, breaking_end_date, text, featured_img_id'
+      insertValues = f'''{itm.id}, "{itm.title}", '{itm.pubDate}', '{itm.modDate}', "{itm.description}", {itm.priotity}, {itm.breakingNews}, "{itm.text}", {itm.featuredImgID}'''
+      file.write(f"INSERT INTO tr_articles ({insertFields}) VALUES ({insertValues});\n")
+    file.close()
+```
+As shown, we were taking the dictionaries and building out MASSIVE `.txt` files for manual injection. To whoever is reapproaching this, it'd be nice to be able to inject from the script itself. For testing purposes, try to inject directly from your developing device. This will require you to figure out:
+1. Connecting to PRISM's SQL server
+2. Securely logging into DB
+3. Safely inserting necessary data
+4. Closing the connection safely
+
+This will also force whoever is working on this to aread PRISM's documentation and understand its layout. For any questions, you can 100% ask Kenneth or Steve regarding things about PRISM, or Daniel in regards to building out a script with the appropriate Python library, but the developer here has some amount of jurisdiction as to what happens here!

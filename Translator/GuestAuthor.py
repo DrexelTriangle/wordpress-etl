@@ -1,7 +1,6 @@
-import json
+from Translator.WPObject import WPObject as WPO
 
-class GuestAuthor:
-
+class GuestAuthor(WPO):
     def __init__(self, display_name, first_name, last_name, email, login, count):
         self.data = {
                 "display_name": display_name,
@@ -12,6 +11,3 @@ class GuestAuthor:
                 "id": count
         } 
 
-    def __str__(self):
-        log = json.dump(self.objDataDict, file, indent=4)
-        print(log)

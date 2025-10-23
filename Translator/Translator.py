@@ -3,7 +3,6 @@ from Translator.GuestAuthor import *
 import json
 
 class Translator:
-
     def __init__(self, source):
         self.source = source
         self.objCount = 0

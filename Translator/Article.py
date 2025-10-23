@@ -1,8 +1,7 @@
 from Utility import Utility as U
-from Translator.Translator import Translator
-import json
+from Translator.WPObject import WPObject as WPO
 
-class Article():  
+class Article(WPO):  
   # Constructor - blank object
   defaultValue = "None"
   def __init__(
@@ -40,10 +39,12 @@ class Article():
     del self.data[key]
   
 
-  def dataSanityCheck(self):
-    text = self["text"]
+  def dataSanityCheck(self, debugMode=False):
+    text = self["text"] 
     title = self["title"]
-    isTextNotNull = text != Article.defaultValue and len(text) > 100 
+
+    lengthCheck = 4 if debugMode else 100 
+    isTextNotNull = text != Article.defaultValue and len(text) >= lengthCheck 
     isTitleNotNull = title != Article.defaultValue 
     isTextNotSudoku = isTextNotNull and ('sudoku' not in text)
     isTitleNotUnderscore = isTitleNotNull and ('_' not in title) 

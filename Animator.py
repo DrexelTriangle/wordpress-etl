@@ -23,10 +23,10 @@ class Animator:
       time.sleep(0.075)
     checkmark = Animator.color_wrap('\033[32m', '✓')
     text = Animator.color_wrap('\033[90m', onDone)
-    sys.stdout.write(f"\r{checkmark} {text}    ")
+    sys.stdout.write(f"\r{checkmark} {text}    \n")
 
 
-  def Spinner(self, onLoad, onDone, func):
+  def Spinner(self, onLoad, onDone, func, *args):
     chars = "⣾⣽⣻⢿⡿⣟⣯⣷"
     text = " Extracting..."
     stopEvent = threading.Event()
@@ -35,7 +35,7 @@ class Animator:
       args=(chars, text, onLoad, onDone, stopEvent)
     )
     animThread.start()
-    result = func()
+    result = func() if (len(args) == 0) else func(*args) 
     stopEvent.set()
     animThread.join()
 

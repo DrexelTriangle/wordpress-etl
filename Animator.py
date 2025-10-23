@@ -3,30 +3,36 @@ import time
 import threading
 
 class Animator:
+  def __init__(self):
+    self.animations = {
+      "spin": ...
+    }
+
+  
   def color_wrap(ansi_color, text):
     return f"{ansi_color}{text}\033[0m"
 
 
-  def spinning_animation(chars, text, e):
+  def spinning_animation(chars, text, onLoad, onDone, e):
     idx = 0
     while not e.is_set():
       char = Animator.color_wrap('\033[90m', chars[idx % len(chars)])
-      sys.stdout.write(f"\r{char}{text}")
+      sys.stdout.write(f"\r{char} {onLoad}")
       sys.stdout.flush()
       idx += 1
       time.sleep(0.075)
     checkmark = Animator.color_wrap('\033[32m', '✓')
-    text = Animator.color_wrap('\033[90m', "Extracted.")
+    text = Animator.color_wrap('\033[90m', onDone)
     sys.stdout.write(f"\r{checkmark} {text}    ")
 
 
-  def Spinner(func):
+  def Spinner(self, onLoad, onDone, func):
     chars = "⣾⣽⣻⢿⡿⣟⣯⣷"
     text = " Extracting..."
     stopEvent = threading.Event()
     animThread = threading.Thread(
       target=Animator.spinning_animation, 
-      args=(chars, text, stopEvent)
+      args=(chars, text, onLoad, onDone, stopEvent)
     )
     animThread.start()
     result = func()

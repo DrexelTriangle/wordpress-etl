@@ -13,13 +13,16 @@ from Animator import Animator
 
 
 
+
 # unzip export data
+a = Animator()
+
 Utility.unzip(ZIP_FILE)
 
 # STEP 1: Extraction
 extractor = Extractor(*UNZIPPED_FILES)
 # extracted = extractor.getData() 
-extracted = Animator.Spinner(extractor.getData)
+extracted = a.Spinner('Extracting...', 'Extracted.', extractor.getData)
 
 
 # Step 2: Translation

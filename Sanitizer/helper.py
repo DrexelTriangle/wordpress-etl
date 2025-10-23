@@ -1,4 +1,5 @@
 import re
+from bitarray import bitarray
 
 def cleanDocument(document):
     document = re.sub("&amp;|\\W|_", "", document)
@@ -11,8 +12,30 @@ def generateKShingles(document, k):
         shingles.add(document[i:i + k])
     return shingles
 
-doc = "sa\0sa**sa&amp;saS#A$C___chi\tCn iXX%s tX^he[}\\| Xbest yay!"
-print(doc)
-clean = cleanDocument(doc)
-print(clean)
-print(generateKShingles(clean, 2))
+def generateVocab(shingleSets):
+    vocab = set()
+    for shingleSet in shingleSets:
+        vocab = vocab.union(shingleSet)
+    return vocab
+
+def generateSparseVector(shingleSet, vocab):
+    vector = bitarray(len(vocab))
+    for i in range(len(vocab)):
+        if vocab[i] is in shingleSet:
+            vector.set(True, i)
+    return vector
+
+def generateDenseVector():
+    pass
+
+def checkCosineSimilarity(a, b):
+    similarity = 0
+    for i in range(len(a)):
+        similarity += (a[i] * b[i])
+    similarity = similarity/(len(a)*len(b))
+    return similarity
+#doc = "sa\0sa**sa&amp;saS#A$C___chi\tCn iXX%s tX^he[}\\| Xbest yay!"
+#print(doc)
+#clean = cleanDocument(doc)
+#print(clean)
+#print(generateKShingles(clean, 2))

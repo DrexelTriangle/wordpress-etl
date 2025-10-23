@@ -1,5 +1,5 @@
 from xmltodict import *
-from Utils.Utility import *
+from Utils.Utility import Utility as U
 from Utils.Constants import EXPORT_DIR
 
 class Extractor:
@@ -16,7 +16,7 @@ class Extractor:
   # GETTERS/SETTERS
   def getData(self):
     self._xml2Dict(self.postsFile, self.guestAuthsFile)
-    Utility._delete_dir(EXPORT_DIR)
+    U._delete_dir(EXPORT_DIR)
     return self.data
 
   def _setData(self, key, value):

@@ -1,4 +1,4 @@
-from Constants import *
+from Utils.Constants import *
 import zipfile
 import shutil
 

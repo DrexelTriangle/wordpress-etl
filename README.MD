@@ -98,8 +98,10 @@ class Sanitizer:
   def sanitize():
     ...
 ```
-This will probebly be where the most annoying step of this entire process will occur. If you look into text of articles, or the names of some authors/g-authors, you'll notice irregularities inside the data. 
+This will probebly be where the most annoying step of this entire process will occur. If you look into text of articles, or the names of some authors/g-authors, you'll notice irregularities inside the data. The goal of these sanitizers is to resolve all of these errors to leave clean, sanitized data for future reference. It is to be noted that articles, authors, and gAuthors will have slightly different issues: they might share some common errors, but it is worth going through the data yourself and confirming the existence of irregularities. Here are a few off the top of my head, using the author dictionary as our example:
 
+---
+---
 ### Data Alignment Errors
 For example, Ava Heckler (author id #1):
 ```json
@@ -125,7 +127,6 @@ We know her first name and last name, and yet those values are set to null here.
   "first_name": "A&amp;E",
   "last_name": "Desk"
 },
-// ...
 "67": {
   "id": 67,
   "login": "tyler.chance",
@@ -139,7 +140,7 @@ For author #55, you have the ampersand character being represented by the XML es
 For author #67, we have a period instead of a space inside our display name. 
 These formatting errors are due to a combination of xml escape characters, as well as just weird formatting from the old WP data. 
 
-### Database Mending Errors
+### Aggregate User Errors (Database Mending)
 ```json
 "204": {
     "id": 204,
@@ -149,7 +150,6 @@ These formatting errors are due to a combination of xml escape characters, as we
     "first_name": "Granny",
     "last_name": "Eloise"
 },
-//...
 "502": {
   "id": 502,
   "login": "jenna-oneill-and-amelia-erb",
@@ -158,7 +158,6 @@ These formatting errors are due to a combination of xml escape characters, as we
   "first_name": null,
   "last_name": null
 },
-//...
 "520": {
   "id": 520,
   "login": "jenna-oneill",
@@ -167,7 +166,6 @@ These formatting errors are due to a combination of xml escape characters, as we
   "first_name": null,
   "last_name": null
 },
-//...
 "560": {
   "id": 560,
   "login": "amelia-erb",
@@ -177,7 +175,12 @@ These formatting errors are due to a combination of xml escape characters, as we
   "last_name": null
 },
 ```
-Here, authors Amelia Erb and Jenna O'Neill are separate authors. An article that they both written is credited towards a new author, "Jenna O'Neill and Amelia Erb", instead of the two of them individually.
+Here, authors Amelia Erb and Jenna O'Neill are separate authors. An article that they both written is credited towards a new author, "Jenna O'Neill and Amelia Erb", instead of the two of them individually. We need to basically do three things with these aggregate users:
+1. Correctly Identify the multiple users that exist for the aggregation. If one of them does not exist, create a user
+2. Any article that was written by the aggregate user must be mapped back to those two individual authors
+3. Delete the aggregated user after ensuring every article it was credited it with was re-mapped.
+
+This is the most fun as not wverything with an `"and"`/`'&'` is necessarily an aggregated user (For example, Author #204 refers to a section of articles written by the characters "Granny & Eloise". There is no need to separate these two).
 
 
 ### Special Cases
@@ -190,7 +193,6 @@ Here, authors Amelia Erb and Jenna O'Neill are separate authors. An article that
   "first_name": "Eunice Maya",
   "last_name": "Kamami"
 },
-//...
 "91": {
   "id": 91,
   "login": "the triangle sports desk",
@@ -199,7 +201,6 @@ Here, authors Amelia Erb and Jenna O'Neill are separate authors. An article that
   "first_name": "The Triangle",
   "last_name": "Sports Desk"
 },
-//...
 "98": {
   "id": 98,
   "login": "the triangle news desk",
@@ -208,7 +209,6 @@ Here, authors Amelia Erb and Jenna O'Neill are separate authors. An article that
   "first_name": "The Triangle News Desk",
   "last_name": null
 },
-//...
 "460": {
   "id": 460,
   "login": "st.-christophers-hospital-for-children",
@@ -249,5 +249,8 @@ There are a couple of special cases, where the author doesn't fit the orthodox s
   "last_name": null
 },
 ```
+I HIHLY recommend cleaning the authors and gAuthors first before dealing with the behemoth that are articles. Sifting this step out will essentially allow us to do the mass article-author migration with no problem. My suggestion for this santizing would be:
+1. Identify as many errors as possible
+2. Construct policeis that automatically mend as much data as possible.
+3. Manually sift through remaining errors, and construct a file that takes will automatically re-execute those steps the next time something is ran. 
 
-```

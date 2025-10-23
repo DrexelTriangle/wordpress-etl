@@ -26,13 +26,22 @@ class ArticleTranslator(Translator):
     text = str(U._html_text_norm(data.get('content:encoded', Article.defaultValue))).replace('"', '\\"')
     title = U._html_text_norm(data.get('title', Article.defaultValue))
 
-    return [
-      authorIDs, authors, authorCleanNames,
-      breakingNews, commentStatus, description,
-      featuredImgID, id, priority, modDate, 
-      photoCred, pubDate, tags, text, title
-    ]
+    chunk1 = [authorIDs, authors, authorCleanNames]
+    chunk2 = [breakingNews, commentStatus, description]
+    chunk3 = [featuredImgID, id, priority, modDate]
+    chunk4 = [photoCred, pubDate, tags, text, title]
 
+    # return all article data as one contiguous list
+    return [*chunk1, *chunk2, *chunk3, *chunk4]
+
+
+  # NOTE: using to only load 9k of the article data
+  def _shouldSkip(self, obj:Article):
+    title = obj["title"]
+    if (title is None or not obj.dataSanityCheck() or obj["tags"] == -1):
+      return False 
+    obj["title"] = title.replace('"', '\\"')
+    return True
 
 
   def translate(self):
@@ -40,16 +49,12 @@ class ArticleTranslator(Translator):
       objData = self._getArticleData(itm)
       obj = Article(*objData)
       obj.processTags()
-      
       # NOTE: using to only load 9k of the article data
-      title = obj["title"]
-      if (title is not None):
-        obj["title"] = title.replace('"', '\\"')
-      if (obj["title"] is None or not obj.dataSanityCheck() or obj["tags"] == -1):
+      if self._shouldSkip(obj):
         continue
-    
-      self.objDataDict.update({obj["id"]: obj.data})
-      self.addObject(obj)
+      else:
+        self.objDataDict.update({obj["id"]: obj.data})
+        self.addObject(obj)
 
 
   def _printUniqueAuthors(self):

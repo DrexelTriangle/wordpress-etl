@@ -20,6 +20,5 @@ class AuthorTranslator(Translator):
         for author in self.source:
             authorData = self._getAuthorData(author)
             authorObject = Author(*authorData)
-            self.objDataDict.update({authorObject.data["id"]: authorObject.data})
-            self.objCount += 1
+            self.addObject(authorObject)
     

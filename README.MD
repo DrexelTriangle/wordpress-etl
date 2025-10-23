@@ -237,6 +237,7 @@ There are a couple of special cases, where the author doesn't fit the orthodox s
   "first_name": "One Two",
   "last_name": "Three-Four"
 },
+```
 
 2. If the name belongs to a company/organization or a Triangle desk, store everything in `first_name`:
 ```json

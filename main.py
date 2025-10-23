@@ -24,7 +24,6 @@ extractor = Extractor(*UNZIPPED_FILES)
 # extracted = extractor.getData() 
 extracted = a.Spinner('Extracting...', 'Extracted.', extractor.getData)
 
-
 # Step 2: Translation
 translators = {
   "articles": ArticleTranslator(extracted["art"]),
@@ -32,9 +31,8 @@ translators = {
   "auth": AuthorTranslator(extracted["auth"])
 }
 
-for key in translators:
-  translators[key].translate()
 
+extracted = a.Spinner('Translating...', 'Translated.', Translator.batchTranslate, translators)
 
 # DEBUG: logging
 translators["articles"]._log('log\\articles.json')

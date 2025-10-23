@@ -100,3 +100,154 @@ class Sanitizer:
 ```
 This will probebly be where the most annoying step of this entire process will occur. If you look into text of articles, or the names of some authors/g-authors, you'll notice irregularities inside the data. 
 
+### Data Alignment Errors
+For example, Ava Heckler (author id #1):
+```json
+"1": {
+        "id": 1,
+        "login": "ava haekler",
+        "email": "ava.haekler@thetriangle.org",
+        "display_name": "Ava Haekler",
+        "first_name": null,
+        "last_name": null
+    }
+```
+We know her first name and last name, and yet those values are set to null here. I'm calling this a data alignment error. Everything is technically there, it just isn't formatted to our best standard.
+
+### Formatting Error
+
+```json
+"55": {
+  "id": 55,
+  "login": "ae.desk",
+  "email": "entertainment@thetriangle.org",
+  "display_name": "Entertainment Desk",
+  "first_name": "A&amp;E",
+  "last_name": "Desk"
+},
+// ...
+"67": {
+  "id": 67,
+  "login": "tyler.chance",
+  "email": "tyler.chance@thetriangle.org",
+  "display_name": "Tyler.Chance",
+  "first_name": "Tyler",
+  "last_name": "Chance"
+},
+```
+For author #55, you have the ampersand character being represented by the XML escape character `&amp;`. 
+For author #67, we have a period instead of a space inside our display name. 
+These formatting errors are due to a combination of xml escape characters, as well as just weird formatting from the old WP data. 
+
+### Database Mending Errors
+```json
+"204": {
+    "id": 204,
+    "login": "granny-and-eloise",
+    "email": "advice1@thetriangle.org",
+    "display_name": "Granny &amp; Eloise",
+    "first_name": "Granny",
+    "last_name": "Eloise"
+},
+//...
+"502": {
+  "id": 502,
+  "login": "jenna-oneill-and-amelia-erb",
+  "email": null,
+  "display_name": "Jenna O'Neill and Amelia Erb",
+  "first_name": null,
+  "last_name": null
+},
+//...
+"520": {
+  "id": 520,
+  "login": "jenna-oneill",
+  "email": null,
+  "display_name": "Jenna O'Neill",
+  "first_name": null,
+  "last_name": null
+},
+//...
+"560": {
+  "id": 560,
+  "login": "amelia-erb",
+  "email": null,
+  "display_name": "Amelia Erb",
+  "first_name": null,
+  "last_name": null
+},
+```
+Here, authors Amelia Erb and Jenna O'Neill are separate authors. An article that they both written is credited towards a new author, "Jenna O'Neill and Amelia Erb", instead of the two of them individually.
+
+
+### Special Cases
+```json
+"4": {
+  "id": 4,
+  "login": "maya.kamami",
+  "email": "maya.kamami@thetriangle.org",
+  "display_name": "Eunice Maya Kamami",
+  "first_name": "Eunice Maya",
+  "last_name": "Kamami"
+},
+//...
+"91": {
+  "id": 91,
+  "login": "the triangle sports desk",
+  "email": "sports@thetriangle.org",
+  "display_name": "The Triangle Sports Desk",
+  "first_name": "The Triangle",
+  "last_name": "Sports Desk"
+},
+//...
+"98": {
+  "id": 98,
+  "login": "the triangle news desk",
+  "email": "news@thetriangle.org",
+  "display_name": "The Triangle News Desk",
+  "first_name": "The Triangle News Desk",
+  "last_name": null
+},
+//...
+"460": {
+  "id": 460,
+  "login": "st.-christophers-hospital-for-children",
+  "email": null,
+  "display_name": "St. Christopher's Hospital for Children",
+  "first_name": null,
+  "last_name": null
+},
+```
+There are a couple of special cases, where the author doesn't fit the orthodox standard of "First Last". A lot of these come from organization names, or Triangle Section Desks. However, there are also people, that will also have more than two names. There isn't really a scenario for these ones in my head yet, as I don't know how they should fit onto the database. Conversing with Kenneth or Daniel might be best practice for dealing with these cases, but for now let's apply the following policy:
+1. If the name belongs to a person, put the very last name in `last_name` and store the rest in `first_name`. It's to be noted that hyphenated words count as one word:
+```json
+"777": {
+  "id": 777,
+  "login": "one-two-three-four",
+  "email": null,
+  "display_name": "One Two Three Four",
+  "first_name": "One Two Three",
+  "last_name": "Four"
+},
+"777": {
+  "id": 777,
+  "login": "one-two-three-four",
+  "email": null,
+  "display_name": "One Two Three-Four",
+  "first_name": "One Two",
+  "last_name": "Three-Four"
+},
+
+2. If the name belongs to a company/organization or a Triangle desk, store everything in `first_name`:
+```json
+"68": {
+  "id": 68,
+  "login": "op.ed",
+  "email": "op-ed@thetriangle.org",
+  "display_name": "Op-Ed",
+  "first_name": "The Triangle Op-Ed Section",
+  "last_name": null
+},
+```
+
+```

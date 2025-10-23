@@ -2,6 +2,7 @@ from Translator.Translator import Translator
 from Translator.Article import Article
 import os as OS
 from Utils.Utility import Utility as U
+import json
 
 class ArticleTranslator(Translator):  
   # Constructor
@@ -80,6 +81,31 @@ class ArticleTranslator(Translator):
       if (i + 1) % columns == 0:
         print()
     print('\n')
+  
+  def _log(self, fileDestination):                      
+    fileBuckets = []
+    dictLen = len(self.objDataDict)
+    remainder = dictLen % 1000
+    bucketNum = (dictLen // 1000) + (1 if (remainder > 0) else 0)
+    if not (OS.path.isdir(fileDestination)):
+      OS.makedirs(fileDestination)
+
+    for i in range(bucketNum):
+      fileBuckets.append({})
+    
+    for i, itm in enumerate(self.objDataDict):
+      bucket = i // 1000
+      fileBuckets[bucket].update({i: self.objDataDict[i]})
+    
+    for i in range(len(fileBuckets)):
+      bucket = fileBuckets[i]
+      with open(f"{fileDestination}\\{i}.json", 'w+', encoding='utf-8') as file:
+        json.dump(bucket, file, indent=4)
+        file.close()
+
+
+ 
+
 
   
 

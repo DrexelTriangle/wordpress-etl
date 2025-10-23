@@ -6,14 +6,20 @@ from Translator.ArticleTranslator import *
 from Translator.GuestAuthorTranslator import *
 from Translator.AuthorTranslator import *
 
+from Animator import Animator
+
 # TODO: python library dependency checks
+
+
+
 
 # unzip export data
 Utility.unzip(ZIP_FILE)
 
 # STEP 1: Extraction
 extractor = Extractor(*UNZIPPED_FILES)
-extracted = extractor.getData() 
+# extracted = extractor.getData() 
+extracted = Animator.Spinner(extractor.getData)
 
 
 # Step 2: Translation

@@ -28,7 +28,7 @@ for key in translators:
 
 
 # DEBUG: logging
-translators["articles"]._log('log\\articles.json')
+translators["articles"]._log('log\\articles')
 translators["gAuth"]._log('log\\gAuth.json')
 translators["auth"]._log('log\\auth.json')
 

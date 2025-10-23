@@ -4,16 +4,22 @@ from Translator.Translator import *
 class AuthorTranslator(Translator):
     def __init__(self, source):
         super().__init__(source)
+
+    def _getAuthorData(self, author):
+        count = self.objCount
+        login = author['wp:author_login']
+        email = author['wp:author_email']
+        displayName = author['wp:author_display_name']
+        firstName = author['wp:author_first_name']
+        lastName = author['wp:author_last_name']
+
+        return [count, login, email, displayName, firstName, lastName]
+        
     
     def translate(self):
-        authors = []
         for author in self.source:
-            authorObject = Author(int(author['wp:author_id']), 
-                                  author['wp:author_login'], 
-                                  author['wp:author_email'],
-                                  author['wp:author_display_name'], 
-                                  author['wp:author_first_name'], 
-                                  author['wp:author_last_name'])
-            authors.append(authorObject)
-        return authors
+            authorData = self._getAuthorData(author)
+            authorObject = Author(*authorData)
+            self.objDataDict.update({authorObject.data["id"]: authorObject.data})
+            self.objCount += 1
     

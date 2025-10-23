@@ -1,7 +1,7 @@
 from Translator.Translator import Translator
 from Translator.Article import Article
 import os as OS
-from Utility.Utility import Utility as U
+from Utils.Utility import Utility as U
 
 class ArticleTranslator(Translator):  
   # Constructor

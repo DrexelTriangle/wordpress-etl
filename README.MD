@@ -255,3 +255,5 @@ I HIHLY recommend cleaning the authors and gAuthors first before dealing with th
 2. Construct policeis that automatically mend as much data as possible.
 3. Manually sift through remaining errors, and construct a file that takes will automatically re-execute those steps the next time something is ran. 
 
+Once you get through the articles, people should work together to try and identify errors. Don't spend too much time identifying errors here, as this being perfect isn't necessary for our tables. Catch any weird stuff, and then move on. 
+

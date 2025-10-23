@@ -1,6 +1,6 @@
 from Translator.GuestAuthor import *
 from Translator.Translator import *
-from Utility import *
+from Utils.Utility import *
 import json
 
 class GuestAuthorTranslator(Translator):

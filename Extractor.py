@@ -1,6 +1,6 @@
 from xmltodict import *
-from Utility import *
-from Constants import EXPORT_DIR
+from Utils.Utility import *
+from Utils.Constants import EXPORT_DIR
 
 class Extractor:
   def __init__(self, posts, guestAuths):

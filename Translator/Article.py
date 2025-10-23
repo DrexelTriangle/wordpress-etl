@@ -1,4 +1,4 @@
-from Utility import Utility as U
+from Utils.Utility import Utility as U
 from Translator.WPObject import WPObject as WPO
 
 class Article(WPO):  

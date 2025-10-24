@@ -1,5 +1,7 @@
 import re
+import numpy as np
 from bitarray import bitarray
+from functools import lru_cache
 
 def cleanDocument(document):
     document = re.sub("&amp;|\\W|_", "", document)
@@ -29,11 +31,8 @@ def generateDenseVector():
     pass
 
 def checkCosineSimilarity(a, b):
-    similarity = 0
-    for i in range(len(a)):
-        similarity += (a[i] * b[i])
-    similarity = similarity/(len(a)*len(b))
-    return similarity
+    return np.dot(a, b)/(np.linalg.norm(a)*np.linalg.norm(b))
+
 #doc = "sa\0sa**sa&amp;saS#A$C___chi\tCn iXX%s tX^he[}\\| Xbest yay!"
 #print(doc)
 #clean = cleanDocument(doc)

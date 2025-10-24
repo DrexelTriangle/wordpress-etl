@@ -1,8 +1,10 @@
 import re
+import os
 import numpy as np
 from joblib import Memory
 
-memory = Memory("cache_dir", verbose=0)
+cacheDirectory = os.path.join(".", "cacheDirectory")
+memory = Memory(cacheDirectory, verbose=0)
 
 def cleanDocument(document):
     document = re.sub("&amp;|\\W|_", "", document)
@@ -26,7 +28,7 @@ def generateVocab(shingleSets):
 def generateSparseVector(shingleSet, vocab):
     vector = np.zeros(len(vocab))
     for i in range(len(vocab)):
-        if vocab[i] is in shingleSet:
+        if vocab[i] in shingleSet:
             vector[i] = 1
     return vector
 
@@ -37,8 +39,8 @@ def generateDenseVector():
 def checkCosineSimilarity(a, b):
     return np.dot(a, b)/(np.linalg.norm(a)*np.linalg.norm(b))
 
-#doc = "sa\0sa**sa&amp;saS#A$C___chi\tCn iXX%s tX^he[}\\| Xbest yay!"
-#print(doc)
-#clean = cleanDocument(doc)
-#print(clean)
-#print(generateKShingles(clean, 2))
+doc = "sa\0sa**sa&amp;saS#A$C___chi\tCn iXX%s tX^he[}\\| Xbest yay!"
+print(doc)
+clean = cleanDocument(doc)
+print(clean)
+print(generateKShingles(clean, 2))

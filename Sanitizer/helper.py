@@ -1,13 +1,15 @@
 import re
 import numpy as np
-from bitarray import bitarray
-from functools import lru_cache
+from joblib import Memory
+
+memory = Memory("cache_dir", verbose=0)
 
 def cleanDocument(document):
     document = re.sub("&amp;|\\W|_", "", document)
     document = document.lower()
     return document
 
+@memory.cache
 def generateKShingles(document, k):
     shingles = set()
     for i in range(len(document) - k + 1):
@@ -20,13 +22,15 @@ def generateVocab(shingleSets):
         vocab = vocab.union(shingleSet)
     return vocab
 
+@memory.cache
 def generateSparseVector(shingleSet, vocab):
-    vector = bitarray(len(vocab))
+    vector = np.zeros(len(vocab))
     for i in range(len(vocab)):
         if vocab[i] is in shingleSet:
-            vector.set(True, i)
+            vector[i] = 1
     return vector
 
+@memory.cache
 def generateDenseVector():
     pass
 

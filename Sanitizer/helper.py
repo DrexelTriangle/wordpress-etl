@@ -26,6 +26,7 @@ def generateVocab(shingleSets):
 
 @memory.cache
 def generateSparseVector(shingleSet, vocab):
+    vocab = list(vocab)
     vector = np.zeros(len(vocab))
     for i in range(len(vocab)):
         if vocab[i] in shingleSet:

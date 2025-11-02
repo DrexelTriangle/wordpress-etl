@@ -22,7 +22,7 @@ class GuestAuthorTranslator(Translator):
                     lastName = metadata['wp:meta_value']
                 case 'cap-user_login':
                     login = metadata['wp:meta_value']
-        return [displayName, firstName, lastName, email, login, self.objCount]
+        return [self.objCount, displayName, firstName, lastName, email, login]
 
 
     def translate(self):

@@ -6,14 +6,13 @@ class AuthorTranslator(Translator):
         super().__init__(source)
 
     def _getAuthorData(self, author):
-        count = self.objCount
-        login = author['wp:author_login']
-        email = author['wp:author_email']
         displayName = author['wp:author_display_name']
         firstName = author['wp:author_first_name']
         lastName = author['wp:author_last_name']
+        email = author['wp:author_email']
+        login = author['wp:author_login']
 
-        return [count, login, email, displayName, firstName, lastName]
+        return [self.objCount, displayName, firstName, lastName, email, login]
         
     
     def translate(self):

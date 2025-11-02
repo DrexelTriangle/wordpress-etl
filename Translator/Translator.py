@@ -22,6 +22,9 @@ class Translator:
         self.objDataDict.update({object.data["id"]: object.data})
         self.objCount += 1
         
+    def getObjDataDict(self):
+        return self.objDataDict
+        
 
 
 

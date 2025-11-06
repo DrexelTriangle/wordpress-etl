@@ -43,9 +43,6 @@ def generateSignatureMatrix(sparseMatrix, hashParams: list[tuple[int, int]], p: 
     for sigRow in signatureMatrix
         
 
-    
-
-
 # Calculates the cosine similarity of two documents represented by dense vectors (signatures)
 def checkCosineSimilarity(a: np.ndarray, b: np.ndarray):
     return np.dot(a, b)/(np.linalg.norm(a)*np.linalg.norm(b))

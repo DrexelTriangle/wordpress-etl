@@ -1,47 +1,59 @@
 import re
 import os
 import numpy as np
+import random
 from joblib import Memory
 
 cacheDirectory = os.path.join(".", "cacheDirectory")
 memory = Memory(cacheDirectory, verbose=0)
 
-def cleanDocument(document):
-    document = re.sub("&amp;|\\W|_", "", document)
-    document = document.lower()
-    return document
+# Purges document of unwanted characters and ensures uniformity of text
+def cleanDocument(document: str) -> str:
+    return re.sub("&amp;|\\W|_", "", document).lower()
 
-@memory.cache
-def generateKShingles(document, k):
-    shingles = set()
-    for i in range(len(document) - k + 1):
-        shingles.add(document[i:i + k])
-    return shingles
+# Generates slices of text using a sliding window of k size
+@memory.cache # Uses LRU to cache previous results and avoid re-running function
+def generateKShingles(document: str, k: int) -> set:
+    return {document[i:i + k] for i in range(len(document) - k + 1)}
 
-def generateVocab(shingleSets):
-    vocab = set()
-    for shingleSet in shingleSets:
-        vocab = vocab.union(shingleSet)
-    return vocab
+# Creates a common vocab that is a set of every shingle present in all documents
+def generateVocab(shingleSets: list[set]) -> set:
+    return set().union(*shingleSets)
 
-@memory.cache
-def generateSparseVector(shingleSet, vocab):
-    vocab = list(vocab)
-    vector = np.zeros(len(vocab))
-    for i in range(len(vocab)):
-        if vocab[i] in shingleSet:
-            vector[i] = 1
-    return vector
+# Returns k hash parameters (a, b) where the number is between 1 and a large prime p
+def generateKHashParameters(k: int, p: int) -> list[tuple[int, int]]:
+    return [((random.randint(1, p-1), random.randint(0, p-1))) for i in range(k)]
 
-@memory.cache
-def generateDenseVector():
-    pass
+# Creates a vector that represents a document via its overlap with common vocab
+@memory.cache # Uses LRU to cache previous results and avoid re-running function
+def generateSparseVector(shingleSet: set, vocab: set) -> np.ndarray:
+    vocab = sorted(vocab)
+    return np.array([1 if i in shingleSet else 0 for i in vocab], dtype=int) 
 
-def checkCosineSimilarity(a, b):
+def generateSparseMatrix(sparseVectors: list[np.ndarray]) -> np.ndarray:
+    return np.column_stack((sparseMatrix, vector))
+
+def rowHash(r: np.ndarray, a: int, b: int, p: int):
+
+
+# Generates a matrix of dense vectors through which similarity tests may be conducted
+@memory.cache # Uses LRU to cache previous results and avoid re-running function
+def generateSignatureMatrix(sparseMatrix, hashParams: list[tuple[int, int]], p: int) -> np.ndarray:
+    signatureMatrix = np.full(len(hashParams, len(sparseVectors))
+    for sigRow in signatureMatrix
+        
+
+    
+
+
+# Calculates the cosine similarity of two documents represented by dense vectors (signatures)
+def checkCosineSimilarity(a: np.ndarray, b: np.ndarray):
     return np.dot(a, b)/(np.linalg.norm(a)*np.linalg.norm(b))
 
-doc = "sa\0sa**sa&amp;saS#A$C___chi\tCn iXX%s tX^he[}\\| Xbest yay!"
-print(doc)
-clean = cleanDocument(doc)
-print(clean)
-print(generateKShingles(clean, 2))
+#TESTING
+if __name__ == "__main__":
+    doc = "sa\0sa**sa&amp;saS#A$C___chi\tCn iXX%s tX^he[}\\| Xbest yay!"
+    print(doc)
+    clean = cleanDocument(doc)
+    print(clean)
+    print(generateKShingles(clean, 2))

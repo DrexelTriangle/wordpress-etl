@@ -9,7 +9,6 @@ class GuestAuthorTranslator(Translator):
         super().__init__(source)
     
     def _extractMetadata(self, data):
-        displayName, firstName, lastName, email, login = '', '', '', '', ''
         for metadata in data:
             match metadata['wp:meta_key']:
                 case 'cap-display_name':

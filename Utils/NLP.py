@@ -1,60 +1,59 @@
 import re
 import os
 import numpy as np
-import random
+import hashlib
 from joblib import Memory
 
-cacheDirectory = os.path.join(".", "cacheDirectory")
+cacheDirectory = os.path.join(".", "cacheDirectory") # Create persistent cache for efficient reruns of ELT pipeline
 memory = Memory(cacheDirectory, verbose=0)
 
 # Purges document of unwanted characters and ensures uniformity of text
 def cleanDocument(document: str) -> str:
     return re.sub("&amp;|\\W|_", "", document).lower()
 
-# Generates slices of text using a sliding window of k size
+# Generates slices (shingles) of text using a sliding window of size k
 @memory.cache # Uses LRU to cache previous results and avoid re-running function
-def generateKShingles(document: str, k: int) -> set:
-    return {document[i:i + k] for i in range(len(document) - k + 1)}
+def generateKShingles(document: str, k: int) -> np.ndarray:
+    return np.unique([int(hashlib.sha1(document[i:i + k].encode()).hexdigest(), 16) % (2**31 - 1) for i in range(len(document) - k + 1)]) # Uses deterministic hashing function to reduce overhead
 
 # Creates a common vocab that is a set of every shingle present in all documents
-def generateVocab(shingleSets: list[set]) -> set:
-    return set().union(*shingleSets)
+def generateVocab(shingleSets: list[np.ndarray]) -> np.ndarray:
+    return np.unique(np.concatenate(shingleSets)) # Uses numpy to reduce overhead
 
-# Returns k hash parameters (a, b) where the number is between 1 and a large prime p
-def generateKHashParameters(k: int, p: int) -> list[tuple[int, int]]:
-    return [((random.randint(1, p-1), random.randint(0, p-1))) for i in range(k)]
+# Returns k hash parameters (a, b) where the number is between 1|0 and a large prime p
+def generateKHashParameters(k: int, p: int) -> np.ndarray:
+    np.random.seed(42) # Uses const seed to ensure determistic (cacheable) parameters
+    a = np.random.randint(1, p, size=k, dtype=np.int64) # Generate k random a values
+    b = np.random.randint(0, p, size=k, dtype=np.int64) # Generate k random b values
+    return np.column_stack((a, b)) # Return an ndarray of a,b pairs
 
-# Creates a vector that represents a document via its overlap with common vocab
+# Creates a vector that represents a document via its overlap with common vocab (see one-hot-encoding)
 @memory.cache # Uses LRU to cache previous results and avoid re-running function
-def generateSparseVector(shingleSet: set, vocab: set) -> np.ndarray:
-    vocab = sorted(vocab)
-    return np.array([1 if i in shingleSet else 0 for i in vocab], dtype=int) 
+def generateSparseVector(shingleSet: np.ndarray, vocab: np.ndarray) -> np.ndarray:
+    return np.isin(vocab, shingleSet).astype(np.uint8) # Uses numpy one-hot-encoding mask to reduce overhead
 
+# Returns a matrix where each column is a document represented by a sparse vector
 def generateSparseMatrix(sparseVectors: list[np.ndarray]) -> np.ndarray:
-    return np.column_stack((sparseMatrix, vector))
-
-def hashRow(r: np.ndarray, a: int, b: int, p: int):
-
+    return np.vstack(sparseVectors).T
 
 # Generates a matrix of dense vectors through which similarity tests may be conducted
 @memory.cache # Uses LRU to cache previous results and avoid re-running function
-def generateSignatureMatrix(sparseMatrix, hashParams: list[tuple[int, int]], p: int) -> np.ndarray:
-    signatureMatrix = np.full(len(hashParams, len(sparseVectors), np.inf)
-    for row in sparseMatrix:
-        hashes = np.empty(len(hashParams))
-        for param in hashParams:
-            rowHash = hashRow(row, param[0], param[1], p)
-        
-        
+def generateSignatureMatrix(sparseMatrix, hashParams: np.ndarray, p: int = 2**31 -1) -> np.ndarray:
+    nHashes = len(hashParams)
+    nRows, nDocs = sparseMatrix.shape # Uses the number of columns in sparseMatrix to represent the number of documents
+    signatureMatrix = np.full((nHashes, nDocs), np.inf) # Creates a matrix where there is a row for each hash function and column for each document where every index is initialized to infinity
+    for row in range(nRows):
+        hashes = [(a * row + b) % p for a, b in hashParams]
+        for column in range(nDocs):
+            if sparseMatrix[row, column] == 1:
+                for i in range(nHashes):
+                    signatureMatrix[i, column] = min(signatureMatrix[i, column], hashes[i])
+    return signatureMatrix
 
-# Calculates the cosine similarity of two documents represented by dense vectors (signatures)
-def checkCosineSimilarity(a: np.ndarray, b: np.ndarray):
-    return np.dot(a, b)/(np.linalg.norm(a)*np.linalg.norm(b))
+# Calculates the Jaccard similarity of two documents represented by dense vectors (signatures) -- this is an estimation of the actually similariity
+def checkJaccardSignatureSimilarity(a: np.ndarray, b: np.ndarray) -> float:
+    return np.mean(a == b)
 
-#TESTING
-if __name__ == "__main__":
-    doc = "sa\0sa**sa&amp;saS#A$C___chi\tCn iXX%s tX^he[}\\| Xbest yay!"
-    print(doc)
-    clean = cleanDocument(doc)
-    print(clean)
-    print(generateKShingles(clean, 2))
+# Calculates the Jaccard similarity of two documents represented as sparse vectors (one-hot-encodings) -- this is a fully accurate calculation of similarity
+def checkJaccardSetSimilarity(a: set, b: set) -> float:
+    return len(a & b) / len(a | b)

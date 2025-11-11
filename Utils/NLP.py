@@ -4,7 +4,7 @@ import numpy as np
 import hashlib
 from joblib import Memory
 
-cacheDirectory = os.path.join(".", "cacheDirectory") # Create persistent cache for efficient reruns of ELT pipeline
+cacheDirectory = os.path.join(".", "cacheDirectory") # Create persistent cache for efficient reruns of ETL pipeline
 memory = Memory(cacheDirectory, verbose=0)
 
 # Purges document of unwanted characters and ensures uniformity of text

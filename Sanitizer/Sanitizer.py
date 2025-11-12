@@ -1,12 +1,49 @@
-class Sanitizer:
-    def __init__(self, source):
-        self.source = source
+from abc import ABC, abstractmethod
+import datetime
+import os
 
-    def clean(self):
-        pass
+class Sanitizer(ABC):
+    def __init__(self, data: list, policies: dict, logDir: str = "./logs"):
+        self.data = data
+        self.policies = policies
+        self.logDir = logDir
+        self.changes = []
+        self.conflicts = []
 
+    @abstractmethod
+    def normalizeText(self):
+        raise NotImplementedError
+
+    @abstractmethod
     def autoResolve(self):
-        pass
+        raise NotImplementedError
 
+    @abstractmethod
     def manualResolve(self):
-        pass
+        raise NotImplementedError
+
+    @abstractmethod
+    def sanitize(self)
+        raise NotImplementedError
+
+    def _recordChange(self, obj, field, old, new):
+        change = {
+            "id": obj["id"],
+            "field": field,
+            "old": old,
+            "new": new
+        }
+        self.conflicts.append(change)
+
+    def _recordConflict(self, obj, field, reason, details):
+        conflict = {
+            "id": obj["id"],
+            "field": field,
+            "reason": reason,
+            "details": details
+        }
+
+    def _log(self, filename=(datetime.now().strftime("%H:%M:%S") + "_sanitization_report.json")):
+        os.makedirs(self.logDir, exist_ok=True)
+        with open(os.path.join(self.logDir, filename), "w+", encoding="utf-8" as file:
+            json.dump({"changes": self.changes}, "conflicts": self.conflicts)

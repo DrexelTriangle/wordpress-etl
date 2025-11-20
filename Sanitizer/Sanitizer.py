@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import datetime
+import json
 import os
 
 class Sanitizer(ABC):
@@ -23,7 +24,7 @@ class Sanitizer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def sanitize(self)
+    def sanitize(self):
         raise NotImplementedError
 
     def _recordChange(self, obj, field, old, new):
@@ -45,5 +46,5 @@ class Sanitizer(ABC):
 
     def _log(self, filename=(datetime.now().strftime("%H:%M:%S") + "_sanitization_report.json")):
         os.makedirs(self.logDir, exist_ok=True)
-        with open(os.path.join(self.logDir, filename), "w+", encoding="utf-8" as file:
-            json.dump({"changes": self.changes}, "conflicts": self.conflicts)
+        with open(os.path.join(self.logDir, filename), "w+", encoding="utf-8") as file:
+            json.dump({"Changes": self.changes}, {"conflicts": self.conflicts})

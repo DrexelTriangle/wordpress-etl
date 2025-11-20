@@ -6,6 +6,7 @@ rawdata/*
 stats/*
 visualizations/*
 temp.txt
+*.json
 result.txt
 skenanigans-rawdata.zip
 

@@ -9,9 +9,19 @@ cacheDirectory = os.path.join(".", "cacheDirectory") # Create persistent cache f
 memory = Memory(cacheDirectory, verbose=0)
 
 # Purges document of unwanted characters and ensures uniformity of text
-def cleanDocument(document: str) -> str:
-    return re.sub("&amp;|\\W|_", "", document).lower()
-
+def cleanDocument(document: str, type: str) -> str:
+    match type:
+        case "author_full":
+            document = document.split("@")
+            return re.sub("by-|By-|By |by |&amp;|\\W|_|&", "", document[0]).lower()
+        case "author_multiple":
+            documents = re.split(r"&|&amp;|and", document)
+            for doc in documents:
+                doc = re.sub("by-|By-|By |by |\\W|_", "", doc).lower()
+            return documents
+        
+        
+    
 # Generates slices (shingles) of text using a sliding window of size k
 @memory.cache # Uses LRU to cache previous results and avoid re-running function
 def generateKShingles(document: str, k: int) -> NDArray[np.int64]:

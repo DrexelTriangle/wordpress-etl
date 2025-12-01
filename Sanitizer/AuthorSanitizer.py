@@ -6,5 +6,5 @@ class AuthorSanitizer(Sanitizer):
     def __init__(self, data: list, policies: dict, logDir: str):
         super().__init__(self, data, policies, logDir)
 
-    def normalizeText(self):
-
+    def normalizeText(author: Author):
+        author.data

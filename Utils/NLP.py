@@ -10,15 +10,25 @@ memory = Memory(cacheDirectory, verbose=0)
 
 # Purges document of unwanted characters and ensures uniformity of text
 def cleanDocument(document: str, type: str) -> str:
+    def uppercaseMatch(match):
+        return match.group(0).upper()
     match type:
         case "author_single":
             document = document.split("@")
-            return re.sub("by-|By-|By |by |&amp;|\\W|_|&", "", document[0]).lower().strip()
+            document = re.sub("&amp;", "&", document[0])
+            document = re.sub("\\.(?=\\w\\w)", " ", document)
+            document = re.sub("by-|By-|By |by |[^\\w ^'^\\.^-]|_|\\d", "", document).strip()
+            document = re.sub("^\\w| \\w", uppercaseMatch, document)
+            return document
         case "author_multiple":
-            documents = re.split(r"&|&amp;|\band\b", document)
+            documents = re.split(r"&|&amp;|\band\b|,", document)
             for i in range(len(documents)):
-                documents[i] = re.sub("by-|By-|By |by |\\W|_", "", documents[i]).lower().strip()
+                documents[i] = re.sub("by-|By-|By |by |[^\\w ]|_", "", documents[i]).strip()
             return documents
+        case "similarity":
+            return re.sub("[^\\w]| |\\d|_", "", document).lower()
+        case "article":
+            pass
         
 # Generates slices (shingles) of text using a sliding window of size k
 @memory.cache # Uses LRU to cache previous results and avoid re-running function

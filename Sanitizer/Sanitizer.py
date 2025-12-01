@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-import datetime
+from datetime import datetime
 import json
 import os
 
@@ -12,7 +12,7 @@ class Sanitizer(ABC):
         self.conflicts = []
 
     @abstractmethod
-    def normalizeText(self):
+    def normalizeData(self):
         raise NotImplementedError
 
     @abstractmethod

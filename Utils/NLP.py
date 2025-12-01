@@ -11,17 +11,15 @@ memory = Memory(cacheDirectory, verbose=0)
 # Purges document of unwanted characters and ensures uniformity of text
 def cleanDocument(document: str, type: str) -> str:
     match type:
-        case "author_full":
+        case "author_single":
             document = document.split("@")
             return re.sub("by-|By-|By |by |&amp;|\\W|_|&", "", document[0]).lower().strip()
         case "author_multiple":
-            documents = re.split(r"&|&amp;|and|", document)
-            for doc in documents:
-                doc = re.sub("by-|By-|By |by |\\W|_", "", doc).lower().strip()
+            documents = re.split(r"&|&amp;|\band\b", document)
+            for i in range(len(documents)):
+                documents[i] = re.sub("by-|By-|By |by |\\W|_", "", documents[i]).lower().strip()
             return documents
         
-        
-    
 # Generates slices (shingles) of text using a sliding window of size k
 @memory.cache # Uses LRU to cache previous results and avoid re-running function
 def generateKShingles(document: str, k: int) -> NDArray[np.int64]:
@@ -45,16 +43,16 @@ def generateSparseVector(shingleSet: NDArray[np.int64], vocab: NDArray[np.int64]
 
 # Returns a matrix where each column is a document represented by a sparse vector
 def generateSparseMatrix(sparseVectors: list[NDArray[np.uint8]]) -> NDArray[np.uint8]:
-    return np.vstack(sparseVectors).T
+    return np.column_stack(sparseVectors)
 
 # Generates a matrix of dense vectors through which similarity tests may be conducted
 @memory.cache # Uses LRU to cache previous results and avoid re-running function
-def generateSignatureMatrix(sparseMatrix: NDArray[np.uint8], hashParams: NDArray[np.int64], p: int = 2**31 -1) -> NDArray[np.float64]:
+def generateSignatureMatrix(sparseMatrix: NDArray[np.uint8], vocab: NDArray[np.int64], hashParams: NDArray[np.int64], p: int = 2**31 -1) -> NDArray[np.float64]:
     nHashes = len(hashParams)
-    nRows, nDocs = sparseMatrix.shape # Uses the number of columns in sparseMatrix to represent the number of documents
+    nRows, nDocs = sparseMatrix.shape # nRows = shingles, nDocs = documents
     signatureMatrix = np.full((nHashes, nDocs), np.inf) # Creates a matrix where there is a row for each hash function and column for each document where every index is initialized to infinity
     for row in range(nRows):
-        hashes = [(a * row + b) % p for a, b in hashParams]
+        hashes = [(a * vocab[row] + b) % p for a, b in hashParams]
         for column in range(nDocs):
             if sparseMatrix[row, column] == 1:
                 for i in range(nHashes):

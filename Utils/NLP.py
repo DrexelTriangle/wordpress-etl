@@ -13,11 +13,11 @@ def cleanDocument(document: str, type: str) -> str:
     match type:
         case "author_full":
             document = document.split("@")
-            return re.sub("by-|By-|By |by |&amp;|\\W|_|&", "", document[0]).lower()
+            return re.sub("by-|By-|By |by |&amp;|\\W|_|&", "", document[0]).lower().strip()
         case "author_multiple":
-            documents = re.split(r"&|&amp;|and", document)
+            documents = re.split(r"&|&amp;|and|", document)
             for doc in documents:
-                doc = re.sub("by-|By-|By |by |\\W|_", "", doc).lower()
+                doc = re.sub("by-|By-|By |by |\\W|_", "", doc).lower().strip()
             return documents
         
         

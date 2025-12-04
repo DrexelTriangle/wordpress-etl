@@ -12,15 +12,15 @@ class Sanitizer(ABC):
         self.conflicts = []
 
     @abstractmethod
-    def normalizeData(self):
+    def _normalizeData(self):
         raise NotImplementedError
 
     @abstractmethod
-    def autoResolve(self):
+    def _autoResolve(self):
         raise NotImplementedError
 
     @abstractmethod
-    def manualResolve(self):
+    def _manualResolve(self):
         raise NotImplementedError
 
     @abstractmethod

@@ -17,13 +17,13 @@ def cleanDocument(document: str, type: str) -> str:
             document = document.split("@")
             document = re.sub("&amp;", "&", document[0])
             document = re.sub("\\.(?=\\w\\w)", " ", document)
-            document = re.sub("by-|By-|By |by |[^\\w ^'^\\.^-]|_|\\d", "", document).strip()
+            document = re.sub("^by-|^By-|^By |^by |[^\\w ^'^\\.^-]|_|\\d", "", document).strip()
             document = re.sub("^\\w| \\w", uppercaseMatch, document)
             return document
         case "author_multiple":
-            documents = re.split(r"&|&amp;|\band\b|,", document)
+            documents = re.split(r"&amp;|&|\band\b|,", document)
             for i in range(len(documents)):
-                documents[i] = re.sub("by-|By-|By |by |[^\\w ]|_", "", documents[i]).strip()
+                documents[i] = re.sub("^by-|^By-|^By |^by |[^\\w ^'^\\.^-]|_|\\d", "", documents[i]).strip()
             return documents
         case "similarity":
             return re.sub("[^\\w]| |\\d|_", "", document).lower()

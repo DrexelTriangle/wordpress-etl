@@ -1,34 +1,44 @@
-from xmltodict import *
-from newUtility import *
-from Author import *
-from Article import *
-from json import *
-import os as OS 
-from Controller import XmlSetup
-from Menu import *
+from Extractor import Extractor
+from Translator.Translator import *
+from Utils.Utility import *
+from Utils.Constants import *
+from Translator.ArticleTranslator import *
+from Translator.GuestAuthorTranslator import *
+from Translator.AuthorTranslator import *
 
-# Setup
-file1 = ".\\rawdata\\tri-wpdump_4-1-24.xml"
-file2 = ".\\rawdata\\thetriangle.WordPress.2024-07-10.xml"
-authorData, articleData, guestAuthorData = [], [], []
-existing, mustReplace, unmapped = [], [], []
-authorData, articleData, guestAuthorData = XmlSetup(file1, file2)
+# TODO: python library dependency checks
 
-# Process Authors
-Author.processAuthors(authorData)
-Author.processGuestAuthors(guestAuthorData)
+# unzip export data
+Utility.unzip(ZIP_FILE)
 
-# Process Articles
-Article.processArticles(articleData)
-
-# Mending
-existing, mustReplace = checkForMending()
-unmapped = mapping(mustReplace)
-beginMapping(unmapped)
-count = binding(existing, mustReplace)
+# STEP 1: Extraction
+extractor = Extractor(*UNZIPPED_FILES)
+extracted = extractor.getData() 
 
 
-if (count == 0):
-  print(f'> [main] All article authors have been locally mapped. Everything is accounted for!')
-  Author.SQLifiy()
-  Article.SQLifiy()
+# Step 2: Translation
+translators = {
+  "articles": ArticleTranslator(extracted["art"]),
+  "gAuth": GuestAuthorTranslator(extracted["guestAuth"]),
+  "auth": AuthorTranslator(extracted["auth"])
+}
+
+for key in translators:
+  translators[key].translate()
+
+
+# DEBUG: logging
+translators["articles"]._log('log\\articles')
+translators["gAuth"]._log('log\\gAuth.json')
+translators["auth"]._log('log\\auth.json')
+
+
+
+
+
+
+
+
+
+
+

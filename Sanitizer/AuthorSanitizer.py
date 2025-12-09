@@ -9,7 +9,7 @@ from Sanitizer.Policy import Policy
 class AuthorSanitizer(Sanitizer):
     def __init__(self, data: list, policies: Policy):
         super().__init__(data, policies)
-        self.lastAuid = int(data[-1].data["id"])
+        self.lastAuid = len(data) - 1
         self.conflictsCache = None
         self.priorityId = set()
         self.type = "auth" if policies.isAuthor else "gauth"

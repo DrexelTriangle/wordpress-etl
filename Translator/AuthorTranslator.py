@@ -5,7 +5,7 @@ class AuthorTranslator(Translator):
     def __init__(self, source):
         super().__init__(source)
 
-    def _getAuthorData(self, author):
+    def _getAuthor(self, author):
         displayName = author['wp:author_display_name']
         firstName = author['wp:author_first_name']
         lastName = author['wp:author_last_name']

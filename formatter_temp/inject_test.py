@@ -5,7 +5,10 @@ from Utils.Constants import *
 from Translator.ArticleTranslator import *
 from Translator.GuestAuthorTranslator import *
 from Translator.AuthorTranslator import *
-from Sanitizer.AuthorSanitizer import *
+from Formatter.Formatter import *
+from Formatter.ArticleFormatter import *
+from Formatter.AuthorFormatter import *
+from Formatter.GuestAuthorFormatter import *
 
 # TODO: python library dependency checks
 
@@ -28,18 +31,18 @@ for key in translators:
   translators[key].translate()
 
 
+# Step 3: Formatter
+formatters = {
+    "articles": ArticleFormatter(translators["articles"]),
+    "gAuth": GuestAuthorFormatter(translators["gAuth"]),
+    "auth": AuthorFormatter(translators["auth"])
+}
+
+for key in formatters:
+    formatters[key].SQLify()
+    
 # DEBUG: logging
-translators["articles"]._log('log\\articles')
-translators["gAuth"]._log('log\\gAuth.json')
-translators["auth"]._log('log\\auth.json')
-
-
-
-
-
-
-
-
-
-
+formatters["articles"]._logCommands('log\\sql-articles.json')
+formatters["gAuth"]._logCommands('log\\sql-gAuth.json')
+formatters["auth"]._logCommands('log\\sql-auth.json')
 

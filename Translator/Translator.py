@@ -24,6 +24,9 @@ class Translator:
         
     def getObjDataDict(self):
         return self.objDataDict
+    
+    def getObjList(self):
+        return list(self.objDataDict.values())
         
 
 

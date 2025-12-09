@@ -35,7 +35,7 @@ for key in translators:
 
 
 # Step 3: Sanitation
-authorSanitizer = AuthorSanitizer(list(translators["auth"].getObjDataDict().values()), {})
+authorSanitizer = AuthorSanitizer(translators["auth"].getObjList(), {})
 authorSanitizer.sanitize()
 
 

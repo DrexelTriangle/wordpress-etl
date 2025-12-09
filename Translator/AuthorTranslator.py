@@ -18,7 +18,7 @@ class AuthorTranslator(Translator):
     
     def translate(self):
         for author in self.source:
-            self.addObject(self._getAuthorData(author))
+            self.addObject(self._getAuthor(author))
     
     def _log(self, fileDestination):
         with open(fileDestination, 'w+', encoding='utf-8') as file:

@@ -5,6 +5,7 @@ from Utils.Constants import *
 from Translator.ArticleTranslator import *
 from Translator.GuestAuthorTranslator import *
 from Translator.AuthorTranslator import *
+from Sanitizer.AuthorSanitizer import *
 
 # TODO: python library dependency checks
 

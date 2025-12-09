@@ -56,7 +56,7 @@ class ArticleTranslator(Translator):
   def translate(self):
     debugMode = False
     for i, itm in enumerate(self.source):
-      obj = self._getArticleData(itm, debugMode)
+      obj = self._getArticle(itm, debugMode)
       obj.processTags()
       # NOTE: using to only load 9k of the article data
       if self._shouldSkip(obj, debugMode):

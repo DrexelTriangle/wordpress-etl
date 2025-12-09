@@ -5,6 +5,9 @@ from Utils.Constants import *
 from Translator.ArticleTranslator import *
 from Translator.GuestAuthorTranslator import *
 from Translator.AuthorTranslator import *
+from Formatter.ArticleFormatter import *
+from Formatter.AuthorFormatter import *
+from Formatter.GuestAuthorFormatter import *
 from Sanitizer.AuthorSanitizer import *
 
 # TODO: python library dependency checks
@@ -39,7 +42,15 @@ authorSanitizer = AuthorSanitizer(translators["auth"].getObjList(), {})
 authorSanitizer.sanitize()
 
 
+# Step 4: Formatting
+formatters = {
+  "articles": ArticleFormatter(translators["articles"]),
+  "gAuth": GuestAuthorFormatter(translators["auth"]),
+  "auth": AuthorFormatter(translators["gAuth"]),
+}
 
+for key in formatters:
+  formatters[key].format()
 
 
 

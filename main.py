@@ -28,13 +28,15 @@ for key in translators:
   translators[key].translate()
 
 
-# DEBUG: logging
-translators["articles"]._log('log\\articles')
-translators["gAuth"]._log('log\\gAuth.json')
-translators["auth"]._log('log\\auth.json')
+# # DEBUG: logging
+# translators["articles"]._log('log\\articles')
+# translators["gAuth"]._log('log\\gAuth.json')
+# translators["auth"]._log('log\\auth.json')
 
 
-
+# Step 3: Sanitation
+authorSanitizer = AuthorSanitizer(list(translators["auth"].getObjDataDict().values()), {})
+authorSanitizer.sanitize()
 
 
 

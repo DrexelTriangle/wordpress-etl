@@ -5,6 +5,7 @@ output/*
 rawdata/*
 stats/*
 log/*
+cacheDirectory/*
 temp.txt
 *.json
 result.txt

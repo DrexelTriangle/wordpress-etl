@@ -1,11 +1,11 @@
 import json
 class Formatter():
-    def __init__(self, translator):
-        self.translator = translator
+    def __init__(self, data):
+        self.data = data
         self.sqlCommands = []
         
     def getObjDataDict(self):
-        return self.translator.getObjDataDict()
+        return self.data.getObjDataDict()
         
     def _esc(self, value):
         if value is None:
@@ -18,7 +18,7 @@ class Formatter():
           json.dump(self.sqlCommands, file, indent=4)
           file.close()
     
-    def SQLify(self, table):
+    def format(self, table):
         pass
     
     

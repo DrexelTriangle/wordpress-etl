@@ -11,7 +11,7 @@ class ArticleTranslator(Translator):
     super().__init__(incomingData)
     self.uniqueAuthorCleanNames = set()
 
-  def _getArticleData(self, data, noTextGrab=False):
+  def _getArticle(self, data, noTextGrab=False):
     textData = ''
     
     if (noTextGrab):

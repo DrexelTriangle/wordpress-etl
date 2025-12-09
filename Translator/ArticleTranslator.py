@@ -40,7 +40,8 @@ class ArticleTranslator(Translator):
     chunk4 = [photoCred, pubDate, tags, text, title]
 
     # return all article data as one contiguous list
-    return [*chunk1, *chunk2, *chunk3, *chunk4]
+    data = [*chunk1, *chunk2, *chunk3, *chunk4]
+    return Article(*data)
 
 
   # NOTE: using to only load 9k of the article data
@@ -55,14 +56,12 @@ class ArticleTranslator(Translator):
   def translate(self):
     debugMode = False
     for i, itm in enumerate(self.source):
-      objData = self._getArticleData(itm, debugMode)
-      obj = Article(*objData)
+      obj = self._getArticleData(itm, debugMode)
       obj.processTags()
       # NOTE: using to only load 9k of the article data
       if self._shouldSkip(obj, debugMode):
         continue
       else:
-        self.objDataDict.update({obj["id"]: obj.data})
         self.addObject(obj)
 
 

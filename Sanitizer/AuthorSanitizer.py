@@ -86,11 +86,14 @@ class AuthorSanitizer(Sanitizer):
         sparseMatrix = nlp.generateSparseMatrix(sparseVectors)
         params = nlp.generateKHashParameters(150, 2**31 - 1)
         sigMatrix = nlp.generateSignatureMatrix(sparseMatrix, vocab, params)
+        print('\033[?25l')
         for i in range(len(authors)):
             for j in range(i+1, len(authors)):
                 sim = nlp.checkJaccardSignatureSimilarity(sigMatrix[:, i], sigMatrix[:, j])
                 print(f"{authors[i]} vs {authors[j]}")
-                print("Similarity:", round(sim, 4))
+                print(f"Similarity: {round(sim, 4):.4f}")
+                print("\x1b[1A\x1b[2K"*3)
+        print('\033[?25h')
 
     def _manualResolve(self):
         pass

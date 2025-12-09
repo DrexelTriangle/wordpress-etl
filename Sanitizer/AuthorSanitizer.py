@@ -7,10 +7,11 @@ from Sanitizer.PolicyDict import PolicyDict
 class AuthorSanitizer(Sanitizer):
     def __init__(self, data: list, policies: PolicyDict, logDir: str = "./log"):
         super().__init__(data, policies, logDir)
-        self.lastAuid = int(data[-1].data["id"])
+        self.lastAuid = len(data) - 1
 
     def _normalizeData(self):
         multipleAuthorIndicators = ["-and-", " and ", " &amp; ", ","]
+
         for author in list(self.data):
             match author.data["display_name"]: # Catch Special Cases
                 case "Jena.M.Doka":

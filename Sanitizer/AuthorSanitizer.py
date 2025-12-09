@@ -69,7 +69,8 @@ class AuthorSanitizer(Sanitizer):
                 pass
 
     def _mergeAuthors(a: Author, b: Author, auto: bool):
-        # merges into a, deletes b -- auto favors lengthier names, failure to resolve will return an error which will be handled by moving that set of authors into a manual resolve queue
+        # merges into a and deletes b, favors lengthier names by default, 
+        # failure to resolve will return an error to be handled by authors into a manual resolve queue
         if auto is True:
             for field in a.data:
                 if a.data[field] == b.data[field]:

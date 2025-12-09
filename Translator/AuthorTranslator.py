@@ -12,12 +12,16 @@ class AuthorTranslator(Translator):
         email = author['wp:author_email']
         login = author['wp:author_login']
 
-        return [self.objCount, displayName, firstName, lastName, email, login]
+        data = [self.objCount, displayName, firstName, lastName, email, login]
+        return Author(*data)
         
     
     def translate(self):
         for author in self.source:
-            authorData = self._getAuthorData(author)
-            authorObject = Author(*authorData)
-            self.addObject(authorObject)
+            self.addObject(self._getAuthorData(author))
+    
+    def _log(self, fileDestination):
+        with open(fileDestination, 'w+', encoding='utf-8') as file:
+          json.dump(self.objDataDict, file, indent=4)
+          file.close()
     

@@ -20,4 +20,17 @@ class AuthorTranslator(Translator):
             authorData = self._getAuthorData(author)
             authorObject = Author(*authorData)
             self.addObject(authorObject)
+
+    def listAuthors(self):
+        return [
+            Author(
+                auid=auth["id"],
+                login=auth["login"],
+                email=auth["email"],
+                display_name=auth["display_name"],
+                first_name=auth["first_name"],
+                last_name=auth["last_name"],
+            )
+            for auth in self.objDataDict.values()
+        ]
     

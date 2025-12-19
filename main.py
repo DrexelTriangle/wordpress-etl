@@ -32,14 +32,9 @@ for key in translators:
 translators["articles"]._log('log\\articles')
 translators["gAuth"]._log('log\\gAuth.json')
 translators["auth"]._log('log\\auth.json')
-
-
-
-
-
-
-
-
+authors = translators["auth"].listAuthors()
+sanitizer = AuthorSanitizer(authors, {}, "")
+sanitizer.sanitize()
 
 
 

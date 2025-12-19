@@ -3,6 +3,7 @@ import re
 from Translator.Author import Author
 from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.PolicyDict import PolicyDict
+from Sanitizer.DiffChecker import DiffChecker
 
 class AuthorSanitizer(Sanitizer):
     def __init__(self, data: list, policies: PolicyDict, logDir: str = "./log"):
@@ -51,7 +52,7 @@ class AuthorSanitizer(Sanitizer):
                     authors = nlp.cleanDocument(author.data["display_name"], "author_multiple")
                     for name in authors:
                         self.lastAuid += 1
-                        newAuthor = Author(int(self.lastAuid+1), None, None, name, None, None)
+                        newAuthor = Author(int(self.lastAuid), None, None, name, None, None)
                         self.data.append(newAuthor)
                     self.data.remove(author)
                     continue
@@ -68,27 +69,61 @@ class AuthorSanitizer(Sanitizer):
             else:
                 pass
 
-    def _mergeAuthors(a: Author, b: Author, auto: bool):
-        # merges into a, deletes b -- auto favors lengthier names, failure to resolve will return an error which will be handled by moving that set of authors into a manual resolve queue
-        if auto is True:
-            for field in a.data:
-                if a.data[field] == b.data[field]:
-                    pass
+    def _merge(self, a: Author, b: Author, sim):
+        print(f"{a.data["display_name"]}, {b.data["display_name"]}, {sim}")
 
+    def _flag(self, a: Author, b: Author, sim):
+        print(f"{a.data["display_name"]}, {b.data["display_name"]}", {sim})
 
     def _autoResolve(self):
-        authors = [nlp.cleanDocument(a.data["display_name"],"similarity") for a in self.data if a.data["display_name"] is not None]
-        shingles = [nlp.generateKShingles(doc, 2) for doc in authors]
-        vocab = nlp.generateVocab(shingles)
-        sparseVectors = [nlp.generateSparseVector(s, vocab) for s in shingles]
-        sparseMatrix = nlp.generateSparseMatrix(sparseVectors)
-        params = nlp.generateKHashParameters(150, 2**31 - 1)
-        sigMatrix = nlp.generateSignatureMatrix(sparseMatrix, vocab, params)
+        banList = [ # Removed to bolster similarity checking
+            "Editorial Board",
+            "Campus Election Engagement Project",
+            "Entertainment Desk",
+            "Op-Ed",
+            "The Triangle Sports Desk",
+            "The Triangle News Desk",
+            "Sadie Says",
+            "The Pretentious Film Majors",
+            "Granny  Eloise",
+            "St. Christopher's Hospital For Children",
+            "The Editorial Board",
+            "Drexel For PILOTS",
+            "The Triangle Alumni",
+            "Campus Election Engagement Project",
+            "Tadmin",
+            "None",
+        ]
+
+        banListNormalized = {nlp.cleanDocument(name, "similarity") for name in banList}
+        filteredAuthors = []
+        bannedAuthors = []
+        for author in self.data:
+            name = author.data["display_name"]
+            if name is None:
+                bannedAuthors.append(author)
+                continue
+            nameNormalized = nlp.cleanDocument(name, "similarity")
+            if nameNormalized in banListNormalized:
+                bannedAuthors.append(author)
+                continue
+            filteredAuthors.append(author)
+
+        authors = [nlp.cleanDocument(a.data["display_name"], "similarity") for a in filteredAuthors]
+        authorsMeta = filteredAuthors
+
+        diffChecker = DiffChecker(authors)
         for i in range(len(authors)):
             for j in range(i+1, len(authors)):
-                sim = nlp.checkJaccardSignatureSimilarity(sigMatrix[:, i], sigMatrix[:, j])
-                print(f"{authors[i]} vs {authors[j]}")
-                print("Similarity:", round(sim, 4))
+                sim = diffChecker.compare(i, j)
+                if sim >= .9:
+                    self._merge(authorsMeta[i], authorsMeta[j], sim)
+                elif sim >= .8:
+                    self._flag(authorsMeta[i], authorsMeta[j], sim)
+                else:
+                    self._flag(authorsMeta[i], authorsMeta[j], sim)
+
+        self.data = filteredAuthors + bannedAuthors
 
     def _manualResolve(self):
         pass

@@ -29,12 +29,16 @@ for key in translators:
 
 
 # DEBUG: logging
-translators["articles"]._log('log\\articles')
-translators["gAuth"]._log('log\\gAuth.json')
-translators["auth"]._log('log\\auth.json')
+translators["articles"]._log('logs/articles/.')
+translators["gAuth"]._log('logs/gAuth.json')
+translators["auth"]._log('logs/auth.json')
 authors = translators["auth"].listAuthors()
-sanitizer = AuthorSanitizer(authors, {}, "")
-sanitizer.sanitize()
-
-
+sanitizer = AuthorSanitizer(authors, {})
+authors = sanitizer.sanitize()
+with open("output.json", 'w+', encoding='utf-8') as file:
+  oAuthors = {}
+  for i in range(len(authors)):
+    oAuthors[str(i)] = authors[i].data
+  json.dump(oAuthors, file, indent=4)
+  file.close()
 

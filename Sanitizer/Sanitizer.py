@@ -58,13 +58,10 @@ class Sanitizer(ABC):
                 serialized.append(conflict.data if hasattr(conflict, "data") else conflict)
         return serialized
 
-    def _log(self, filename: str | None = None):
-        if filename is None:
-            timestamp = datetime.now().strftime("%H-%M-%S")
-            filename = f"{timestamp}_sanitization_report.json"
+    def _log(self, filename, conflictName):
         log_dir = "./logs"
         os.makedirs(log_dir, exist_ok=True)
-        with open(os.path.join(log_dir, filename), "w+", encoding="utf-8") as file:
+        with open(os.path.join(log_dir, filename+".json"), "w+", encoding="utf-8") as file:
             json.dump(
                 {
                     "changes": self._serializeChanges(),
@@ -72,7 +69,7 @@ class Sanitizer(ABC):
                 file,
                 indent=4,
             )
-        conflicts_path = os.path.join(log_dir, "conflicts.json")
+        conflicts_path = os.path.join(log_dir, conflictName+".json")
         existing_conflicts = []
         if os.path.exists(conflicts_path):
             try:

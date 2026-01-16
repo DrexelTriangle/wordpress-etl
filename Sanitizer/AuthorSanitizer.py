@@ -336,5 +336,5 @@ class AuthorSanitizer(Sanitizer):
         flaggedAuthors = self._autoResolve()
         self._manualResolve(flaggedAuthors)
         self._autoResolve()
-        self._log()
+        self._log("auth_mappings", "auth_conflicts")
         return self.data

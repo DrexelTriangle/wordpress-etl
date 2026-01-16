@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from Utils import NLP as nlp
 import re
@@ -336,5 +337,5 @@ class GuestAuthorSanitizer(Sanitizer):
         flaggedAuthors = self._autoResolve()
         self._manualResolve(flaggedAuthors)
         self._autoResolve()
-        self._log()
+        self._log("gauth_mappings", "gauth_conflicts")
         return self.data

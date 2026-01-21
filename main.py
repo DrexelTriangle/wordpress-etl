@@ -9,6 +9,7 @@ from Formatter.ArticleFormatter import *
 from Formatter.AuthorFormatter import *
 from Formatter.GuestAuthorFormatter import *
 from Sanitizer.AuthorSanitizer import *
+from Sanitizer.TempArticleSanitizer import *
 
 # TODO: python library dependency checks
 
@@ -21,32 +22,32 @@ extracted = extractor.getData()
 
 
 # Step 2: Translation
-translators = {
-  "articles": ArticleTranslator(extracted["art"]),
-  "gAuth": GuestAuthorTranslator(extracted["guestAuth"]),
-  "auth": AuthorTranslator(extracted["auth"])
-}
+articleTranslator = ArticleTranslator(extracted["art"])
+authTranslator = AuthorTranslator(extracted["auth"])
+gAuthTranslator = GuestAuthorTranslator(extracted["guestAuth"])
 
-for key in translators:
-  translators[key].translate()
+articleTranslator.translate()
+authTranslator.translate()
+gAuthTranslator.translate()
 
 
-# # DEBUG: logging
-# translators["articles"]._log('log\\articles')
-# translators["gAuth"]._log('log\\gAuth.json')
-# translators["auth"]._log('log\\auth.json')
+# DEBUG: logging
+articleTranslator._log('log\\articles')
+authTranslator._log('log\\gAuth.json')
+gAuthTranslator._log('log\\auth.json')
 
 
 # Step 3: Sanitation
-authorSanitizer = AuthorSanitizer(translators["auth"].getObjList(), {})
-authorSanitizer.sanitize()
-
+authorSanitizer = AuthorSanitizer(authTranslator.getObjList(), {})
+articleSanitizer = TempArticleSanitizer(articleTranslator.getObjDataDict(), {})
+# authorSanitizer.sanitize()
+articleSanitizer._checkForImgTags()
 
 # Step 4: Formatting
 formatters = {
-  "articles": ArticleFormatter(translators["articles"]),
-  "gAuth": GuestAuthorFormatter(translators["auth"]),
-  "auth": AuthorFormatter(translators["gAuth"]),
+  "articles": ArticleFormatter(articleTranslator),
+  "gAuth": GuestAuthorFormatter(authTranslator),
+  "auth": AuthorFormatter(gAuthTranslator),
 }
 
 for key in formatters:

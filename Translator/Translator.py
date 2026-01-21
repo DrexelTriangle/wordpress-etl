@@ -13,9 +13,13 @@ class Translator:
         return translation
     
     def _log(self, fileDestination):
-        # Log data into json
+        # Convert dataObjDict to dict of dicts
+        temp = {}
+        for obj in self.getObjDataDict().values():
+            temp.update({str(obj.data["id"]): obj.data}) 
+
         with open(fileDestination, 'w+', encoding='utf-8') as file:
-          json.dump(self.objDataDict, file, indent=4)
+          json.dump(temp, file, indent=4)
           file.close()
 
     def addObject(self, object):

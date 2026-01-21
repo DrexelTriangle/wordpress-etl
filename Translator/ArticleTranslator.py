@@ -81,7 +81,13 @@ class ArticleTranslator(Translator):
         print()
     print('\n')
   
-  def _log(self, fileDestination):                      
+  def _log(self, fileDestination):   
+    # Convert dataObjDict to dict of dicts
+    temp = {}
+    for article in self.getObjDataDict().values():
+      temp.update({str(article.data["id"]): article.data}) 
+
+
     fileBuckets = []
     dictLen = len(self.objDataDict)
     remainder = dictLen % 1000
@@ -92,9 +98,9 @@ class ArticleTranslator(Translator):
     for i in range(bucketNum):
       fileBuckets.append({})
     
-    for i, itm in enumerate(self.objDataDict):
+    for i, itm in enumerate(temp):
       bucket = i // 1000
-      fileBuckets[bucket].update({i: self.objDataDict[i]})
+      fileBuckets[bucket].update({i: temp[str(i)]})
     
     for i in range(len(fileBuckets)):
       bucket = fileBuckets[i]

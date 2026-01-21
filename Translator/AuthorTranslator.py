@@ -20,8 +20,5 @@ class AuthorTranslator(Translator):
         for author in self.source:
             self.addObject(self._getAuthor(author))
     
-    def _log(self, fileDestination):
-        with open(fileDestination, 'w+', encoding='utf-8') as file:
-          json.dump(self.objDataDict, file, indent=4)
-          file.close()
+    
     

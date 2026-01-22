@@ -44,6 +44,10 @@ class AuthorSanitizer(Sanitizer):
                 self.priorityId.add(str(author.data.get("id")))
             if author.data["display_name"] is not None:
                 if any(indicator in author.data["display_name"] for indicator in self.policies.multipleAuthorIndicators):
+            author.data = self._edgeCases(author.data)
+            if author.data["display_name"] != None:
+                # multiple authors case
+                if any(indicator in author.data["display_name"] for indicator in multipleAuthorIndicators):
                     authors = nlp.cleanDocument(author.data["display_name"], "author_multiple")
                     for name in authors:
                         cleanedName = nlp.cleanDocument(name, "author_single")
@@ -56,6 +60,7 @@ class AuthorSanitizer(Sanitizer):
                     continue
                 author.data["display_name"] = nlp.cleanDocument(author.data["display_name"], "author_single")
 
+                # missing first/last name
                 if author.data["first_name"] is None or author.data["last_name"] is None:
                     firstName, lastName = self._splitDisplayName(author.data["display_name"])
                     if firstName or lastName:

@@ -10,3 +10,4 @@ temp.txt
 result.txt
 skenanigans-rawdata.zip
 cacheDirectory/*
+cacheDirectory/joblib/Utils/NLP/*

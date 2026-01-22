@@ -18,12 +18,30 @@ class TempArticleSanitizer(Sanitizer):
         hasPhoto = []
         count = 0
         for article in self.data.values():
-            matchObj = re.search(r"https\:\/\/www\.thetriangle.org\/wp-content\/uploads\/(.*?)\\", article.data["text"])
+            matchObj = re.search(r"https\:\/\/www\.thetriangle.org\/wp-content\/uploads\/(.*?)\\.{0,400}", article.data["text"])
             if matchObj:
                 hasPhoto.append(matchObj.group(0))
                 count += 1
-            else:
-                print(article.data["text"])
+                with open('TEMP.txt', "a", encoding='utf-8') as file:
+                    file.write(matchObj.group(0))
+                    file.write('\n')
+                    file.close()
+        
+        # Check for
+        for item in hasPhoto:
+            lowered = str.lower(item)
+            # if not('courtes' in lowered or 'by' in lowered or 'photo:' in lowered or 'credit' in lowered):
+            #     with open('TEMP.txt', "a", encoding='utf-8') as file:
+            #         file.write(item)
+            #         file.write('\n\n')
+            #         file.close()
+
+            # 1065 --> <figcaption(.+?)<\/figcaption>
+            # 
+
+
+
+
         print(count/len(self.data))
         exit(7)
 

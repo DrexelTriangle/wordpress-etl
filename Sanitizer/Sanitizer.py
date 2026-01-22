@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-from datetime import datetime
 import json
-import os
+from pathlib import Path
 
 class Sanitizer(ABC):
     def __init__(self, data: list, policies: dict):
@@ -59,9 +58,10 @@ class Sanitizer(ABC):
         return serialized
 
     def _log(self, filename, conflictName):
-        log_dir = "./logs"
-        os.makedirs(log_dir, exist_ok=True)
-        with open(os.path.join(log_dir, filename+".json"), "w+", encoding="utf-8") as file:
+        logDir = Path("logs")
+        logDir.mkdir(parents=True, exist_ok=True)
+        changesPath = logDir / f"{filename}.json"
+        with changesPath.open("w+", encoding="utf-8") as file:
             json.dump(
                 {
                     "changes": self._serializeChanges(),
@@ -69,11 +69,11 @@ class Sanitizer(ABC):
                 file,
                 indent=4,
             )
-        conflicts_path = os.path.join(log_dir, conflictName+".json")
+        conflictsPath = logDir / f"{conflictName}.json"
         existing_conflicts = []
-        if os.path.exists(conflicts_path):
+        if conflictsPath.exists():
             try:
-                with open(conflicts_path, "r", encoding="utf-8") as file:
+                with conflictsPath.open("r", encoding="utf-8") as file:
                     payload = json.load(file)
                 existing_conflicts = payload.get("conflicts", payload) if isinstance(payload, dict) else payload
                 if not isinstance(existing_conflicts, list):
@@ -91,7 +91,7 @@ class Sanitizer(ABC):
                 seen.add(key)
                 merged.append(conflict)
             new_conflicts = merged
-        with open(conflicts_path, "w+", encoding="utf-8") as file:
+        with conflictsPath.open("w+", encoding="utf-8") as file:
             json.dump(
                 {
                     "conflicts": new_conflicts,

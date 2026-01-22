@@ -2,6 +2,7 @@ import json
 from Utils import NLP as nlp
 import re
 import os
+from pathlib import Path
 from Translator.Author import Author
 from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.PolicyDict import PolicyDict
@@ -175,13 +176,12 @@ class GuestAuthorSanitizer(Sanitizer):
     def _loadConflictsFromFile(self):
         if self._conflicts_cache is not None:
             return self._conflicts_cache
-        log_dir = "./logs"
-        conflicts_path = os.path.join(log_dir, "gauth_conflicts.json")
-        if not os.path.exists(conflicts_path):
+        conflictsPath = Path("logs") / "gauth_conflicts.json"
+        if not conflictsPath.exists():
             self._conflicts_cache = []
             return self._conflicts_cache
         try:
-            with open(conflicts_path, "r", encoding="utf-8") as file:
+            with conflictsPath.open("r", encoding="utf-8") as file:
                 payload = json.load(file)
         except (OSError, json.JSONDecodeError):
             self._conflicts_cache = []

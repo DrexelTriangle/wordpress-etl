@@ -1,7 +1,6 @@
 from Translator.GuestAuthor import *
 from Translator.Translator import *
 from Utils.Utility import *
-import json
 
 class GuestAuthorTranslator(Translator):
 
@@ -9,6 +8,11 @@ class GuestAuthorTranslator(Translator):
         super().__init__(source)
     
     def _extractMetadata(self, data):
+        displayName = None
+        email = None
+        firstName = None
+        lastName = None
+        login = None
         for metadata in data:
             match metadata['wp:meta_key']:
                 case 'cap-display_name':

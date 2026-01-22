@@ -176,7 +176,7 @@ class AuthorSanitizer(Sanitizer):
         if self._conflicts_cache is not None:
             return self._conflicts_cache
         log_dir = "./logs"
-        conflicts_path = os.path.join(log_dir, "conflicts.json")
+        conflicts_path = os.path.join(log_dir, "auth_conflicts.json")
         if not os.path.exists(conflicts_path):
             self._conflicts_cache = []
             return self._conflicts_cache
@@ -279,11 +279,61 @@ class AuthorSanitizer(Sanitizer):
         self.data = filteredAuthors + canonicals + bannedAuthors
         return flaggedAuthors
 
-    def _manualResolve(self, disputes: list[tuple[Author, Author]]):
+    def _manualResolve(self, disputes: list[tuple[Author, Author]], clear_screen: bool = True):
+        def _read_choice():
+            try:
+                if os.name == "nt":
+                    import msvcrt
+                    while True:
+                        ch = msvcrt.getch()
+                        if ch in (b"\x00", b"\xe0"):
+                            code = msvcrt.getch()
+                            if code == b"K":
+                                return "RIGHT"
+                            if code == b"M":
+                                return "LEFT"
+                        elif ch in (b"e", b"E"):
+                            return "E"
+                        elif ch in (b"l", b"L", b"\r", b"\n"):
+                            return "LEFT"
+                        elif ch in (b"r", b"R"):
+                            return "RIGHT"
+                else:
+                    import sys
+                    import termios
+                    import tty
+                    fd = sys.stdin.fileno()
+                    old = termios.tcgetattr(fd)
+                    try:
+                        tty.setraw(fd)
+                        ch = sys.stdin.read(1)
+                        if ch == "\x1b":
+                            seq = sys.stdin.read(2)
+                            if seq == "[D":
+                                return "RIGHT"
+                            if seq == "[C":
+                                return "LEFT"
+                        elif ch in ("e", "E"):
+                            return "E"
+                        elif ch in ("l", "L", "\r", "\n"):
+                            return "LEFT"
+                        elif ch in ("r", "R"):
+                            return "RIGHT"
+                    finally:
+                        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+            except Exception:
+                pass
+            choice = input("Type L or R to select left or right. Type E to manually enter a value.\n")
+            if choice in ("R", "r"):
+                return "RIGHT"
+            if choice in ("E", "e"):
+                return "E"
+            return "LEFT"
+
         authors = []
         to_remove = []
-        for dispute in disputes:
-            authorParams = []
+        for idx, dispute in enumerate(disputes):
+            authorParams = {}
             leftAuthor = dispute[0]
             rightAuthor = dispute[1]
             to_remove.extend([leftAuthor, rightAuthor])
@@ -297,30 +347,120 @@ class AuthorSanitizer(Sanitizer):
             right = rightAuthor.data
             keys = ["id", "display_name", "first_name", "last_name", "email", "login"]
 
-            table = ""
+            diffs = []
             for key in keys:
                 lval = "" if left.get(key) is None else str(left.get(key))
                 rval = "" if right.get(key) is None else str(right.get(key))
-                table += f"{key:<14} {lval:<50} {rval}\n"
-
-            for key in keys:
-                print(f"{'field':<14} {'left':<50} {'right'}\n")
-                print(table)
-                lval = "" if left.get(key) is None else str(left.get(key))
-                rval = "" if right.get(key) is None else str(right.get(key))
-                print(f"{key:<14} {lval:<50} {rval}")
-                choice = input("Type L or R to select left or right. Type E to manually enter a value.\n")
-                if choice == "R" or choice == "r":
-                    authorParams.append(right.get(key))
-                elif choice == "L" or choice == "l":
-                    authorParams.append(left.get(key))
-                elif choice == "E" or choice == "e":
-                    field = input("Value: ")
-                    authorParams.append(field)
+                if lval == rval:
+                    authorParams[key] = left.get(key)
                 else:
+                    diffs.append((key, lval, rval))
+
+            def _render_table(active_key: str):
+                def _pad(value: str, width: int):
+                    text = "" if value is None else str(value)
+                    return text[:width].ljust(width)
+
+                def _center(value: str, width: int):
+                    text = "" if value is None else str(value)
+                    if len(text) >= width:
+                        return text[:width]
+                    left = (width - len(text)) // 2
+                    right = width - len(text) - left
+                    return (" " * left) + text + (" " * right)
+
+                def _center_colored(text: str, width: int, color: str):
+                    if not text:
+                        return " " * width
+                    if len(text) >= width:
+                        return f"{color}{text[:width]}\033[0m"
+                    left = (width - len(text)) // 2
+                    right = width - len(text) - left
+                    return (" " * left) + f"{color}{text}\033[0m" + (" " * right)
+
+                if clear_screen:
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                try:
+                    import shutil
+                    term_width = shutil.get_terminal_size((120, 20)).columns
+                except Exception:
+                    term_width = 120
+                field_width = 14
+                marker_width = 16
+                min_col = 10
+                max_col = 40
+                max_left = max((len(str(lval)) for _, lval, _ in diffs), default=len("LEFT"))
+                max_right = max((len(str(rval)) for _, _, rval in diffs), default=len("RIGHT"))
+                max_chosen = max((len(str(authorParams.get(key, ""))) for key, _, _ in diffs), default=len("CHOSEN"))
+                base_width = max(len("CHOSEN"), max_left, max_right, max_chosen, min_col)
+                col_width = max(min_col, min(base_width, max_col))
+                total_width = field_width + (marker_width * 2) + (col_width * 3) + 5
+                while total_width > term_width and col_width > min_col:
+                    col_width -= 1
+                    total_width = field_width + (marker_width * 2) + (col_width * 3) + 5
+                left_width = col_width
+                chosen_width = col_width
+                right_width = col_width
+                left_marker_width = col_width
+                right_marker_width = col_width
+                field_label = _pad("FIELD", field_width)
+                left_label = _pad("LEFT", left_width)
+                chosen_label = _pad("CHOSEN", chosen_width)
+                right_label = _pad("RIGHT", right_width)
+                left_marker_label = _pad("", left_marker_width)
+                right_marker_label = _pad("", right_marker_width)
+                header = [
+                    f"\033[37m{field_label}\033[0m",
+                    f"\033[36m{left_label}\033[0m",
+                    left_marker_label,
+                    f"\033[32m{chosen_label}\033[0m",
+                    right_marker_label,
+                    f"\033[33m{right_label}\033[0m",
+                ]
+                print(f"{header[0]} {header[1]} {header[2]} {header[3]} {header[4]} {header[5]}")
+                print()
+                for key, lval, rval in diffs:
+                    ltxt = f"\033[36m{_pad(lval, left_width)}\033[0m"
+                    rtxt = f"\033[33m{_pad(rval, right_width)}\033[0m"
+                    chosen_raw = authorParams.get(key, "")
+                    chosen = _pad(chosen_raw, chosen_width) if chosen_raw else (" " * chosen_width)
+                    ctxt = f"\033[32m{chosen}\033[0m"
+                    prefix = "> " if key == active_key else "  "
+                    key_txt = _pad(f"{prefix}{key}", field_width)
+                    left_marker = ""
+                    right_marker = ""
+                    if key in authorParams and authorParams.get(key) == left.get(key):
+                        left_marker = ">>>>>>>>>>"
+                    elif key in authorParams and authorParams.get(key) == right.get(key):
+                        right_marker = "<<<<<<<<<<"
+                    left_marker_txt = _center_colored(left_marker, left_marker_width, "\033[36m")
+                    right_marker_txt = _center_colored(right_marker, right_marker_width, "\033[33m")
+                    row = f"{key_txt} {ltxt} {left_marker_txt} {ctxt} {right_marker_txt} {rtxt}"
+                    print(row)
+                count = f"CONFLICT {idx + 1}/{len(disputes)}"
+                count_text = f"\033[36m\033[7m{count}\033[0m"
+                instructions = "Use \u2192 for left, \u2190 for right, or E to edit."
+                pad = max(0, term_width - len(count) - len(instructions) - 1)
+                print()
+                print(f"{instructions}{' ' * pad}{count_text}")
+
+            for field_idx, (key, lval, rval) in enumerate(diffs):
+                _render_table(key)
+                while True:
+                    choice = _read_choice()
+                    if choice == "RIGHT":
+                        authorParams[key] = right.get(key)
+                        break
+                    if choice == "LEFT":
+                        authorParams[key] = left.get(key)
+                        break
+                    if choice == "E":
+                        field = input("Value: ")
+                        authorParams[key] = field
+                        break
                     print("Input not recognized -- try again")
-                os.system('cls' if os.name == 'nt' else 'clear')
-            canonical = Author(*authorParams)
+
+            canonical = Author(*(authorParams[key] for key in keys))
             self._manual_ids.add(str(canonical.data.get("id")))
             authors.append(canonical)
             self._logChange(leftAuthor, canonical)
@@ -331,10 +471,14 @@ class AuthorSanitizer(Sanitizer):
             self.data = [author for author in self.data if author not in to_remove]
         self.data.extend(authors) 
 
-    def sanitize(self):
+    def sanitize(self, on_manual_start=None, on_manual_end=None, clear_screen: bool = True):
         self._normalizeData()
         flaggedAuthors = self._autoResolve()
-        self._manualResolve(flaggedAuthors)
+        if flaggedAuthors and on_manual_start:
+            on_manual_start()
+        self._manualResolve(flaggedAuthors, clear_screen=clear_screen)
+        if flaggedAuthors and on_manual_end:
+            on_manual_end()
         self._autoResolve()
         self._log("auth_mappings", "auth_conflicts")
         return self.data

@@ -1,4 +1,3 @@
-from datetime import datetime
 import json
 from Utils import NLP as nlp
 import re
@@ -177,7 +176,7 @@ class GuestAuthorSanitizer(Sanitizer):
         if self._conflicts_cache is not None:
             return self._conflicts_cache
         log_dir = "./logs"
-        conflicts_path = os.path.join(log_dir, "conflicts.json")
+        conflicts_path = os.path.join(log_dir, "gauth_conflicts.json")
         if not os.path.exists(conflicts_path):
             self._conflicts_cache = []
             return self._conflicts_cache

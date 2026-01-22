@@ -9,45 +9,51 @@ class AuthorSanitizer(Sanitizer):
         super().__init__(data, policies, logDir)
         self.lastAuid = len(data) - 1
 
+    # nlp implementation for similarity checking
+    def _generateSigMatrix(self, authors):
+        shingles = [nlp.generateKShingles(doc, 2) for doc in authors]
+        vocab = nlp.generateVocab(shingles)
+        sparseVectors = [nlp.generateSparseVector(s, vocab) for s in shingles]
+        sparseMatrix = nlp.generateSparseMatrix(sparseVectors)
+        params = nlp.generateKHashParameters(150, 2**31 - 1)
+        return nlp.generateSignatureMatrix(sparseMatrix, vocab, params)
+
+    # hard coded edge cases
+    def _edgeCases(self, data):
+        match data["display_name"]: # Catch Special Cases
+            case "Entertainment Desk":
+                data["first_name"] = "A&E Desk"
+                data["last_name"] = None
+            case "The Triangle Sports Desk":
+                data["first_name"] = "The Triangle Sports Desk"
+                data["last_name"] = None  
+            case "The Triangle Alumni":
+                data["first_name"] = "The Triangle Alumni"
+                data["last_name"] = None
+            case "The Editorial Board":
+                data["first_name"] = "The Editorial Board"
+                data["last_name"] = None
+            case "Drexel for PILOTS":
+                data["first_name"] = "Drexel for PILOTS"
+                data["last_name"] = None
+            case "St. Christopher's Hospital for Children":
+                data["first_name"] = "St. Christopher's Hospital for Children"
+                data["last_name"] = None
+            case "Granny &amp; Eloise":
+                data["display_name"] = "Granny & Eloise"
+                data["first_name"] = "Granny & Eloise"
+                data["last_name"] = None        
+        return data
+    
+
+
     def _normalizeData(self):
         multipleAuthorIndicators = ["-and-", " and ", " &amp; ", ","]
 
         for author in list(self.data):
-            match author.data["display_name"]: # Catch Special Cases
-                case "Jena.M.Doka":
-                    author.data["display_name"] = "Jenna M. Doka"
-                    continue
-                case "Campus Election Engagement Project":
-                    continue
-                case "Op-Ed":
-                    continue
-                case "Entertainment Desk":
-                    author.data["first_name"] = "A&E Desk"
-                    author.data["last_name"] = None
-                case "The Triangle Sports Desk":
-                    author.data["first_name"] = "The Triangle Sports Desk"
-                    author.data["last_name"] = None
-                case "The Triangle News Desk":
-                    continue
-                case "The Triangle Alumni":
-                    author.data["first_name"] = "The Triangle Alumni"
-                    author.data["last_name"] = None
-                case "The Editorial Board":
-                    author.data["first_name"] = "The Editorial Board"
-                    author.data["last_name"] = None
-                case "Drexel for PILOTS":
-                    author.data["first_name"] = "Drexel for PILOTS"
-                    author.data["last_name"] = None
-                case "St. Christopher's Hospital for Children":
-                    author.data["first_name"] = "St. Christopher's Hospital for Children"
-                    author.data["last_name"] = None
-                case "tadmin":
-                    pass
-                case "Granny &amp; Eloise":
-                    author.data["display_name"] = "Granny & Eloise"
-                    author.data["first_name"] = "Granny & Eloise"
-                    author.data["last_name"] = None
+            author.data = self._edgeCases(author.data)
             if author.data["display_name"] != None:
+                # multiple authors case
                 if any(indicator in author.data["display_name"] for indicator in multipleAuthorIndicators):
                     authors = nlp.cleanDocument(author.data["display_name"], "author_multiple")
                     for name in authors:
@@ -59,6 +65,7 @@ class AuthorSanitizer(Sanitizer):
                 else:
                     author.data["display_name"] = nlp.cleanDocument(author.data["display_name"], "author_single")
 
+                # missing first/last name
                 if author.data["first_name"] is None or author.data["last_name"] is None:
                     try:
                         name = re.split(" (?!.* )", author.data["display_name"])
@@ -80,20 +87,19 @@ class AuthorSanitizer(Sanitizer):
 
     def _autoResolve(self):
         authors = [nlp.cleanDocument(a.data["display_name"],"similarity") for a in self.data if a.data["display_name"] is not None]
-        shingles = [nlp.generateKShingles(doc, 2) for doc in authors]
-        vocab = nlp.generateVocab(shingles)
-        sparseVectors = [nlp.generateSparseVector(s, vocab) for s in shingles]
-        sparseMatrix = nlp.generateSparseMatrix(sparseVectors)
-        params = nlp.generateKHashParameters(150, 2**31 - 1)
-        sigMatrix = nlp.generateSignatureMatrix(sparseMatrix, vocab, params)
-        print('\033[?25l')
-        for i in range(len(authors)):
-            for j in range(i+1, len(authors)):
-                sim = nlp.checkJaccardSignatureSimilarity(sigMatrix[:, i], sigMatrix[:, j])
-                print(f"{authors[i]} vs {authors[j]}")
-                print(f"Similarity: {round(sim, 4):.4f}")
-                print("\x1b[1A\x1b[2K"*3)
-        print('\033[?25h')
+        sigMatrix = self._generateSigMatrix(authors)
+
+        # Similarity Checking
+        print('Checking Similarities...')
+        # print('\033[?25l')
+        # for i in range(len(authors)):
+        #     for j in range(i+1, len(authors)):
+        #         sim = nlp.checkJaccardSignatureSimilarity(sigMatrix[:, i], sigMatrix[:, j])
+        #         if (sim > 0.5):
+        #             print("\x1b[1A\x1b[2K"*3)
+        #             print(f"{authors[i]} vs {authors[j]}")
+        #             print(f"Similarity: {round(sim, 4):.4f}")               
+        # print('\033[?25h')
 
     def _manualResolve(self):
         pass

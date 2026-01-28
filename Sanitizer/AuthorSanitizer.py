@@ -82,15 +82,19 @@ class AuthorSanitizer(Sanitizer):
                 if displayName is not None:
                     author.data["display_name"] = displayName
             special = False
+
+            # check for special editing edge case
             updates = self.specialEdits.get(author.data["display_name"])
             if updates:
                 author.data.update(updates)
                 special = True
             elif author.data["display_name"] in self.specialFlags:
                 special = True
+            
             if special:
                 self.priorityId.add(str(author.data.get("id")))
             if author.data["display_name"] is not None:
+                # Check if author actually represents 2 authors
                 if any(indicator in author.data["display_name"] for indicator in self.multipleAuthorIndicators):
                     authors = nlp.cleanDocument(author.data["display_name"], "author_multiple")
                     for name in authors:
@@ -246,7 +250,7 @@ class AuthorSanitizer(Sanitizer):
     def _manualResolve(self, disputes: list[tuple[Author, Author]], clear: bool = True):
         def _readChoice():
             try:
-                if os.name == "nt":
+                if (os.name == "nt"):
                     import msvcrt
                     while True:
                         ch = msvcrt.getch()
@@ -283,6 +287,8 @@ class AuthorSanitizer(Sanitizer):
                             return "LEFT"
                         elif ch in ("r", "R"):
                             return "RIGHT"
+                        elif ch in ("q", "Q"):
+                            return "EXIT"
                     finally:
                         termios.tcsetattr(fd, termios.TCSADRAIN, old)
             except Exception:
@@ -327,6 +333,8 @@ class AuthorSanitizer(Sanitizer):
                 )
                 while True:
                     choice = _readChoice()
+                    if choice == "EXIT":
+                        exit(7)
                     if choice in {"RIGHT", "LEFT"}:
                         authorParams[key] = right.get(key) if choice == "RIGHT" else left.get(key)
                         break

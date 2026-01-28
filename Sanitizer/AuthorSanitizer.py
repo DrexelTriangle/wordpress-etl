@@ -147,6 +147,7 @@ class AuthorSanitizer(Sanitizer):
 
         return Author(id, displayName, firstName, lastName, email, login)
 
+    # LOGGING FUNCTIONS 
     def _logChange(self, a: Author, b: Author):
         for change in self.changes:
             if change and change[-1].data.get("id") == a.data.get("id"):
@@ -163,6 +164,7 @@ class AuthorSanitizer(Sanitizer):
             return
         self.changes.append([a, b])
 
+    # CONFLICT FUCNTIONS
     def _logConflict(self, a: Author, b: Author):
         self.conflicts.append([a, b])
 
@@ -247,53 +249,59 @@ class AuthorSanitizer(Sanitizer):
         self.data = filteredAuthors + canonicals + bannedAuthors
         return flaggedAuthors
 
-    def _manualResolve(self, disputes: list[tuple[Author, Author]], clear: bool = True):
-        def _readChoice():
-            try:
-                if (os.name == "nt"):
-                    import msvcrt
-                    while True:
-                        ch = msvcrt.getch()
-                        if ch in (b"\x00", b"\xe0"):
-                            code = msvcrt.getch()
-                            if code == b"K":
-                                return "RIGHT"
-                            if code == b"M":
-                                return "LEFT"
-                        elif ch in (b"e", b"E"):
-                            return "E"
-                        elif ch in (b"l", b"L", b"\r", b"\n"):
-                            return "LEFT"
-                        elif ch in (b"r", b"R"):
-                            return "RIGHT"
-                else:
-                    import sys
-                    import termios
-                    import tty
-                    fd = sys.stdin.fileno()
-                    old = termios.tcgetattr(fd)
-                    try:
-                        tty.setraw(fd)
-                        ch = sys.stdin.read(1)
-                        if ch == "\x1b":
-                            seq = sys.stdin.read(2)
-                            if seq == "[D":
-                                return "RIGHT"
-                            if seq == "[C":
-                                return "LEFT"
-                        elif ch in ("e", "E"):
-                            return "E"
-                        elif ch in ("l", "L", "\r", "\n"):
-                            return "LEFT"
-                        elif ch in ("r", "R"):
-                            return "RIGHT"
-                        elif ch in ("q", "Q"):
-                            return "EXIT"
-                    finally:
-                        termios.tcsetattr(fd, termios.TCSADRAIN, old)
-            except Exception:
-                pass
+    def _readInputNT():
+        import msvcrt
+        while True:
+            ch = msvcrt.getch()
+            if ch in (b"\x00", b"\xe0"):
+                code = msvcrt.getch()
+                if code == b"K":
+                    return "RIGHT"
+                if code == b"M":
+                    return "LEFT"
+            elif ch in (b"e", b"E"):
+                return "E"
+            elif ch in (b"l", b"L", b"\r", b"\n"):
+                return "LEFT"
+            elif ch in (b"r", b"R"):
+                return "RIGHT"
 
+    def _readInput():
+        import sys
+        import termios
+        import tty
+        fd = sys.stdin.fileno()
+        old = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            ch = sys.stdin.read(1)
+            if ch == "\x1b":
+                seq = sys.stdin.read(2)
+                if seq == "[D":
+                    return "RIGHT"
+                if seq == "[C":
+                    return "LEFT"
+            elif ch in ("e", "E"):
+                return "E"
+            elif ch in ("l", "L", "\r", "\n"):
+                return "LEFT"
+            elif ch in ("r", "R"):
+                return "RIGHT"
+            elif ch in ("q", "Q"):
+                return "EXIT"
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old)
+    
+    def _readChoice():
+        try:
+            if (os.name == "nt"):
+                return AuthorSanitizer._readInputNT()
+            else:
+                return AuthorSanitizer._readInput()  
+        except Exception:
+            pass
+
+    def _manualResolve(self, disputes: list[tuple[Author, Author]], clear: bool = True):
         authors = []
         toRemove = []
         for i, dispute in enumerate(disputes):
@@ -309,8 +317,8 @@ class AuthorSanitizer(Sanitizer):
                 continue
             left = leftAuthor.data
             right = rightAuthor.data
+            
             keys = ["id", "display_name", "first_name", "last_name", "email", "login"]
-
             diffs = []
             for key in keys:
                 lval = "" if left.get(key) is None else str(left.get(key))
@@ -321,18 +329,9 @@ class AuthorSanitizer(Sanitizer):
                     diffs.append((key, lval, rval))
 
             for key, lval, rval in diffs:
-                Animator._renderTable(
-                    key,
-                    diffs,
-                    authorParams,
-                    left,
-                    right,
-                    clear,
-                    i,
-                    len(disputes),
-                )
+                Animator._renderTable(key, diffs, authorParams, left, right, clear, i, len(disputes))
                 while True:
-                    choice = _readChoice()
+                    choice = AuthorSanitizer._readChoice()
                     if choice == "EXIT":
                         exit(7)
                     if choice in {"RIGHT", "LEFT"}:

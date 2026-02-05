@@ -10,5 +10,9 @@ temp.txt
 *.json
 result.txt
 skenanigans-rawdata.zip
-cacheDirectory/*
-Utils/cacheDirectory/*
+cacheDirectory/joblib/Utils/NLP/generateKShingles/*
+cacheDirectory/joblib/Utils/NLP/generateSparseVector/*
+cacheDirectory/joblib/Utils/NLP/generateSignatureMatrix/*
+Utils/cacheDirectory/Utils/NLP/_generateKShingles_impl/*
+Utils/cacheDirectory/Utils/NLP/_generateSignatureMatrix_impl/*
+Utils/cacheDirectory/Utils/NLP/_generateSparseVector_impl/*

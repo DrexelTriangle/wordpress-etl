@@ -39,3 +39,4 @@ class GuestAuthorPolicy(Policy):
             "Triangle Ed-Board"
         ]
         super().__init__(specialEdits, specialFlags, banList, data, False)
+        

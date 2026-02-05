@@ -11,3 +11,4 @@ temp.txt
 result.txt
 skenanigans-rawdata.zip
 cacheDirectory/*
+Utils/cacheDirectory/*

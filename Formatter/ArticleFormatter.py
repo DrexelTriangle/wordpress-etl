@@ -2,11 +2,12 @@ from Formatter.Formatter import Formatter
 import json
 
 class ArticleFormatter(Formatter):
-    def __init__(self, translator):
-        super().__init__(translator)
+    def __init__(self, articleData):
+        super().__init__(articleData)
 
-    def SQLify(self, table="articles"):
+    def format(self, table="articles"):
         for id, obj in self.getObjDataDict().items():
+            obj = obj.data
             command = f"""INSERT INTO {table} (id, title, description, text, tags, pubDate, modDate, priority, breakingNews, commentStatus, featuredImgID, photoCred)
                 VALUES (
                     {id},

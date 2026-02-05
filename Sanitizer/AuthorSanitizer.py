@@ -7,43 +7,56 @@ from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.Policy import Policy
 
 class AuthorSanitizer(Sanitizer):
-    def __init__(self, data: list, policies: Policy):
-        super().__init__(data, policies)
-        self.lastAuid = int(data[-1].data["id"])
-        self.conflictsCache = None
-        self.priorityId = set()
-        self.type = "auth" if policies.isAuthor else "gauth"
+    def __init__(self, data: list, policies: PolicyDict, logDir: str = "./log"):
+        super().__init__(data, policies, logDir)
+        self.lastAuid = len(data) - 1
 
-    @staticmethod
-    def _buildDisplayName(firstName, lastName):
-        nameParts = list(filter(None, (firstName, lastName)))
-        return " ".join(nameParts) if nameParts else None
+    # nlp implementation for similarity checking
+    def _generateSigMatrix(self, authors):
+        shingles = [nlp.generateKShingles(doc, 2) for doc in authors]
+        vocab = nlp.generateVocab(shingles)
+        sparseVectors = [nlp.generateSparseVector(s, vocab) for s in shingles]
+        sparseMatrix = nlp.generateSparseMatrix(sparseVectors)
+        params = nlp.generateKHashParameters(150, 2**31 - 1)
+        return nlp.generateSignatureMatrix(sparseMatrix, vocab, params)
 
-    @staticmethod
-    def _splitDisplayName(displayName):
-        try:
-            firstName, lastName = re.split(" (?!.* )", displayName)
-            return firstName, lastName
-        except ValueError:
-            return None, None
+    # hard coded edge cases
+    def _edgeCases(self, data):
+        match data["display_name"]: # Catch Special Cases
+            case "Entertainment Desk":
+                data["first_name"] = "A&E Desk"
+                data["last_name"] = None
+            case "The Triangle Sports Desk":
+                data["first_name"] = "The Triangle Sports Desk"
+                data["last_name"] = None  
+            case "The Triangle Alumni":
+                data["first_name"] = "The Triangle Alumni"
+                data["last_name"] = None
+            case "The Editorial Board":
+                data["first_name"] = "The Editorial Board"
+                data["last_name"] = None
+            case "Drexel for PILOTS":
+                data["first_name"] = "Drexel for PILOTS"
+                data["last_name"] = None
+            case "St. Christopher's Hospital for Children":
+                data["first_name"] = "St. Christopher's Hospital for Children"
+                data["last_name"] = None
+            case "Granny &amp; Eloise":
+                data["display_name"] = "Granny & Eloise"
+                data["first_name"] = "Granny & Eloise"
+                data["last_name"] = None        
+        return data
+    
+
 
     def _normalizeData(self):
+        multipleAuthorIndicators = ["-and-", " and ", " &amp; ", ","]
+
         for author in list(self.data):
-            if author.data["display_name"] is None:
-                displayName = self._buildDisplayName(author.data["first_name"], author.data["last_name"])
-                if displayName is not None:
-                    author.data["display_name"] = displayName
-            special = False
-            updates = self.policies.specialEdits.get(author.data["display_name"])
-            if updates:
-                author.data.update(updates)
-                special = True
-            elif author.data["display_name"] in self.policies.specialFlags:
-                special = True
-            if special:
-                self.priorityId.add(str(author.data.get("id")))
-            if author.data["display_name"] is not None:
-                if any(indicator in author.data["display_name"] for indicator in self.policies.multipleAuthorIndicators):
+            author.data = self._edgeCases(author.data)
+            if author.data["display_name"] != None:
+                # multiple authors case
+                if any(indicator in author.data["display_name"] for indicator in multipleAuthorIndicators):
                     authors = nlp.cleanDocument(author.data["display_name"], "author_multiple")
                     for name in authors:
                         cleanedName = nlp.cleanDocument(name, "author_single")
@@ -56,30 +69,41 @@ class AuthorSanitizer(Sanitizer):
                     continue
                 author.data["display_name"] = nlp.cleanDocument(author.data["display_name"], "author_single")
 
+                # missing first/last name
                 if author.data["first_name"] is None or author.data["last_name"] is None:
                     firstName, lastName = self._splitDisplayName(author.data["display_name"])
                     if firstName or lastName:
                         author.data["first_name"] = firstName
                         author.data["last_name"] = lastName
 
-    def _logChange(self, a: Author, b: Author):
-        for change in self.changes:
-            if change and change[-1].data.get("id") == a.data.get("id"):
-                if change[-1].data.get("id") == b.data.get("id"):
-                    return
-                change.append(b)
-                return
-        if a.data.get("id") == b.data.get("id"):
-            return
-        self.changes.append([a, b])
+    def _mergeAuthors(a: Author, b: Author, auto: bool):
+        # merges into a and deletes b, favors lengthier names by default, 
+        # failure to resolve will return an error to be handled by authors into a manual resolve queue
+        if auto is True:
+            for field in a.data:
+                if a.data[field] == b.data[field]:
+                    pass
 
     def _logSplitChange(self, a: Author, b: Author):
         if a.data.get("id") == b.data.get("id"):
             return
         self.changes.append([a, b])
 
-    def _logConflict(self, a: Author, b: Author):
-        self.conflicts.append([a, b])
+    def _autoResolve(self):
+        authors = [nlp.cleanDocument(a.data["display_name"],"similarity") for a in self.data if a.data["display_name"] is not None]
+        sigMatrix = self._generateSigMatrix(authors)
+
+        # Similarity Checking
+        print('Checking Similarities...')
+        # print('\033[?25l')
+        # for i in range(len(authors)):
+        #     for j in range(i+1, len(authors)):
+        #         sim = nlp.checkJaccardSignatureSimilarity(sigMatrix[:, i], sigMatrix[:, j])
+        #         if (sim > 0.5):
+        #             print("\x1b[1A\x1b[2K"*3)
+        #             print(f"{authors[i]} vs {authors[j]}")
+        #             print(f"Similarity: {round(sim, 4):.4f}")               
+        # print('\033[?25h')
 
     def _loadConflicts(self):
         if self.conflictsCache is not None:

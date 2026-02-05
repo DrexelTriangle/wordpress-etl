@@ -1,9 +1,10 @@
 import json
 import os
 from pathlib import Path
-
 from Animator import Animator
 from Extractor import Extractor
+from Sanitizer.GuestAuthorPolicy import GuestAuthorPolicy
+from Sanitizer.AuthorPolicy import AuthorPolicy
 from Sanitizer.AuthorSanitizer import AuthorSanitizer
 from Translator.ArticleTranslator import ArticleTranslator
 from Translator.AuthorTranslator import AuthorTranslator
@@ -42,10 +43,10 @@ def logOutputs(translators):
   for onLoad, onDone, func, path in logTargets:
     runStep(onLoad, onDone, func, path)
 
-def sanitizeAuthors(translators):
-  authors = translators["auth"].listAuthors()
-  authSanitizer = AuthorSanitizer(authors, {})
-  authSpinner = animator.startSpinner("Sanitizing authors...", "Sanitized authors", showDone=False)
+def sanitizeAuthors(translators, key, name):
+  authors = translators[key].listAuthors()
+  authSanitizer = AuthorSanitizer(authors, AuthorPolicy(authors)) if key == "auth" else AuthorSanitizer(authors, GuestAuthorPolicy(authors))
+  authSpinner = animator.startSpinner(f"Sanitizing {name}...", f"Sanitized {name}", showDone=False)
   def onManualStart():
     authSpinner.pause()
 
@@ -54,16 +55,16 @@ def sanitizeAuthors(translators):
     manualEnd=authSpinner.resume,
   )
   authSpinner.stop()
-  completedSteps.append("Sanitized authors")
+  completedSteps.append(f"Sanitized {name}")
   return authors
 
-def writeAuthorOutput(authors):
+def writeAuthorOutput(authors, path, name):
   def outputAuthors():
-    Path("logs/auth_output.json").write_text(
+    Path(path).write_text(
       json.dumps({str(i): authors[i].data for i in range(len(authors))}, indent=4),
       encoding="utf-8",
     )
-  runStep("Writing author output...", "Wrote author output", outputAuthors)
+  runStep(f"Writing {name} output...", f"Wrote {name} output", outputAuthors)
 
 def printChecklist():
   os.system('cls' if os.name == 'nt' else 'clear')
@@ -75,6 +76,8 @@ def printChecklist():
 extracted = extractData()
 translators = translateData(extracted)
 logOutputs(translators)
-authors = sanitizeAuthors(translators)
-writeAuthorOutput(authors)
+authors = sanitizeAuthors(translators, "auth", "authors")
+writeAuthorOutput(authors, "logs/auth_output.json", "author")
+guestAuthors = sanitizeAuthors(translators, "gAuth", "guest authors")
+writeAuthorOutput(guestAuthors, "logs/gauth_output.json", "guest author")
 printChecklist()

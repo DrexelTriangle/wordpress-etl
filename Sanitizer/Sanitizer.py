@@ -14,14 +14,6 @@ class Sanitizer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _autoResolve(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def _manualResolve(self):
-        raise NotImplementedError
-
-    @abstractmethod
     def sanitize(self):
         raise NotImplementedError
     

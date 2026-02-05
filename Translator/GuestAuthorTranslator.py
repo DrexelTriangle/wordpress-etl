@@ -34,7 +34,7 @@ class GuestAuthorTranslator(Translator):
             guestAuthorObject = GuestAuthor(*metadata)
             self.addObject(guestAuthorObject)
 
-    def listGuestAuthors(self):
+    def listAuthors(self):
         return [
             GuestAuthor(
                 gauid=gauth["id"],

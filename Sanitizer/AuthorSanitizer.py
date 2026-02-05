@@ -60,7 +60,6 @@ class AuthorSanitizer(Sanitizer):
                     continue
                 author.data["display_name"] = nlp.cleanDocument(author.data["display_name"], "author_single")
 
-                # missing first/last name
                 if author.data["first_name"] is None or author.data["last_name"] is None:
                     firstName, lastName = self._splitDisplayName(author.data["display_name"])
                     if firstName or lastName:
@@ -77,12 +76,24 @@ class AuthorSanitizer(Sanitizer):
         if a.data.get("id") == b.data.get("id"):
             return
         self.changes.append([a, b])
+    def _logChange(self, a: Author, b: Author):
+        for change in self.changes:
+            if change and change[-1].data.get("id") == a.data.get("id"):
+                if change[-1].data.get("id") == b.data.get("id"):
+                    return
+                change.append(b)
+                return
+        if a.data.get("id") == b.data.get("id"):
+            return
+        self.changes.append([a, b])
 
     def _logSplitChange(self, a: Author, b: Author):
         if a.data.get("id") == b.data.get("id"):
             return
         self.changes.append([a, b])
 
+    def _logConflict(self, a: Author, b: Author):
+        self.conflicts.append([a, b])
     def _logConflict(self, a: Author, b: Author):
         self.conflicts.append([a, b])
 

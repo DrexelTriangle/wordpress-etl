@@ -1,6 +1,5 @@
-from Translator.Author import *
-from Translator.GuestAuthor import *
 import json
+from pathlib import Path
 
 class Translator:
     def __init__(self, source):
@@ -14,9 +13,10 @@ class Translator:
     
     def _log(self, fileDestination):
         # Log data into json
-        with open(fileDestination, 'w+', encoding='utf-8') as file:
+        filePath = Path(fileDestination)
+        filePath.parent.mkdir(parents=True, exist_ok=True)
+        with filePath.open('w+', encoding='utf-8') as file:
           json.dump(self.objDataDict, file, indent=4)
-          file.close()
 
     def addObject(self, object):
         self.objDataDict.update({object.data["id"]: object})
@@ -28,7 +28,6 @@ class Translator:
     def getObjList(self):
         return list(self.objDataDict.values())
         
-
 
 
 

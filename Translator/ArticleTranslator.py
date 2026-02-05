@@ -1,8 +1,9 @@
+from pathlib import Path
+import os as OS
+import json
 from Translator.Translator import Translator
 from Translator.Article import Article
-import os as OS
 from Utils.Utility import Utility as U
-import json
 
 class ArticleTranslator(Translator):  
   # Constructor
@@ -27,7 +28,7 @@ class ArticleTranslator(Translator):
     featuredImgID = -1
     id = self.objCount
     priority = False 
-    modDate = data.get('wp:post_modified_gmt', Article.defaultValue),
+    modDate = data.get('wp:post_modified_gmt', Article.defaultValue)
     photoCred = None
     pubDate = data.get('wp:post_date_gmt', Article.defaultValue)
     tags = data.get('category')
@@ -68,6 +69,8 @@ class ArticleTranslator(Translator):
   def _printUniqueAuthors(self):
     terminal_size = OS.get_terminal_size()
     names = sorted(list(self.uniqueAuthorCleanNames))
+    if not names:
+      return
     longestName = len(max(names, key=len))
     columns = terminal_size.columns // longestName
 
@@ -86,8 +89,8 @@ class ArticleTranslator(Translator):
     dictLen = len(self.objDataDict)
     remainder = dictLen % 1000
     bucketNum = (dictLen // 1000) + (1 if (remainder > 0) else 0)
-    if not (OS.path.isdir(fileDestination)):
-      OS.makedirs(fileDestination)
+    fileDir = Path(fileDestination)
+    fileDir.mkdir(parents=True, exist_ok=True)
 
     for i in range(bucketNum):
       fileBuckets.append({})
@@ -98,15 +101,13 @@ class ArticleTranslator(Translator):
     
     for i in range(len(fileBuckets)):
       bucket = fileBuckets[i]
-      with open(f"{fileDestination}\\{i}.json", 'w+', encoding='utf-8') as file:
+      filePath = fileDir / f"{i}.json"
+      with filePath.open('w+', encoding='utf-8') as file:
         json.dump(bucket, file, indent=4)
-        file.close()
 
 
  
 
 
   
-
-
 

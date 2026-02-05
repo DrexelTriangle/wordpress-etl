@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 class Formatter():
     def __init__(self, data):
         self.data = data
@@ -14,9 +15,10 @@ class Formatter():
         return f"'{safe_value}'"
 
     def _logCommands(self, fileDestination):
-        with open(fileDestination, 'w+', encoding='utf-8') as file:
+        filePath = Path(fileDestination)
+        filePath.parent.mkdir(parents=True, exist_ok=True)
+        with filePath.open('w+', encoding='utf-8') as file:
           json.dump(self.sqlCommands, file, indent=4)
-          file.close()
     
     def format(self, table):
         pass

@@ -10,5 +10,3 @@ temp.txt
 *.json
 result.txt
 skenanigans-rawdata.zip
-cacheDirectory/*
-Utils/cacheDirectory/*

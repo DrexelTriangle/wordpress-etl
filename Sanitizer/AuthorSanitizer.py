@@ -7,8 +7,8 @@ from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.Policy import Policy
 
 class AuthorSanitizer(Sanitizer):
-    def __init__(self, data: list, policies: Policy):
-        super().__init__(data, policies)
+    def __init__(self, data: list, policies: Policy, logDir: str = "./log"):
+        super().__init__(data, policies, logDir)
         self.lastAuid = len(data) - 1
         self.conflictsCache = None
         self.priorityId = set()

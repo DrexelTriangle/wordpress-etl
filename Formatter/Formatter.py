@@ -1,12 +1,12 @@
 import json
 from pathlib import Path
 class Formatter():
-    def __init__(self, translator):
-        self.translator = translator
+    def __init__(self, data):
+        self.data = data
         self.sqlCommands = []
         
     def getObjDataDict(self):
-        return self.translator.getObjDataDict()
+        return self.data.getObjDataDict()
         
     def _esc(self, value):
         if value is None:
@@ -20,7 +20,7 @@ class Formatter():
         with filePath.open('w+', encoding='utf-8') as file:
           json.dump(self.sqlCommands, file, indent=4)
     
-    def SQLify(self, table):
+    def format(self, table):
         pass
     
     

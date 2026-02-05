@@ -1,11 +1,12 @@
 from Formatter.Formatter import *
 
 class AuthorFormatter(Formatter):
-    def __init__(self, authTranslator):
-        super().__init__(authTranslator)
+    def __init__(self, authData):
+        super().__init__(authData)
         
-    def SQLify(self, table="authors"):
+    def format(self, table="authors"):
         for id, obj in self.getObjDataDict().items():
+            obj = obj.data
             command = f"""INSERT INTO {table} (id, display_name, first_name, last_name, email, login)
                 VALUES (
                     {id},

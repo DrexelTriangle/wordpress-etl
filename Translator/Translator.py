@@ -19,11 +19,14 @@ class Translator:
           json.dump(self.objDataDict, file, indent=4)
 
     def addObject(self, object):
-        self.objDataDict.update({object.data["id"]: object.data})
+        self.objDataDict.update({object.data["id"]: object})
         self.objCount += 1
         
     def getObjDataDict(self):
         return self.objDataDict
+    
+    def getObjList(self):
+        return list(self.objDataDict.values())
         
 
 

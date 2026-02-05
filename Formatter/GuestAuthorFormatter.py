@@ -1,11 +1,12 @@
 from Formatter.Formatter import *
 
 class GuestAuthorFormatter(Formatter):
-    def __init__(self, gAuthTranslator):
-        super().__init__(gAuthTranslator)
+    def __init__(self, gAuthData):
+        super().__init__(gAuthData)
         
-    def SQLify(self, table="guest_authors"):
+    def format(self, table="guest_authors"):
         for id, obj in self.getObjDataDict().items():
+            obj = obj.data
             command = f"""INSERT INTO {table} (id, display_name, first_name, last_name, email, login)
                 VALUES (
                     {id},

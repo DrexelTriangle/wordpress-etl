@@ -7,6 +7,47 @@ from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.Policy import Policy
 
 class AuthorSanitizer(Sanitizer):
+    def __init__(self, data: list, policies: Policy, logDir: str = "./log"):
+        super().__init__(data, policies, logDir)
+        self.lastAuid = len(data) - 1
+
+    # nlp implementation for similarity checking
+    def _generateSigMatrix(self, authors):
+        shingles = [nlp.generateKShingles(doc, 2) for doc in authors]
+        vocab = nlp.generateVocab(shingles)
+        sparseVectors = [nlp.generateSparseVector(s, vocab) for s in shingles]
+        sparseMatrix = nlp.generateSparseMatrix(sparseVectors)
+        params = nlp.generateKHashParameters(150, 2**31 - 1)
+        return nlp.generateSignatureMatrix(sparseMatrix, vocab, params)
+
+    # hard coded edge cases
+    def _edgeCases(self, data):
+        match data["display_name"]: # Catch Special Cases
+            case "Entertainment Desk":
+                data["first_name"] = "A&E Desk"
+                data["last_name"] = None
+            case "The Triangle Sports Desk":
+                data["first_name"] = "The Triangle Sports Desk"
+                data["last_name"] = None  
+            case "The Triangle Alumni":
+                data["first_name"] = "The Triangle Alumni"
+                data["last_name"] = None
+            case "The Editorial Board":
+                data["first_name"] = "The Editorial Board"
+                data["last_name"] = None
+            case "Drexel for PILOTS":
+                data["first_name"] = "Drexel for PILOTS"
+                data["last_name"] = None
+            case "St. Christopher's Hospital for Children":
+                data["first_name"] = "St. Christopher's Hospital for Children"
+                data["last_name"] = None
+            case "Granny &amp; Eloise":
+                data["display_name"] = "Granny & Eloise"
+                data["first_name"] = "Granny & Eloise"
+                data["last_name"] = None        
+        return data
+    
+
     def __init__(self, data: list, policies: Policy):
         super().__init__(data, policies)
         self.lastAuid = int(data[-1].data["id"])

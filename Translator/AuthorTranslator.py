@@ -24,4 +24,17 @@ class AuthorTranslator(Translator):
         with open(fileDestination, 'w+', encoding='utf-8') as file:
           json.dump(self.objDataDict, file, indent=4)
           file.close()
+
+    def listAuthors(self):
+        return [
+            Author(
+                auid=auth["id"],
+                display_name=auth["display_name"],
+                first_name=auth["first_name"],
+                last_name=auth["last_name"],
+                email=auth["email"],
+                login=auth["login"],
+            )
+            for auth in self.objDataDict.values()
+        ]
     

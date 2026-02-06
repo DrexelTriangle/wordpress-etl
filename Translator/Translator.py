@@ -16,10 +16,11 @@ class Translator:
         filePath = Path(fileDestination)
         filePath.parent.mkdir(parents=True, exist_ok=True)
         with filePath.open('w+', encoding='utf-8') as file:
-          json.dump(self.objDataDict, file, indent=4)
+            json.dump(self.objDataDict, file, indent=4)
 
     def addObject(self, object):
-        self.objDataDict.update({object.data["id"]: object})
+        payload = object.data if hasattr(object, "data") else object
+        self.objDataDict.update({payload["id"]: payload})
         self.objCount += 1
         
     def getObjDataDict(self):
@@ -28,6 +29,3 @@ class Translator:
     def getObjList(self):
         return list(self.objDataDict.values())
         
-
-
-

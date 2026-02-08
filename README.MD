@@ -10,7 +10,7 @@ flowchart LR
     g1 --> ma[Main]
     ma --> g2
     ma --> g4
-    g4 --> cmd@{ shape: docs, label: "SQL_Commands.txt"}
+    g4 --> cmd@{ shape: docs, label: "SQL_Commands.txt"} --> in[Injector] --> pr[(PRISM)] --> sc@{ shape: tri, label: "Scalene"}
 
 subgraph g1[1]
     ex[Extractor]
@@ -33,8 +33,9 @@ end
 sa --> ma
 
 subgraph g4[4]
-    fm[SQL Formatter]
+    fm[Formatter]
 end
+
 ```
 The project boils down into 4 main components:
 1. The Extractor brings in .xml files into a Python dictionaries.

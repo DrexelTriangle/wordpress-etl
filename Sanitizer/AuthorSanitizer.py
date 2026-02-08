@@ -3,6 +3,7 @@ from Utils import NLP as nlp
 import re
 from pathlib import Path
 from Translator.Author import Author
+from Translator.GuestAuthor import GuestAuthor
 from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.Policy import Policy
 
@@ -13,6 +14,10 @@ class AuthorSanitizer(Sanitizer):
         self.conflictsCache = None
         self.priorityId = set()
         self.type = "auth" if policies.isAuthor else "gauth"
+
+    def _makeAuthor(self, *args, **kwargs):
+        cls = Author if self.type == "auth" else GuestAuthor
+        return cls(*args, **kwargs)
 
     @staticmethod
     def _buildDisplayName(firstName, lastName):
@@ -43,13 +48,16 @@ class AuthorSanitizer(Sanitizer):
             if special:
                 self.priorityId.add(str(author.data.get("id")))
             if author.data["display_name"] is not None:
-                if any(indicator in author.data["display_name"] for indicator in self.policies.multipleAuthorIndicators):
+                display_lower = author.data["display_name"].lower()
+                indicators = [indicator.lower() for indicator in self.policies.multipleAuthorIndicators]
+                # Skip splitting names that are explicitly flagged as special.
+                if not special and any(indicator in display_lower for indicator in indicators):
                     authors = nlp.cleanDocument(author.data["display_name"], "author_multiple")
                     for name in authors:
                         cleanedName = nlp.cleanDocument(name, "author_single")
                         firstName, lastName = self._splitDisplayName(cleanedName)
                         self.lastAuid += 1
-                        newAuthor = Author(int(self.lastAuid), cleanedName, firstName, lastName, None, None)
+                        newAuthor = self._makeAuthor(int(self.lastAuid), cleanedName, firstName, lastName, None, None)
                         self.data.append(newAuthor)
                         self._logSplitChange(author, newAuthor)
                     self.data.remove(author)

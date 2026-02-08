@@ -24,7 +24,8 @@ class _ArrayKey:
 _AMP_PATTERN = re.compile("&amp;")
 _DOT_PATTERN = re.compile("\\.(?=\\w\\w)")
 _AUTHOR_CLEAN_PATTERN = re.compile("^by-|^By-|^By |^by |[^\\w ^'^\\.^-]|_|\\d")
-_AUTHOR_SPLIT_PATTERN = re.compile(r"&amp;|&|\\band\\b|,")
+# Split on common multiple-author separators; ignore case so \"And\" or \"AND\" match.
+_AUTHOR_SPLIT_PATTERN = re.compile(r"&amp;|&|\band\b|,", re.IGNORECASE)
 _SIMILARITY_PATTERN = re.compile("[^\\w]| |\\d|_")
 
 # Purges document of unwanted characters and ensures uniformity of text

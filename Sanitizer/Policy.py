@@ -13,7 +13,10 @@ class Policy():
                  banList: list[str],
                  data: list,
                  isAuthor: bool,
-                 multipleAuthorIndicators: list[str] = ["-and-", " and ", " &amp; ", ","]
+                 # Strings that imply multiple authors in a display name. Keep this
+                 # simple and intentionally redundant; we normalize case when
+                 # checking so we can spot variants like "And" or raw ampersands.
+                 multipleAuthorIndicators: list[str] = ["-and-", " and ", " &amp; ", " & ", ","]
                 ):
         self.specialEdits = specialEdits
         self.specialFlags = specialFlags
@@ -144,7 +147,8 @@ class Policy():
                     flaggedAuthors.append((authorsMeta[i], authorsMeta[j]))
             if mergedAny:
                 keep[i] = False
-                canonicals.append(canonical)
+                if canonical is not None:
+                    canonicals.append(canonical)
 
         filteredAuthors = [authorsMeta[i] for i in range(len(authorsMeta)) if keep[i]]
         self.data = filteredAuthors + canonicals + bannedAuthors
@@ -221,4 +225,18 @@ class Policy():
         self.changes.append([a, b])
 
     def _logConflict(self, a, b):
+        # Skip self-conflicts and duplicates (regardless of order).
+        a_id = a.get("id") if isinstance(a, dict) else a.data.get("id")
+        b_id = b.get("id") if isinstance(b, dict) else b.data.get("id")
+        if a_id == b_id:
+            return
+        id_pair = tuple(sorted((a_id, b_id)))
+        for entry in self.conflicts:
+            if not entry or len(entry) < 2:
+                continue
+            entry_ids = []
+            for obj in entry[:2]:
+                entry_ids.append(obj.get("id") if isinstance(obj, dict) else obj.data.get("id"))
+            if len(entry_ids) == 2 and tuple(sorted(entry_ids)) == id_pair:
+                return
         self.conflicts.append([a, b])

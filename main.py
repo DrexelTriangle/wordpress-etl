@@ -5,8 +5,10 @@ from Animator import Animator
 from Extractor import Extractor
 from Sanitizer.GuestAuthorPolicy import GuestAuthorPolicy
 from Sanitizer.AuthorPolicy import AuthorPolicy
+from Sanitizer.CullingPolicy import CullingPolicy
 from Sanitizer.AuthorSanitizer import AuthorSanitizer
 from Translator.ArticleTranslator import ArticleTranslator
+from Translator.GuestAuthor import GuestAuthor
 from Translator.AuthorTranslator import AuthorTranslator
 from Translator.GuestAuthorTranslator import GuestAuthorTranslator
 from Utils.Constants import UNZIPPED_FILES, ZIP_FILE
@@ -58,6 +60,25 @@ def sanitizeAuthors(translators, key, name):
   completedSteps.append(f"Sanitized {name}")
   return authors
 
+def cullDuplicateGuestAuthors(authors, guestAuthors):
+  # Work on a copy so we don't mutate the original author list
+  data = authors + guestAuthors
+  cullSanitizer = AuthorSanitizer(data, CullingPolicy(data))
+  cullSpinner = animator.startSpinner(f"Culling guest authors...", f"Culled guest authors", showDone=False)
+  def onManualStart():
+    cullSpinner.pause()
+
+  data = cullSanitizer.sanitize(
+    manualStart=onManualStart,
+    manualEnd=cullSpinner.resume,
+  )
+  cullSpinner.stop()
+  completedSteps.append(f"Culled guest authors")
+  
+  guestAuthors = list(filter(lambda x: isinstance(x, GuestAuthor), data))
+
+  return guestAuthors
+
 def writeAuthorOutput(authors, path, name):
   def outputAuthors():
     Path(path).write_text(
@@ -79,5 +100,6 @@ logOutputs(translators)
 authors = sanitizeAuthors(translators, "auth", "authors")
 writeAuthorOutput(authors, "logs/auth_output.json", "author")
 guestAuthors = sanitizeAuthors(translators, "gAuth", "guest authors")
-writeAuthorOutput(guestAuthors, "logs/gauth_output.json", "guest author")
+culledGuestAuthors = cullDuplicateGuestAuthors(authors, guestAuthors)
+writeAuthorOutput(culledGuestAuthors, "logs/gauth_output.json", "guest author")
 printChecklist()

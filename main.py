@@ -6,6 +6,7 @@ from Extractor import Extractor
 from Sanitizer.GuestAuthorPolicy import GuestAuthorPolicy
 from Sanitizer.AuthorPolicy import AuthorPolicy
 from Sanitizer.AuthorSanitizer import AuthorSanitizer
+from Sanitizer.ArticleSanitizer import ArticleSanitizer
 from Translator.ArticleTranslator import ArticleTranslator
 from Translator.AuthorTranslator import AuthorTranslator
 from Translator.GuestAuthorTranslator import GuestAuthorTranslator
@@ -36,12 +37,14 @@ def translateData(extracted):
 
 def logOutputs(translators):
   logTargets = [
-    ("Logging articles...", "Logged articles", translators["articles"]._log, Path("logs") / "articles"),
     ("Logging guest authors...", "Logged guest authors", translators["gAuth"]._log, Path("logs") / "gAuth.json"),
     ("Logging authors...", "Logged authors", translators["auth"]._log, Path("logs") / "auth.json"),
   ]
   for onLoad, onDone, func, path in logTargets:
     runStep(onLoad, onDone, func, path)
+
+def logArticles(translators):
+  runStep("Logging articles...", "Logged articles", translators["articles"]._log, Path("logs") / "articles")
 
 def sanitizeAuthors(translators, key, name):
   authors = translators[key].listAuthors()
@@ -80,4 +83,8 @@ authors = sanitizeAuthors(translators, "auth", "authors")
 writeAuthorOutput(authors, "logs/auth_output.json", "author")
 guestAuthors = sanitizeAuthors(translators, "gAuth", "guest authors")
 writeAuthorOutput(guestAuthors, "logs/gauth_output.json", "guest author")
+articleSanitizer = ArticleSanitizer(translators["articles"].getObjList(), authors, guestAuthors)
+sanitizedArticles = articleSanitizer.sanitize()
+translators["articles"].objDataDict = {art["id"]: art for art in sanitizedArticles}
+logArticles(translators)
 printChecklist()

@@ -12,72 +12,65 @@ from Translator.GuestAuthorTranslator import GuestAuthorTranslator
 from Utils.Constants import UNZIPPED_FILES, ZIP_FILE
 from Utils.Utility import Utility
 
-animator = Animator()
-completedSteps = []
+from App import App 
 
-def runStep(onLoad, onDone, func, *args, showDone: bool = True):
-  result = animator.spinner(onLoad, onDone, func, *args, showDone=showDone)
-  completedSteps.append(onDone)
-  return result
 
-def extractData():
-  Utility.unzip(ZIP_FILE)
-  extractor = Extractor(*UNZIPPED_FILES)
-  return runStep("Extracting...", "Extracted", extractor.getData)
+app = App()
 
-def translateData(extracted):
-  translators = {
+# EXTRACTION
+Utility.unzip(ZIP_FILE)
+extractor = Extractor(*UNZIPPED_FILES)
+extracted = app.run("Extracting...", "Extracted", extractor.getData)
+
+
+
+# TRANSLATION
+translators = {
     "articles": ArticleTranslator(extracted["art"]),
     "gAuth": GuestAuthorTranslator(extracted["guestAuth"]),
     "auth": AuthorTranslator(extracted["auth"]),
-  }
-  runStep("Translating...", "Translated", lambda: [translators[key].translate() for key in translators])
-  return translators
+}
+app.run("Translating...", "Translated", lambda: [translators[key].translate() for key in translators])
 
-def logOutputs(translators):
-  logTargets = [
+
+
+# LOGGING
+logTargets = [
     ("Logging articles...", "Logged articles", translators["articles"]._log, Path("logs") / "articles"),
     ("Logging guest authors...", "Logged guest authors", translators["gAuth"]._log, Path("logs") / "gAuth.json"),
     ("Logging authors...", "Logged authors", translators["auth"]._log, Path("logs") / "auth.json"),
-  ]
-  for onLoad, onDone, func, path in logTargets:
-    runStep(onLoad, onDone, func, path)
+]
+for onLoad, onDone, func, path in logTargets:
+    app.run(onLoad, onDone, func, path)
 
-def sanitizeAuthors(translators, key, name):
-  authors = translators[key].listAuthors()
-  authSanitizer = AuthorSanitizer(authors, AuthorPolicy(authors)) if key == "auth" else AuthorSanitizer(authors, GuestAuthorPolicy(authors))
-  authSpinner = animator.startSpinner(f"Sanitizing {name}...", f"Sanitized {name}", showDone=False)
-  def onManualStart():
+
+
+# SANITATION
+key = "auth"
+name = "authors"
+authors = translators[key].listAuthors()
+authSanitizer = AuthorSanitizer(authors, AuthorPolicy(authors)) if key == "auth" else AuthorSanitizer(authors, GuestAuthorPolicy(authors))
+authSpinner = app.animator.startSpinner(f"Sanitizing {name}...", f"Sanitized {name}", showDone=False)
+def onManualStart():
     authSpinner.pause()
 
-  authors = authSanitizer.sanitize(
-    manualStart=onManualStart,
-    manualEnd=authSpinner.resume,
-  )
-  authSpinner.stop()
-  completedSteps.append(f"Sanitized {name}")
-  return authors
+authors = authSanitizer.sanitize(
+   manualStart=onManualStart,
+   manualEnd=authSpinner.resume,
+)
 
-def writeAuthorOutput(authors, path, name):
-  def outputAuthors():
+authSpinner.stop()
+app.completedSteps.append(f"Sanitized {name}")
+
+
+
+# OUTPUT
+def outputAuthors():
     Path(path).write_text(
       json.dumps({str(i): authors[i].data for i in range(len(authors))}, indent=4),
       encoding="utf-8",
     )
-  runStep(f"Writing {name} output...", f"Wrote {name} output", outputAuthors)
 
-def printChecklist():
-  os.system('cls' if os.name == 'nt' else 'clear')
-  checkmark = Animator.colorWrap('\033[32m', '✓')
-  for step in completedSteps:
-    text = Animator.colorWrap('\033[90m', step)
-    print(f"{checkmark} {text}")
+app.run(f"Writing {name} output...", f"Wrote {name} output", outputAuthors)
+app.printChecklist()
 
-extracted = extractData()
-translators = translateData(extracted)
-logOutputs(translators)
-authors = sanitizeAuthors(translators, "auth", "authors")
-writeAuthorOutput(authors, "logs/auth_output.json", "author")
-guestAuthors = sanitizeAuthors(translators, "gAuth", "guest authors")
-writeAuthorOutput(guestAuthors, "logs/gauth_output.json", "guest author")
-printChecklist()

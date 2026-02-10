@@ -37,4 +37,6 @@ class AuthorTranslator(Translator):
             )
             for auth in self.objDataDict.values()
         ]
+
+    
     

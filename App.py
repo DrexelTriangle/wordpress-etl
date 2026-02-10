@@ -9,9 +9,12 @@ class App:
         self.completedSteps = []
 
     def run(self, onLoad, onDone, func, *args, showDone: bool = True):
-        result = self.animator.spinner(onLoad, onDone, func, *args, showDone=showDone)
-        self.completedSteps.append(onDone)
-        return result
+        try:
+            result = self.animator.spinner(onLoad, onDone, func, *args, showDone=showDone)
+            self.completedSteps.append(onDone)
+            return result
+        except:
+            exit(7)
     
     def printChecklist(self):
         os.system('cls' if os.name == 'nt' else 'clear')

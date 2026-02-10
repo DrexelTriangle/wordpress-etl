@@ -1,4 +1,4 @@
-*.pyc
+# Directories
 __pycache__/
 dumps/*
 output/*
@@ -6,6 +6,11 @@ rawdata/*
 stats/*
 log/*
 cacheDirectory/*
+venv/*
+.venv/*
+
+# Files
+*.pyc
 temp.txt
 *.json
 result.txt

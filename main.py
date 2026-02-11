@@ -13,4 +13,4 @@ def build():
     app.writeAuthorOutput(guestAuthors, "logs/gauth_output.json", "guest author")
     app.printChecklist()
 
-app.build()
+build()

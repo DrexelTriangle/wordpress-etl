@@ -1,4 +1,4 @@
-from Translator.GuestAuthor import *
+from Translator.Author import *
 from Translator.Translator import *
 from Utils.Utility import *
 
@@ -31,13 +31,13 @@ class GuestAuthorTranslator(Translator):
     def translate(self):
         for guestAuthorData in self.source:
             metadata = self._extractMetadata(guestAuthorData['wp:postmeta'])
-            guestAuthorObject = GuestAuthor(*metadata)
+            guestAuthorObject = Author(*metadata)
             self.addObject(guestAuthorObject)
 
     def listAuthors(self):
         return [
-            GuestAuthor(
-                gauid=gauth["id"],
+            Author(
+                auid=gauth["id"],
                 display_name=gauth["display_name"],
                 first_name=gauth["first_name"],
                 last_name=gauth["last_name"],

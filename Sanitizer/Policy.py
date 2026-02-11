@@ -2,7 +2,6 @@ import re
 from Utils import NLP as nlp
 from Utils.Utility import Utility
 from Translator.Author import Author
-from Translator.GuestAuthor import GuestAuthor
 from Animator import Animator
 from Sanitizer.DiffChecker import DiffChecker
 
@@ -71,11 +70,8 @@ class Policy():
             displayName = a.data["display_name"] or b.data["display_name"]
             login = a.data["login"] or b.data["login"]
 
-        if self.isAuthor:
-            return Author(id, displayName, firstName, lastName, email, login)
-        else:
-            return GuestAuthor(id, displayName, firstName, lastName, email, login)
-        
+        return Author(id, displayName, firstName, lastName, email, login)
+                
     def _resolveFromConflicts(self, a, b):
 
         for entry in self.conflicts:
@@ -87,22 +83,14 @@ class Policy():
                 continue
             canonical = entry[-1]
             if isinstance(canonical, dict):
-                if self.isAuthor:
-                    return Author(canonical.get("id"),
-                        canonical.get("display_name"),
-                        canonical.get("first_name"),
-                        canonical.get("last_name"),
-                        canonical.get("email"),
-                        canonical.get("login"),
-                    )
-                else:
-                    return GuestAuthor(canonical.get("id"),
-                        canonical.get("display_name"),
-                        canonical.get("first_name"),
-                        canonical.get("last_name"),
-                        canonical.get("email"),
-                        canonical.get("login"),
-                    )
+                return Author(canonical.get("id"),
+                    canonical.get("display_name"),
+                    canonical.get("first_name"),
+                    canonical.get("last_name"),
+                    canonical.get("email"),
+                    canonical.get("login"),
+                )
+            
             return canonical
         return None
     
@@ -198,7 +186,7 @@ class Policy():
                         break
                     print("Input not recognized -- try again")
 
-            canonical = Author(*(authorParams[key] for key in keys)) if self.isAuthor else GuestAuthor(*(authorParams[key] for key in keys))
+            canonical = Author(*(authorParams[key] for key in keys))
             self.priorityId.add(str(canonical.data.get("id")))
             authors.append(canonical)
             self._logChange(leftAuthor, canonical)

@@ -4,39 +4,13 @@ from pathlib import Path
 
 
 def sanitize_backslashes(content: str) -> str:
-    """Strip excessive backslashes (double-escaped quotes and backslashes)"""
+    # Strip excessive backlashes
     content = content.replace('\\"', '"')
     content = content.replace('\\\\', '\\')
     return content
 
-
-def fix_empty_alt(content: str, generate_alt_from_filename: bool = True) -> str:
-    """Fix empty alt attributes in img tags by generating from filename"""
-    if not generate_alt_from_filename:
-        return content
-        
-    def replace_alt(match):
-        img_tag = match.group(0)
-        if 'alt=""' in img_tag or 'alt=\'\'' in img_tag:
-            src_match = re.search(r'src=["\']([^"\']+)["\']', img_tag)
-            if src_match:
-                filename = Path(src_match.group(1)).stem
-                alt_text = filename.replace('-', ' ').replace('_', ' ')
-                img_tag = re.sub(r'alt=["\']["\']', f'alt="{alt_text}"', img_tag)
-        return img_tag
-    
-    return re.sub(r'<img[^>]*>', replace_alt, content)
-
-
-def remove_dangerous_attrs(content: str, dangerous_patterns: list) -> str:
-    """Remove potentially dangerous HTML attributes and patterns"""
-    for pattern, replacement in dangerous_patterns:
-        content = re.sub(pattern, replacement, content, flags=re.IGNORECASE)
-    return content
-
-
-def log_shortcodes(content: str, article_id: str, shortcode_pattern: str, shortcode_example_length: int = 100) -> list:
-    """Detect and log WordPress shortcodes"""
+def log_shortcodes(content: str, article_id: str, shortcode_pattern: str) -> list:
+    # Log WP shortcodes
     shortcode_log = []
     matches = re.findall(shortcode_pattern, content)
     
@@ -48,29 +22,26 @@ def log_shortcodes(content: str, article_id: str, shortcode_pattern: str, shortc
                 shortcode_log.append({
                     "article_id": article_id,
                     "shortcode": code,
-                    "example": example.group(0)[:shortcode_example_length]
+                    "example": example.group(0)
                 })
-    
     return shortcode_log
 
 
-def log_inline_styles(content: str, article_id: str, inline_style_pattern: str, max_samples: int = 5) -> list:
-    """Detect and log inline CSS styles"""
+def log_inline_styles(content: str, article_id: str, inline_style_pattern: str) -> list:
     inline_style_log = []
     matches = re.findall(inline_style_pattern, content)
     
     if matches:
-        for style in matches[:max_samples]:
+        for style in matches:
             inline_style_log.append({
                 "article_id": article_id,
-                "style": style[:100]
+                "style": style
             })
     
     return inline_style_log
 
 
 def log_problematic_chars(content: str, article_id: str, problematic_char_patterns: list) -> dict:
-    """Log invisible and problematic Unicode characters grouped by type"""
     problematic_chars_log = {}
     
     for pattern, char_type in problematic_char_patterns:
@@ -98,7 +69,7 @@ def log_problematic_chars(content: str, article_id: str, problematic_char_patter
 
 
 def replace_problematic_chars(content: str, problematic_char_patterns: list) -> str:
-    """Replace problematic Unicode characters with their Unicode escape representation"""
+    # Replace problematic char w Unicode escape representation
     for pattern, _ in problematic_char_patterns:
         def replace_func(match):
             char = match.group(0)
@@ -109,7 +80,6 @@ def replace_problematic_chars(content: str, problematic_char_patterns: list) -> 
 
 
 def write_detailed_logs(shortcode_log: list, inline_style_log: list, problematic_chars_log: dict):
-    """Write all detailed content sanitization logs to files"""
     log_dir = Path("logs") / "article-sanitizer"
     log_dir.mkdir(parents=True, exist_ok=True)
     

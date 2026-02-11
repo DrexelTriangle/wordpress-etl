@@ -71,8 +71,8 @@ class ArticleContentSanitizer(Sanitizer):
                 fixes.append("problematic characters replaced")
             
             # Log other issues
-            self.shortcode_log.extend(log_shortcodes(sanitized_text, article_id, self.policies.shortcode_pattern, self.policies.shortcode_example_length))
-            self.inline_style_log.extend(log_inline_styles(sanitized_text, article_id, self.policies.inline_style_pattern, self.policies.max_inline_style_samples))
+            self.shortcode_log.extend(log_shortcodes(sanitized_text, article_id, self.policies.shortcode_pattern))
+            self.inline_style_log.extend(log_inline_styles(sanitized_text, article_id, self.policies.inline_style_pattern))
             
             # Update article and log if anything changed
             if sanitized_text != original_text:

@@ -1,6 +1,3 @@
-import json
-import re
-from pathlib import Path
 from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.ArticlePolicy import ArticlePolicy
 from Utils.WPContentSanitization import (

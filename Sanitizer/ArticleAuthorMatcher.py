@@ -52,7 +52,7 @@ class ArticleAuthorMatcher(Sanitizer):
         # Match each unique name
         flagged = []
         for clean_key, occurrences in unique.items():
-            # 1. Special edits
+            # Special edits
             special = next((v for k, v in self.policies.specialEdits.items() 
                           if clean(str(k), "similarity") == clean_key), None)
             if special:
@@ -68,14 +68,14 @@ class ArticleAuthorMatcher(Sanitizer):
                         self._logChange(aid, name, log_name)
                     continue
             
-            # 2. Exact match
+            # Exact match
             if clean_key in lookup:
                 aid, dname = lookup[clean_key]
                 for art_id, name in occurrences:
                     self.author_matches.setdefault(art_id, {})[name] = (aid, dname)
                 continue
             
-            # 3. Similarity
+            # Similarity
             if not lookup:
                 for art_id, name in occurrences:
                     self.unknown_authors.setdefault(name, []).append(art_id)

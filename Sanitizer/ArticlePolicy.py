@@ -1,12 +1,7 @@
 from Sanitizer.Policy import Policy
 
-
 class ArticlePolicy(Policy):
     def __init__(self, data):
-        """
-        Policy for article content sanitization.
-        Defines patterns and rules for cleaning HTML content.
-        """
         # ArticlePolicy doesn't use Policy's author-specific fields
         super().__init__(
             specialEdits={},

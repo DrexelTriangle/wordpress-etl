@@ -1,5 +1,10 @@
 import json
+import subprocess
+import sys
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
 class Formatter():
     def __init__(self, data):
         self.data = data
@@ -23,4 +28,27 @@ class Formatter():
     def format(self, table):
         pass
     
+    def testConnect():
+        load_dotenv()
+        USERNAME = os.getenv("USERNAME")
+        HOSTNAME = os.getenv("HOSTNAME")
+        REMOTE_PATH = os.getenv("REMOTE_PATH")
+        LOCAL_FILE_PATH = os.getenv("LOCAL_FILE_PATH")
+        
+        try:
+            destination = f"{USERNAME}@{HOSTNAME}:{REMOTE_PATH}"
+            command = ["scp", LOCAL_FILE_PATH, destination]
+            subprocess.run(command, check=True)
+            print(f"File {LOCAL_FILE_PATH} dropped on {HOSTNAME} in {REMOTE_PATH}")
+
+        except subprocess.CalledProcessError as e:
+            print(f"SCP command failed: {e}")
+            sys.exit(1)
+        except FileNotFoundError:
+            print(f"The 'scp' command was not found. Make sure OpenSSH client is installed and in your PATH.")
+            sys.exit(1)
+
+        
+
+
     

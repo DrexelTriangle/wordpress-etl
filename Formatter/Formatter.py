@@ -25,18 +25,17 @@ class Formatter():
         with filePath.open('w+', encoding='utf-8') as file:
           json.dump(self.sqlCommands, file, indent=4)
     
-    def testConnect():
+    def fileDump(file:str):
         load_dotenv()
         USERNAME = os.getenv("USERNAME")
         HOSTNAME = os.getenv("HOSTNAME")
         REMOTE_PATH = os.getenv("REMOTE_PATH")
-        LOCAL_FILE_PATH = os.getenv("LOCAL_FILE_PATH")
         
         try:
             destination = f"{USERNAME}@{HOSTNAME}:{REMOTE_PATH}"
-            command = ["scp", LOCAL_FILE_PATH, destination]
+            command = ["scp", file, destination]
             subprocess.run(command, check=True)
-            print(f"File {LOCAL_FILE_PATH} dropped on {HOSTNAME} in {REMOTE_PATH}")
+            print(f"File {file} dropped on {HOSTNAME} in {REMOTE_PATH}")
 
         except subprocess.CalledProcessError as e:
             print(f"SCP command failed: {e}")

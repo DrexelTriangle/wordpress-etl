@@ -32,13 +32,6 @@ class ArticlePolicy(Policy):
             (r'[^\x00-\x7F]', 'non_ascii'),  # All non-ASCII characters
         ]
         
-        # Dangerous attribute patterns to remove
-        self.dangerous_patterns = [
-            (r'\s+on\w+=["\'][^"\']*["\']', ''),  # Event handlers
-            (r'href=["\']javascript:[^"\']*["\']', 'href="#"'),  # javascript: URLs
-            (r'src=["\']data:text/html[^"\']*["\']', 'src=""'),  # data: URLs with HTML
-        ]
-        
         # Configuration
         self.max_inline_style_samples = 5  # Max samples to log per article
         self.shortcode_example_length = 100  # Max chars for example

@@ -35,16 +35,16 @@ def translateData(extracted):
   runStep("Translating...", "Translated", lambda: [translators[key].translate() for key in translators])
   return translators
 
-def logOutputs(translators):
-  logTargets = [
+def logOutputs(translators, includeArticles: bool = True):
+  logTargets = []
+  if includeArticles:
+    logTargets.append(("Logging articles...", "Logged articles", translators["articles"]._log, Path("logs") / "articles"))
+  logTargets.extend([
     ("Logging guest authors...", "Logged guest authors", translators["gAuth"]._log, Path("logs") / "gAuth.json"),
     ("Logging authors...", "Logged authors", translators["auth"]._log, Path("logs") / "auth.json"),
-  ]
+  ])
   for onLoad, onDone, func, path in logTargets:
     runStep(onLoad, onDone, func, path)
-
-def logArticles(translators):
-  runStep("Logging articles...", "Logged articles", translators["articles"]._log, Path("logs") / "articles")
 
 def sanitizeAuthors(translators, key, name):
   authors = translators[key].listAuthors()
@@ -83,8 +83,20 @@ authors = sanitizeAuthors(translators, "auth", "authors")
 writeAuthorOutput(authors, "logs/auth_output.json", "author")
 guestAuthors = sanitizeAuthors(translators, "gAuth", "guest authors")
 writeAuthorOutput(guestAuthors, "logs/gauth_output.json", "guest author")
+
+# Sanitize articles with manual resolution support
 articleSanitizer = ArticleSanitizer(translators["articles"].getObjList(), authors, guestAuthors)
-sanitizedArticles = articleSanitizer.sanitize()
+articleSpinner = animator.startSpinner("Sanitizing articles...", "Sanitized articles", showDone=False)
+def onArticleManualStart():
+  articleSpinner.pause()
+
+sanitizedArticles = articleSanitizer.sanitize(
+  manualStart=onArticleManualStart,
+  manualEnd=articleSpinner.resume,
+)
+articleSpinner.stop()
+completedSteps.append("Sanitized articles")
+
 translators["articles"].objDataDict = {art["id"]: art for art in sanitizedArticles}
-logArticles(translators)
+logOutputs(translators, includeArticles=True)
 printChecklist()

@@ -22,13 +22,14 @@ class ArticlePolicy(Policy):
         # Inline style pattern
         self.inline_style_pattern = r'<[^>]+style=["\'](.*?)["\'][^>]*>'
         
-        # Weird character patterns to detect and log
-        self.weird_char_patterns = [
+        # Invisible character patterns to detect and log
+        self.invisible_char_patterns = [
             (r'[\u0000-\u001F]', 'control character'),  # Control chars
             (r'[\u200B-\u200D]', 'zero-width character'),  # Zero-width
             (r'\u202E', 'right-to-left override'),
             (r'\u00A0', 'non-breaking space'),
             (r'[\uFEFF]', 'zero-width no-break space'),
+            (r'[^\x00-\x7F]', 'non_ascii'),  # All non-ASCII characters
         ]
         
         # Dangerous attribute patterns to remove

@@ -3,6 +3,15 @@ import re
 from pathlib import Path
 from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.ArticlePolicy import ArticlePolicy
+from Utils.WPContentSanitization import (
+    sanitize_backslashes,
+    fix_empty_alt,
+    remove_dangerous_attrs,
+    log_shortcodes,
+    log_inline_styles,
+    log_invisible_chars,
+    write_detailed_logs
+)
 
 
 class ArticleContentSanitizer(Sanitizer):
@@ -10,7 +19,7 @@ class ArticleContentSanitizer(Sanitizer):
         super().__init__(data, policies=ArticlePolicy([]))
         self.shortcode_log = []
         self.inline_style_log = []
-        self.weird_chars_log = {}  # Changed to dict: char_type -> {unicodes: [...], occurrences: [...]}
+        self.invisible_chars_log = {}  # Changed to dict: char_type -> {unicodes: [...], occurrences: [...]}
     
     def _normalizeData(self):
         """Ensure all articles have required fields"""
@@ -64,15 +73,24 @@ class ArticleContentSanitizer(Sanitizer):
         if not content:
             return content
         
-        # Strip excessive backslashes (double-escaped quotes)
-        content = content.replace('\\"', '"')
-        content = content.replace('\\\\', '\\')
+        # Strip excessive backslashes
+        content = sanitize_backslashes(content)
 
-        self._log_shortcodes(content, article_id)
-        self._log_inline_styles(content, article_id)
-        self._log_weird_chars(content, article_id)
-        content = self._fix_empty_alt(content)
-        content = self._remove_dangerous_attrs(content)
+        # Log issues
+        self.shortcode_log.extend(log_shortcodes(content, article_id, self.policies.shortcode_pattern, self.policies.shortcode_example_length))
+        self.inline_style_log.extend(log_inline_styles(content, article_id, self.policies.inline_style_pattern, self.policies.max_inline_style_samples))
+        
+        # Merge invisible chars log
+        invisible_chars = log_invisible_chars(content, article_id, self.policies.invisible_char_patterns)
+        for char_type, data in invisible_chars.items():
+            if char_type not in self.invisible_chars_log:
+                self.invisible_chars_log[char_type] = data
+            else:
+                self.invisible_chars_log[char_type]["unicodes"].update(data["unicodes"])
+                self.invisible_chars_log[char_type]["occurrences"].extend(data["occurrences"])
+        
+        content = fix_empty_alt(content, self.policies.generate_alt_from_filename)
+        content = remove_dangerous_attrs(content, self.policies.dangerous_patterns)
         
         return content
     
@@ -102,25 +120,25 @@ class ArticleContentSanitizer(Sanitizer):
                     "style": style[:100]
                 })
     
-    def _log_weird_chars(self, content: str, article_id: str):
-        """Log non-ASCII and weird Unicode characters grouped by type"""
-        for pattern, char_type in self.policies.weird_char_patterns:
+    def _log_invisible_chars(self, content: str, article_id: str):
+        """Log invisible and problematic Unicode characters grouped by type"""
+        for pattern, char_type in self.policies.invisible_char_patterns:
             matches = re.finditer(pattern, content)
             for match in matches:
                 unicode_code = f"U+{ord(match.group(0)):04X}"
                 
                 # Initialize char_type entry if not exists
-                if char_type not in self.weird_chars_log:
-                    self.weird_chars_log[char_type] = {
+                if char_type not in self.invisible_chars_log:
+                    self.invisible_chars_log[char_type] = {
                         "unicodes": set(),
                         "occurrences": []
                     }
                 
                 # Add unicode to set (for unique list)
-                self.weird_chars_log[char_type]["unicodes"].add(unicode_code)
+                self.invisible_chars_log[char_type]["unicodes"].add(unicode_code)
                 
                 # Add occurrence
-                self.weird_chars_log[char_type]["occurrences"].append({
+                self.invisible_chars_log[char_type]["occurrences"].append({
                     "article_id": article_id,
                     "position": match.start()
                 })
@@ -165,17 +183,17 @@ class ArticleContentSanitizer(Sanitizer):
                 json.dump({"inline_styles": self.inline_style_log}, f, indent=4)
             print(f"Logged {len(self.inline_style_log)} inline styles")
         
-        # Weird characters log
-        if self.weird_chars_log:
+        # Invisible characters log
+        if self.invisible_chars_log:
             # Convert sets to lists for JSON serialization
             serializable = {
                 char_type: {
                     "unicodes": sorted(list(data["unicodes"])),
                     "occurrences": data["occurrences"]
                 }
-                for char_type, data in self.weird_chars_log.items()
+                for char_type, data in self.invisible_chars_log.items()
             }
-            with open(log_dir / "article_weird_chars.json", 'w') as f:
-                json.dump({"weird_chars": serializable}, f, indent=4)
-            total_occurrences = sum(len(data["occurrences"]) for data in self.weird_chars_log.values())
-            print(f"Logged {total_occurrences} weird characters across {len(self.weird_chars_log)} types")
+            with open(log_dir / "article_invisible_chars.json", 'w') as f:
+                json.dump({"invisible_chars": serializable}, f, indent=4)
+            total_occurrences = sum(len(data["occurrences"]) for data in self.invisible_chars_log.values())
+            print(f"Logged {total_occurrences} invisible characters across {len(self.invisible_chars_log)} types")

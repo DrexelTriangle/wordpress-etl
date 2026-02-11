@@ -104,7 +104,7 @@ runStep("Sanitizing article content...", "Sanitized article content", contentSan
 
 # Write article output
 def writeArticleOutput():
-  Path("logs/article_out.json").write_text(
+  Path("logs/article_output.json").write_text(
     json.dumps({str(i): sanitizedArticles[i] for i in range(len(sanitizedArticles))}, indent=4),
     encoding="utf-8",
   )

@@ -6,13 +6,21 @@ class ArticlePolicy(Policy):
         Policy for matching article author names to existing authors.
         Uses DiffChecker with same thresholds as AuthorPolicy (0.9 auto-match, 0.8 flag).
         """
-        specialEdits = {}
+        # Map ambiguous/unknown author names to canonical authors
+        # Values can be either a string (single author) or list of strings (multiple authors)
+        specialEdits = {
+            "paulie": "Paulie Loscalzo",
+            "alexjones": "Alexandra Jones",
+            "melodywumaddiepelchat": ["Melody Wu", "Maddie Pelchat"],
+            "juliaconleykaseyshamisandtaylorclark": ["Julia Conley", "Kasey Shamis", "Taylor Clark"],
+        }
         specialFlags = set()
         banList = []
         
         self.authors = authors or []
         self.guest_authors = guest_authors or []
         self._author_lookup = self._buildAuthorLookup()
+        self.specialEdits = specialEdits  # Store for use in matching logic
         
         super().__init__(specialEdits, specialFlags, banList, data, isAuthor=False)
     

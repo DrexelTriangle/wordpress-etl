@@ -102,7 +102,45 @@ class ArticleSanitizer(Sanitizer):
         flaggedMatches = []  # For manual resolution
         
         for clean_key, occurrences in unique_names.items():
-            # Try exact match first
+            # Check special edits first (forced mappings)
+            special_edit_value = None
+            for original_name, _ in occurrences:
+                # Find special edit by matching the original cleaned name
+                for special_key, special_value in self.policies.specialEdits.items():
+                    if clean(str(special_key), "similarity") == clean_key:
+                        special_edit_value = special_value
+                        break
+                if special_edit_value:
+                    break
+            
+            if special_edit_value:
+                # Handle special edits (single or multiple authors)
+                author_names = special_edit_value if isinstance(special_edit_value, list) else [special_edit_value]
+                matched_authors = []
+                
+                # Find each author by name
+                for author_name in author_names:
+                    for lookup_key, (author_id, display_name) in author_lookup.items():
+                        if display_name and (display_name == author_name or clean(display_name, "similarity") == clean(author_name, "similarity")):
+                            matched_authors.append((author_id, display_name))
+                            break
+                
+                # Apply matches to all articles with this name
+                if matched_authors:
+                    for article_id, original_name in occurrences:
+                        self.author_matches[article_id] = self.author_matches.get(article_id, {})
+                        # For multi-author special edits, store all matched authors
+                        self.author_matches[article_id][original_name] = matched_authors if len(matched_authors) > 1 else matched_authors[0]
+                        if len(matched_authors) == 1:
+                            author_id, display_name = matched_authors[0]
+                            self._logChange(article_id, original_name, display_name)
+                        else:
+                            # Log multiple authors
+                            author_names_str = ", ".join([name for _, name in matched_authors])
+                            self._logChange(article_id, original_name, author_names_str)
+                continue
+            
+            # Try exact match
             exact_match = author_lookup.get(clean_key)
             if exact_match:
                 author_id, display_name = exact_match
@@ -261,9 +299,18 @@ class ArticleSanitizer(Sanitizer):
             
             for original_name in clean_names:
                 if original_name in matches:
-                    author_id, display_name = matches[original_name]
-                    author_ids.append(author_id)
-                    author_names.append(display_name)
+                    match_value = matches[original_name]
+                    # Handle both single author (tuple) and multiple authors (list of tuples)
+                    if isinstance(match_value, list):
+                        # Multiple authors
+                        for author_id, display_name in match_value:
+                            author_ids.append(author_id)
+                            author_names.append(display_name)
+                    else:
+                        # Single author
+                        author_id, display_name = match_value
+                        author_ids.append(author_id)
+                        author_names.append(display_name)
             
             article_data["authorIDs"] = author_ids
             article_data["authors"] = author_names

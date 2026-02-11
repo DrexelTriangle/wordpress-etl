@@ -1,62 +1,44 @@
 from Sanitizer.Policy import Policy
 
+
 class ArticlePolicy(Policy):
-    def __init__(self, data, authors, guest_authors):
+    def __init__(self, data):
         """
-        Policy for matching article author names to existing authors.
-        Uses DiffChecker with same thresholds as AuthorPolicy (0.9 auto-match, 0.8 flag).
+        Policy for article content sanitization.
+        Defines patterns and rules for cleaning HTML content.
         """
-        # Map ambiguous/unknown author names to canonical authors
-        # Values can be either a string (single author) or list of strings (multiple authors)
-        specialEdits = {
-            "paulie": "Paulie Loscalzo",
-            "alexjones": "Alexandra Jones",
-            "melodywumaddiepelchat": ["Melody Wu", "Maddie Pelchat"],
-            "juliaconleykaseyshamisandtaylorclark": ["Julia Conley", "Kasey Shamis", "Taylor Clark"],
-        }
-        specialFlags = set()
-        banList = []
+        # ArticlePolicy doesn't use Policy's author-specific fields
+        super().__init__(
+            specialEdits={},
+            specialFlags={},
+            banList=[],
+            data=data,
+            isAuthor=False
+        )
         
-        self.authors = authors or []
-        self.guest_authors = guest_authors or []
-        self._author_lookup = self._buildAuthorLookup()
-        self.specialEdits = specialEdits  # Store for use in matching logic
+        # WordPress shortcode pattern
+        self.shortcode_pattern = r'\[(\w+)(?:\s+[^\]]+)?\](?:.*?\[/\1\])?'
         
-        super().__init__(specialEdits, specialFlags, banList, data, isAuthor=False)
-    
-    def _buildAuthorLookup(self):
-        """Build a lookup dictionary for all authors by their cleaned names and logins"""
-        from Utils import NLP as nlp
-        lookup = {}
-        clean = nlp.cleanDocument
+        # Inline style pattern
+        self.inline_style_pattern = r'<[^>]+style=["\'](.*?)["\'][^>]*>'
         
-        for author in [*self.authors, *self.guest_authors]:
-            if hasattr(author, "data"):
-                data = author.data
-                author_id = data.get("id")
-                display_name = data.get("display_name")
-                login = data.get("login")
-            elif isinstance(author, dict):
-                author_id = author.get("id")
-                display_name = author.get("display_name")
-                login = author.get("login")
-            else:
-                continue
-            
-            # Add entry for display_name
-            if display_name:
-                key = clean(display_name, "similarity")
-                if key:
-                    existing = lookup.get(key)
-                    if existing is None or (author_id is not None and author_id < existing[0]):
-                        lookup[key] = (author_id, display_name)
-            
-            # Add entry for login (username)
-            if login:
-                key = clean(login, "similarity")
-                if key:
-                    existing = lookup.get(key)
-                    if existing is None or (author_id is not None and author_id < existing[0]):
-                        lookup[key] = (author_id, display_name)
+        # Weird character patterns to detect and log
+        self.weird_char_patterns = [
+            (r'[\u0000-\u001F]', 'control character'),  # Control chars
+            (r'[\u200B-\u200D]', 'zero-width character'),  # Zero-width
+            (r'\u202E', 'right-to-left override'),
+            (r'\u00A0', 'non-breaking space'),
+            (r'[\uFEFF]', 'zero-width no-break space'),
+        ]
         
-        return lookup
+        # Dangerous attribute patterns to remove
+        self.dangerous_patterns = [
+            (r'\s+on\w+=["\'][^"\']*["\']', ''),  # Event handlers
+            (r'href=["\']javascript:[^"\']*["\']', 'href="#"'),  # javascript: URLs
+            (r'src=["\']data:text/html[^"\']*["\']', 'src=""'),  # data: URLs with HTML
+        ]
+        
+        # Configuration
+        self.max_inline_style_samples = 5  # Max samples to log per article
+        self.shortcode_example_length = 100  # Max chars for example
+        self.generate_alt_from_filename = True  # Auto-generate alt text from filenames

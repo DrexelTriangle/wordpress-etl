@@ -6,7 +6,8 @@ from Extractor import Extractor
 from Sanitizer.GuestAuthorPolicy import GuestAuthorPolicy
 from Sanitizer.AuthorPolicy import AuthorPolicy
 from Sanitizer.AuthorSanitizer import AuthorSanitizer
-from Sanitizer.ArticleSanitizer import ArticleSanitizer
+from Sanitizer.ArticleAuthorMatcher import ArticleAuthorMatcher
+from Sanitizer.ArticleContentSanitizer import ArticleContentSanitizer
 from Translator.ArticleTranslator import ArticleTranslator
 from Translator.AuthorTranslator import AuthorTranslator
 from Translator.GuestAuthorTranslator import GuestAuthorTranslator
@@ -85,7 +86,7 @@ guestAuthors = sanitizeAuthors(translators, "gAuth", "guest authors")
 writeAuthorOutput(guestAuthors, "logs/gauth_output.json", "guest author")
 
 # Sanitize articles with manual resolution support
-articleSanitizer = ArticleSanitizer(translators["articles"].getObjList(), authors, guestAuthors)
+articleSanitizer = ArticleAuthorMatcher(translators["articles"].getObjList(), authors, guestAuthors)
 articleSpinner = animator.startSpinner("Sanitizing articles...", "Sanitized articles", showDone=False)
 def onArticleManualStart():
   articleSpinner.pause()
@@ -96,6 +97,18 @@ sanitizedArticles = articleSanitizer.sanitize(
 )
 articleSpinner.stop()
 completedSteps.append("Sanitized articles")
+
+# Sanitize article content (HTML, backslashes, etc.)
+contentSanitizer = ArticleContentSanitizer(sanitizedArticles)
+runStep("Sanitizing article content...", "Sanitized article content", contentSanitizer.sanitize)
+
+# Write article output
+def writeArticleOutput():
+  Path("logs/article_out.json").write_text(
+    json.dumps({str(i): sanitizedArticles[i] for i in range(len(sanitizedArticles))}, indent=4),
+    encoding="utf-8",
+  )
+runStep("Writing article output...", "Wrote article output", writeArticleOutput)
 
 translators["articles"].objDataDict = {art["id"]: art for art in sanitizedArticles}
 logOutputs(translators, includeArticles=True)

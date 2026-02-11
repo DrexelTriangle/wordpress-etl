@@ -1,14 +1,13 @@
 from Utils import NLP as nlp
-from Utils.articleauthorresolution.InteractiveUI import selectFromList
+from Utils.ArticleAuthorMatching import selectFromList, loadResolutionCache, saveResolutionCache, logUnknownAuthors
 from Sanitizer.Sanitizer import Sanitizer
-from Sanitizer.ArticlePolicy import ArticlePolicy
+from Sanitizer.ArticleAuthorMatchingPolicy import ArticleAuthorMatchingPolicy
 from Sanitizer.DiffChecker import DiffChecker
-from Utils.articleauthorresolution.ArticleSanitizerUtils import loadResolutionCache, saveResolutionCache, logUnknownAuthors
 
 
-class ArticleSanitizer(Sanitizer):
+class ArticleAuthorMatcher(Sanitizer):
     def __init__(self, data: list, authors: list, guest_authors: list):
-        super().__init__(data, policies=ArticlePolicy([], authors, guest_authors))
+        super().__init__(data, policies=ArticleAuthorMatchingPolicy([], authors, guest_authors))
         self.unknown_authors = {}
         self.author_matches = {}
         self.resolution_cache = loadResolutionCache()
@@ -29,7 +28,7 @@ class ArticleSanitizer(Sanitizer):
         self._normalizeData()
         self._matchArticleAuthors(manualStart, manualEnd, clear)
         logUnknownAuthors(self.unknown_authors)
-        self._log("article_mappings", "article_conflicts")
+        self._log("article-sanitizer/article_author_mappings", "article-sanitizer/article_author_conflicts")
         return self.data
 
     

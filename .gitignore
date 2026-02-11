@@ -1,4 +1,5 @@
-# Directories
+.env
+*.pyc
 __pycache__/
 dumps/*
 output/*
@@ -8,9 +9,6 @@ log/*
 cacheDirectory/*
 venv/*
 .venv/*
-
-# Files
-*.pyc
 temp.txt
 *.json
 result.txt

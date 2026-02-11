@@ -22,8 +22,8 @@ class ArticlePolicy(Policy):
         # Inline style pattern
         self.inline_style_pattern = r'<[^>]+style=["\'](.*?)["\'][^>]*>'
         
-        # Invisible character patterns to detect and log
-        self.invisible_char_patterns = [
+        # Problematic character patterns to detect and log
+        self.problematic_char_patterns = [
             (r'[\u0000-\u001F]', 'control character'),  # Control chars
             (r'[\u200B-\u200D]', 'zero-width character'),  # Zero-width
             (r'\u202E', 'right-to-left override'),

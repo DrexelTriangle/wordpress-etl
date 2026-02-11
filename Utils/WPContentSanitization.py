@@ -69,35 +69,46 @@ def log_inline_styles(content: str, article_id: str, inline_style_pattern: str, 
     return inline_style_log
 
 
-def log_invisible_chars(content: str, article_id: str, invisible_char_patterns: list) -> dict:
+def log_problematic_chars(content: str, article_id: str, problematic_char_patterns: list) -> dict:
     """Log invisible and problematic Unicode characters grouped by type"""
-    invisible_chars_log = {}
+    problematic_chars_log = {}
     
-    for pattern, char_type in invisible_char_patterns:
+    for pattern, char_type in problematic_char_patterns:
         matches = re.finditer(pattern, content)
         for match in matches:
             unicode_code = f"U+{ord(match.group(0)):04X}"
             
             # Initialize char_type entry if not exists
-            if char_type not in invisible_chars_log:
-                invisible_chars_log[char_type] = {
+            if char_type not in problematic_chars_log:
+                problematic_chars_log[char_type] = {
                     "unicodes": set(),
                     "occurrences": []
                 }
             
             # Add unicode to set (for unique list)
-            invisible_chars_log[char_type]["unicodes"].add(unicode_code)
+            problematic_chars_log[char_type]["unicodes"].add(unicode_code)
             
             # Add occurrence
-            invisible_chars_log[char_type]["occurrences"].append({
+            problematic_chars_log[char_type]["occurrences"].append({
                 "article_id": article_id,
                 "position": match.start()
             })
     
-    return invisible_chars_log
+    return problematic_chars_log
 
 
-def write_detailed_logs(shortcode_log: list, inline_style_log: list, invisible_chars_log: dict):
+def replace_problematic_chars(content: str, problematic_char_patterns: list) -> str:
+    """Replace problematic Unicode characters with their Unicode escape representation"""
+    for pattern, _ in problematic_char_patterns:
+        def replace_func(match):
+            char = match.group(0)
+            unicode_repr = f"[U+{ord(char):04X}]"
+            return unicode_repr
+        content = re.sub(pattern, replace_func, content)
+    return content
+
+
+def write_detailed_logs(shortcode_log: list, inline_style_log: list, problematic_chars_log: dict):
     """Write all detailed content sanitization logs to files"""
     log_dir = Path("logs") / "article-sanitizer"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -114,17 +125,17 @@ def write_detailed_logs(shortcode_log: list, inline_style_log: list, invisible_c
             json.dump({"inline_styles": inline_style_log}, f, indent=4)
         print(f"Logged {len(inline_style_log)} inline styles")
     
-    # Invisible characters log
-    if invisible_chars_log:
+    # Problematic characters log
+    if problematic_chars_log:
         # Convert sets to lists for JSON serialization
         serializable = {
             char_type: {
                 "unicodes": sorted(list(data["unicodes"])),
                 "occurrences": data["occurrences"]
             }
-            for char_type, data in invisible_chars_log.items()
+            for char_type, data in problematic_chars_log.items()
         }
-        with open(log_dir / "article_invisible_chars.json", 'w') as f:
-            json.dump({"invisible_chars": serializable}, f, indent=4)
-        total_occurrences = sum(len(data["occurrences"]) for data in invisible_chars_log.values())
-        print(f"Logged {total_occurrences} invisible characters across {len(invisible_chars_log)} types")
+        with open(log_dir / "article_problematic_chars.json", 'w') as f:
+            json.dump({"problematic_chars": serializable}, f, indent=4)
+        total_occurrences = sum(len(data["occurrences"]) for data in problematic_chars_log.values())
+        print(f"Logged {total_occurrences} problematic characters across {len(problematic_chars_log)} types")

@@ -9,7 +9,8 @@ from Utils.WPContentSanitization import (
     remove_dangerous_attrs,
     log_shortcodes,
     log_inline_styles,
-    log_invisible_chars,
+    log_problematic_chars,
+    replace_problematic_chars,
     write_detailed_logs
 )
 
@@ -19,7 +20,7 @@ class ArticleContentSanitizer(Sanitizer):
         super().__init__(data, policies=ArticlePolicy([]))
         self.shortcode_log = []
         self.inline_style_log = []
-        self.invisible_chars_log = {}  # Changed to dict: char_type -> {unicodes: [...], occurrences: [...]}
+        self.problematic_chars_log = {}  # Changed to dict: char_type -> {unicodes: [...], occurrences: [...]}
     
     def _normalizeData(self):
         """Ensure all articles have required fields"""
@@ -76,18 +77,20 @@ class ArticleContentSanitizer(Sanitizer):
         # Strip excessive backslashes
         content = sanitize_backslashes(content)
 
-        # Log issues
+        # Log and replace problematic chars
+        problematic_chars = log_problematic_chars(content, article_id, self.policies.problematic_char_patterns)
+        for char_type, data in problematic_chars.items():
+            if char_type not in self.problematic_chars_log:
+                self.problematic_chars_log[char_type] = data
+            else:
+                self.problematic_chars_log[char_type]["unicodes"].update(data["unicodes"])
+                self.problematic_chars_log[char_type]["occurrences"].extend(data["occurrences"])
+        
+        content = replace_problematic_chars(content, self.policies.problematic_char_patterns)
+        
+        # Log other issues
         self.shortcode_log.extend(log_shortcodes(content, article_id, self.policies.shortcode_pattern, self.policies.shortcode_example_length))
         self.inline_style_log.extend(log_inline_styles(content, article_id, self.policies.inline_style_pattern, self.policies.max_inline_style_samples))
-        
-        # Merge invisible chars log
-        invisible_chars = log_invisible_chars(content, article_id, self.policies.invisible_char_patterns)
-        for char_type, data in invisible_chars.items():
-            if char_type not in self.invisible_chars_log:
-                self.invisible_chars_log[char_type] = data
-            else:
-                self.invisible_chars_log[char_type]["unicodes"].update(data["unicodes"])
-                self.invisible_chars_log[char_type]["occurrences"].extend(data["occurrences"])
         
         content = fix_empty_alt(content, self.policies.generate_alt_from_filename)
         content = remove_dangerous_attrs(content, self.policies.dangerous_patterns)
@@ -96,4 +99,4 @@ class ArticleContentSanitizer(Sanitizer):
     
     def _write_detailed_logs(self):
         """Write all detailed logs to files"""
-        write_detailed_logs(self.shortcode_log, self.inline_style_log, self.invisible_chars_log)
+        write_detailed_logs(self.shortcode_log, self.inline_style_log, self.problematic_chars_log)

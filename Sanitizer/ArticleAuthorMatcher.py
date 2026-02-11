@@ -1,5 +1,14 @@
 from Utils import NLP as nlp
-from Utils.ArticleAuthorMatching import selectFromList, loadResolutionCache, saveResolutionCache, logUnknownAuthors
+from Utils.ArticleAuthorMatching import (
+    selectFromList,
+    loadResolutionCache,
+    saveResolutionCache,
+    logUnknownAuthors,
+    collect_unique_author_names,
+    apply_special_edits,
+    apply_exact_match,
+    apply_similarity_match,
+)
 from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.ArticleAuthorMatchingPolicy import ArticleAuthorMatchingPolicy
 from Sanitizer.DiffChecker import DiffChecker
@@ -31,90 +40,28 @@ class ArticleAuthorMatcher(Sanitizer):
         self._log("article-sanitizer/article_author_mappings", "article-sanitizer/article_author_conflicts")
         return self.data
 
-    
     def _matchArticleAuthors(self, manualStart=None, manualEnd=None, clear: bool = True):
-        """Match article authors: special edits → exact → similarity (0.9 auto, 0.8 manual)"""
-        clean = nlp.cleanDocument
         lookup = self.policies._author_lookup
-        
-        # Collect unique names
-        unique = {}
-        for article in self.data:
-            data = article.data if hasattr(article, "data") else article
-            if not isinstance(data, dict):
-                continue
-            for name in (data.get("authorCleanNames") or []):
-                if name:
-                    key = clean(str(name), "similarity")
-                    if key:
-                        unique.setdefault(key, []).append((data.get("id", "unknown"), name))
-        
-        # Match each unique name
+        unique = collect_unique_author_names(self.data, nlp.cleanDocument)
         flagged = []
+
         for clean_key, occurrences in unique.items():
-            # Special edits
-            special = next((v for k, v in self.policies.specialEdits.items() 
-                          if clean(str(k), "similarity") == clean_key), None)
-            if special:
-                names = special if isinstance(special, list) else [special]
-                authors = [next(((aid, dn) for _, (aid, dn) in lookup.items() 
-                               if dn and (dn == n or clean(dn, "similarity") == clean(n, "similarity"))), None) 
-                          for n in names]
-                authors = [a for a in authors if a]
-                if authors:
-                    for aid, name in occurrences:
-                        self.author_matches.setdefault(aid, {})[name] = authors if len(authors) > 1 else authors[0]
-                        log_name = ", ".join([n for _, n in authors]) if len(authors) > 1 else authors[0][1]
-                        self._logChange(aid, name, log_name)
-                    continue
-            
-            # Exact match
-            if clean_key in lookup:
-                aid, dname = lookup[clean_key]
-                for art_id, name in occurrences:
-                    self.author_matches.setdefault(art_id, {})[name] = (aid, dname)
+            if apply_special_edits(clean_key, occurrences, lookup, self.policies.specialEdits, nlp.cleanDocument, self._logChange, self.author_matches):
                 continue
-            
-            # Similarity
-            if not lookup:
-                for art_id, name in occurrences:
-                    self.unknown_authors.setdefault(name, []).append(art_id)
+            if apply_exact_match(clean_key, occurrences, lookup, self.author_matches):
                 continue
-            
-            candidates = list(lookup.items())
-            checker = DiffChecker([clean_key] + [k for k, _ in candidates])
-            best, best_sim, similar = None, 0.0, []
-            
-            for i, (_, (aid, dname)) in enumerate(candidates):
-                sim = checker.compare(0, i + 1)
-                if sim >= 0.9 and sim > best_sim:
-                    best, best_sim = (aid, dname), sim
-                elif sim >= 0.8:
-                    similar.append((aid, dname, sim))
-            
-            if best:
-                for art_id, name in occurrences:
-                    self.author_matches.setdefault(art_id, {})[name] = best
-                    self._logChange(art_id, name, best[1])
-            elif similar:
-                for art_id, name in occurrences:
-                    flagged.append({"article_id": art_id, "author_name": name, "candidates": similar})
-            else:
-                for art_id, name in occurrences:
-                    self.unknown_authors.setdefault(name, []).append(art_id)
-        
-        # Manual resolution
+            apply_similarity_match(clean_key, occurrences, lookup, DiffChecker, self._logChange, self.author_matches, self.unknown_authors, flagged)
+
         if flagged:
             manualStart and manualStart()
             self._manualResolve(flagged)
             saveResolutionCache(self.resolution_cache)
             manualEnd and manualEnd()
-        
+
         self._applyMatches()
     
     
     def _manualResolve(self, flagged: list):
-        """Manual resolution for 0.8-0.9 similarity matches"""
         for i, item in enumerate(flagged):
             aid, name, cands = item["article_id"], item["author_name"], item["candidates"]
             
@@ -142,7 +89,7 @@ class ArticleAuthorMatcher(Sanitizer):
                 print(f"  → {dname}")
     
     def _applyMatches(self):
-        """Apply matched authors to articles"""
+        # Apply matched authors to articles
         for article in self.data:
             data = article.data if hasattr(article, "data") else article
             if not isinstance(data, dict):

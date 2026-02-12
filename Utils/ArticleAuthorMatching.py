@@ -1,8 +1,6 @@
 from pathlib import Path
 import json
-import sys
-import tty
-import termios
+import os
 
 def collect_unique_author_names(data: list, clean_func) -> dict:
     unique = {}
@@ -86,6 +84,7 @@ def apply_similarity_match(clean_key, occurrences, lookup, diff_checker_cls, log
             
             
 def loadResolutionCache():
+    """Load previously resolved author name mappings from cache file"""
     cache_path = Path("logs") / "article-sanitizer" / "article_author_resolution_cache.json"
     if not cache_path.exists():
         return {}
@@ -99,6 +98,7 @@ def loadResolutionCache():
 
 
 def saveResolutionCache(cache):
+    """Save author name resolutions to cache file"""
     log_dir = Path("logs") / "article-sanitizer"
     log_dir.mkdir(parents=True, exist_ok=True)
     cache_path = log_dir / "article_author_resolution_cache.json"
@@ -108,6 +108,7 @@ def saveResolutionCache(cache):
 
 
 def logUnknownAuthors(unknown_authors):
+    """Write unknown authors to log file"""
     if not unknown_authors:
         return
     
@@ -131,16 +132,65 @@ def logUnknownAuthors(unknown_authors):
 
 
 def selectFromList(prompt: str, options: list, format_option=None) -> int:
-    # TUI selection
-    def getch():
-        # Get keyboard input from stdin
-        fd = sys.stdin.fileno()
-        old = termios.tcgetattr(fd)
+    """
+    Interactive arrow key selection from a list.
+    
+    Args:
+        prompt: Header text to display
+        options: List of items to choose from
+        format_option: Optional function to format each option (receives (index, item))
+    
+    Returns:
+        Index of selected item, or -1 if user chose unknown ('u')
+    """
+    def readInput():
         try:
-            tty.setraw(fd)
-            return sys.stdin.read(1)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old)
+            if os.name == "nt":
+                import msvcrt
+                firstChar = msvcrt.getch()
+                if firstChar in (b'\x00', b'\xe0'):
+                    secondChar = msvcrt.getch()
+                    mapping = {
+                        b'H': 'UP',
+                        b'P': 'DOWN',
+                        b'K': 'LEFT',
+                        b'M': 'RIGHT',
+                    }
+                    return mapping.get(secondChar, None)
+                if firstChar == b'\r':
+                    return 'ENTER'
+
+                return firstChar.decode('utf-8')
+                
+            else:
+                import sys
+                import termios
+                import tty
+                """Get single character from stdin"""
+                fd = sys.stdin.fileno()
+                old = termios.tcgetattr(fd)
+                try:
+                    tty.setraw(fd)
+                    ch = sys.stdin.read(1)
+                    if ch == '\x1b':
+                        sys.stdin.read(1)  # skip '['
+                        direction = sys.stdin.read(1)
+
+                        mapping = {
+                            'A': 'UP',
+                            'B': 'DOWN',
+                            'C': 'RIGHT',
+                            'D': 'LEFT'
+                        }
+                        return mapping.get(direction)
+                    if ch == '\r':
+                        return 'ENTER'
+
+                    return ch
+                finally:
+                    termios.tcsetattr(fd, termios.TCSADRAIN, old)
+        except Exception:
+          pass
     
     ptr = 0
     while True:
@@ -159,16 +209,12 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
         print("\n↑↓ to navigate | Enter to select | 'u' for unknown")
         
         # Get input
-        ch = getch()
-        
-        if ch == '\x1b':  # ESC sequence (arrow keys)
-            getch()  # [
-            direction = getch()
-            if direction == 'A':  # Up
-                ptr = max(0, ptr - 1)
-            elif direction == 'B':  # Down
-                ptr = min(len(options) - 1, ptr + 1)
-        elif ch in ('\r', '\n'):  # Enter
+        key = readInput()
+        if (key == 'UP'):
+            ptr = max(0, ptr - 1)
+        elif (key == 'DOWN'):
+            ptr = min(len(options) - 1, ptr + 1)
+        elif (key == 'ENTER'): 
             return ptr
-        elif ch in ('u', 'U'):  # Unknown
+        elif key in ('u', 'U'):
             return -1

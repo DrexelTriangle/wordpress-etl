@@ -1,12 +1,7 @@
-import json
-import re
-from pathlib import Path
 from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.ArticlePolicy import ArticlePolicy
 from Utils.WPContentSanitization import (
     sanitize_backslashes,
-    fix_empty_alt,
-    remove_dangerous_attrs,
     log_shortcodes,
     log_inline_styles,
     log_problematic_chars,
@@ -14,24 +9,14 @@ from Utils.WPContentSanitization import (
     write_detailed_logs
 )
 
-
 class ArticleContentSanitizer(Sanitizer):
     def __init__(self, data: list):
         super().__init__(data, policies=ArticlePolicy([]))
         self.shortcode_log = []
         self.inline_style_log = []
-        self.problematic_chars_log = {}  # Changed to dict: char_type -> {unicodes: [...], occurrences: [...]}
-    
-    def _normalizeData(self):
-        """Ensure all articles have required fields"""
-        for article in self.data:
-            article_data = article.data if hasattr(article, "data") else article
-            if isinstance(article_data, dict):
-                if 'text' not in article_data:
-                    article_data['text'] = ""
+        self.problematic_chars_log = {}
     
     def _logChange(self, article_id, change_type, details):
-        """Log content sanitization changes"""
         self.changes.append({
             "article_id": article_id,
             "change_type": change_type,
@@ -39,64 +24,64 @@ class ArticleContentSanitizer(Sanitizer):
         })
     
     def _logConflict(self, article_id, issue_type, details):
-        """Log issues that need manual review"""
         self.conflicts.append({
             "article_id": article_id,
             "issue_type": issue_type,
             "details": details
         })
+    
+    def _normalizeData(self):
+        """Ensure all articles end with punctuation"""
+        for article in self.data:
+            if 'text' not in article:
+                article['text'] = ""
+            
+            text = article.get('text', '')
+            if text and not text.endswith(('.', '!', '?', ':', ';', '"', "'")):
+                article['text'] = text + "."
         
     def sanitize(self):
-        """Sanitize all article content"""
         self._normalizeData()
         
         for article in self.data:
-            article_data = article.data if hasattr(article, "data") else article
-            if not isinstance(article_data, dict):
+            article_id = article.get("id", "unknown")
+            original_text = article.get('text', '')
+            if not original_text:
                 continue
+            fixes = []
+            sanitized_text = original_text
             
-            article_id = article_data.get("id", "unknown")
-            original_text = article_data.get('text', '')
+            # Strip excessive backslashes
+            sanitized_text = sanitize_backslashes(sanitized_text)
+            if sanitized_text != original_text:
+                fixes.append("backslashes stripped")
             
-            if original_text:
-                sanitized_text = self._sanitize_content(original_text, article_id)
-                
-                if sanitized_text != original_text:
-                    article_data['text'] = sanitized_text
-                    self._logChange(article_id, "content_sanitized", "Stripped backslashes and fixed HTML")
+            # Log and replace problematic chars
+            problematic_chars = log_problematic_chars(sanitized_text, article_id, self.policies.problematic_char_patterns)
+            for char_type, data in problematic_chars.items():
+                if char_type not in self.problematic_chars_log:
+                    self.problematic_chars_log[char_type] = data
+                else:
+                    self.problematic_chars_log[char_type]["unicodes"].update(data["unicodes"])
+                    self.problematic_chars_log[char_type]["occurrences"].extend(data["occurrences"])
+            
+            sanitized_text_before_replace = sanitized_text
+            sanitized_text = replace_problematic_chars(sanitized_text, self.policies.problematic_char_patterns)
+            if sanitized_text != sanitized_text_before_replace:
+                fixes.append("problematic characters replaced")
+            
+            # Log other issues
+            self.shortcode_log.extend(log_shortcodes(sanitized_text, article_id, self.policies.shortcode_pattern))
+            self.inline_style_log.extend(log_inline_styles(sanitized_text, article_id, self.policies.inline_style_pattern))
+            
+            # Update article and log if anything changed
+            if sanitized_text != original_text:
+                article['text'] = sanitized_text
+                self._logChange(article_id, "content_sanitized", "; ".join(fixes))
         
         self._write_detailed_logs()
         self._log("article-sanitizer/article_content_changes", "article-sanitizer/article_content_conflicts")
         return self.data
     
-    def _sanitize_content(self, content: str, article_id: str) -> str:
-        """Sanitize article text content"""
-        if not content:
-            return content
-        
-        # Strip excessive backslashes
-        content = sanitize_backslashes(content)
-
-        # Log and replace problematic chars
-        problematic_chars = log_problematic_chars(content, article_id, self.policies.problematic_char_patterns)
-        for char_type, data in problematic_chars.items():
-            if char_type not in self.problematic_chars_log:
-                self.problematic_chars_log[char_type] = data
-            else:
-                self.problematic_chars_log[char_type]["unicodes"].update(data["unicodes"])
-                self.problematic_chars_log[char_type]["occurrences"].extend(data["occurrences"])
-        
-        content = replace_problematic_chars(content, self.policies.problematic_char_patterns)
-        
-        # Log other issues
-        self.shortcode_log.extend(log_shortcodes(content, article_id, self.policies.shortcode_pattern, self.policies.shortcode_example_length))
-        self.inline_style_log.extend(log_inline_styles(content, article_id, self.policies.inline_style_pattern, self.policies.max_inline_style_samples))
-        
-        content = fix_empty_alt(content, self.policies.generate_alt_from_filename)
-        content = remove_dangerous_attrs(content, self.policies.dangerous_patterns)
-        
-        return content
-    
     def _write_detailed_logs(self):
-        """Write all detailed logs to files"""
         write_detailed_logs(self.shortcode_log, self.inline_style_log, self.problematic_chars_log)

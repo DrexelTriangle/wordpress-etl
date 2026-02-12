@@ -2,12 +2,7 @@ from Sanitizer.Policy import Policy
 
 class ArticleAuthorMatchingPolicy(Policy):
     def __init__(self, data, authors, guest_authors):
-        """
-        Policy for matching article author names to existing authors.
-        Uses DiffChecker with same thresholds as AuthorPolicy (0.9 auto-match, 0.8 flag).
-        """
         # Map ambiguous/unknown author names to canonical authors
-        # Values can be either a string (single author) or list of strings (multiple authors)
         specialEdits = {
             "paulie": "Paulie Loscalzo",
             "alexjones": "Alexandra Jones",
@@ -25,7 +20,7 @@ class ArticleAuthorMatchingPolicy(Policy):
         super().__init__(specialEdits, specialFlags, banList, data, isAuthor=False)
     
     def _buildAuthorLookup(self):
-        """Build a lookup dictionary for all authors by their cleaned names and logins"""
+        # Build a lookup dictionary for all authors by their cleaned names and logins
         from Utils import NLP as nlp
         lookup = {}
         clean = nlp.cleanDocument

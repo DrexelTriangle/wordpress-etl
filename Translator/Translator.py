@@ -17,6 +17,7 @@ class Translator:
         filePath.parent.mkdir(parents=True, exist_ok=True)
         with filePath.open('w+', encoding='utf-8') as file:
             json.dump(self.objDataDict, file, indent=4)
+            file.close()
 
     def addObject(self, object):
         payload = object.data if hasattr(object, "data") else object

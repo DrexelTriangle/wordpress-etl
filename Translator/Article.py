@@ -9,7 +9,7 @@ class Article(WPO):
     authorIDs, authors, authorCleanNames,
     breakingNews, commentStatus, description,
     featuredImgID, id, priority, modDate, 
-    photoURL, pubDate, tags, text, title
+    photoURL, pubDate, tags, metadata, text, title
   ):
     self.data = {
       "authorIDs": authorIDs,
@@ -25,6 +25,7 @@ class Article(WPO):
       "photoURL": photoURL,
       "pubDate": pubDate,
       "tags": tags,
+      "metadata": metadata,
       "text": text,
       "title": title, 
     }
@@ -37,6 +38,8 @@ class Article(WPO):
     self.data[key] = value
   def __delitem__(self, key):
     del self.data[key]
+  def __str__(self):
+    return self.data
   
 
   def dataSanityCheck(self, debugMode=False):

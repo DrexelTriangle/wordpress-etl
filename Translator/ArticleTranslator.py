@@ -66,6 +66,7 @@ class ArticleTranslator(Translator):
     for i, itm in enumerate(self.source):
       obj = self._getArticle(itm, debugMode)
       obj.processTags()
+      obj.processMetadata()
       # NOTE: using to only load 9k of the article data
       if self._shouldSkip(obj, debugMode):
         continue

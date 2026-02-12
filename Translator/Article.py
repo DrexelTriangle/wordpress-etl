@@ -1,5 +1,6 @@
 from Utils.Utility import Utility as U
 from Translator.WPObject import WPObject as WPO
+import re
 
 class Article(WPO):  
   # Constructor - blank object
@@ -89,6 +90,22 @@ class Article(WPO):
 
     resultTags.sort(reverse=True)
     self["tags"] = resultTags
+  
+  def processMetadata(self):
+    collection = {}
+    if (self.data['metadata']):
+      with open('./collections.txt', 'w+') as file:
+        for itm in self.data['metadata']:
+          if isinstance(itm, dict):
+            key, value = itm.get('wp:meta_key'), itm.get('wp:meta_value')
+            if ('yoast') in key:
+              collection.update({key: value})
+        file.close()
+
+    self.data['metadata'] = collection
+
+
+
 
 
 

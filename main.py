@@ -11,7 +11,12 @@ def build():
     app.writeAuthorOutput(authors, "logs/auth_output.json", "author")
     guestAuthors = app.sanitizeAuthors(translators, "gAuth", "guest authors")
     app.writeAuthorOutput(guestAuthors, "logs/gauth_output.json", "guest author")
-    sanitizedArticles = app.sanitizeArticleAuthors(translators, authors, guestAuthors)
+    
+    # Combine and reindex all authors
+    allAuthors = app.combineAndReindexAuthors(authors, guestAuthors)
+    app.writeAuthorOutput(allAuthors, "logs/merged_auth_output.json", "merged authors")
+    
+    sanitizedArticles = app.sanitizeArticleAuthors(translators, allAuthors)
     sanitizedArticles = app.sanitizeArticleContent(sanitizedArticles)
     app.writeArticleOutput(sanitizedArticles)
     

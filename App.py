@@ -70,9 +70,15 @@ class App:
             )
         self.runStep(f"Writing {name} output...", f"Wrote {name} output", outputAuthors)
 
-    def sanitizeArticleAuthors(self, translators, authors, guestAuthors):
+    def combineAndReindexAuthors(self, authors, guestAuthors):
+        combined = authors + guestAuthors
+        for idx, author in enumerate(combined):
+            author.data["id"] = idx
+        return combined
+
+    def sanitizeArticleAuthors(self, translators, allAuthors):
         articles = translators["articles"].getObjList()
-        articleSanitizer = ArticleAuthorMatcher(articles, authors, guestAuthors)
+        articleSanitizer = ArticleAuthorMatcher(articles, allAuthors)
         articleSpinner = self.animator.startSpinner("Sanitizing article authors...", "Sanitized article authors", showDone=False)
         def onManualStart():
             articleSpinner.pause()

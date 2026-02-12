@@ -84,7 +84,7 @@ def apply_similarity_match(clean_key, occurrences, lookup, diff_checker_cls, log
             
             
 def loadResolutionCache():
-    """Load previously resolved author name mappings from cache file"""
+    # Cache previously resolved authors
     cache_path = Path("logs") / "article-sanitizer" / "article_author_resolution_cache.json"
     if not cache_path.exists():
         return {}
@@ -108,7 +108,6 @@ def saveResolutionCache(cache):
 
 
 def logUnknownAuthors(unknown_authors):
-    """Write unknown authors to log file"""
     if not unknown_authors:
         return
     
@@ -132,17 +131,7 @@ def logUnknownAuthors(unknown_authors):
 
 
 def selectFromList(prompt: str, options: list, format_option=None) -> int:
-    """
-    Interactive arrow key selection from a list.
-    
-    Args:
-        prompt: Header text to display
-        options: List of items to choose from
-        format_option: Optional function to format each option (receives (index, item))
-    
-    Returns:
-        Index of selected item, or -1 if user chose unknown ('u')
-    """
+    # TUI selection
     def readInput():
         try:
             if os.name == "nt":

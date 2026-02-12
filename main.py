@@ -32,12 +32,11 @@ def build():
         'articles_authors': ArtAuthFormatter(sanitizedArticles)
     }
     commands = {k: v.format() for k, v in formatters.items()}
-    print(commands['authors'])
-    exit(9)
+
     for key, commandSequence in commands.items():
         for command in commandSequence:
-            with open(f"./{key}_commands.txt", "a") as file:
-                file.write(command.strip())
+            with open(f"./{key}_commands.txt", "a", encoding='utf-8') as file:
+                file.write(command + '\n')
                 file.close()
     
     

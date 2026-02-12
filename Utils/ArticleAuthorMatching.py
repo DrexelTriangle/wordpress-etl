@@ -1,8 +1,7 @@
 from pathlib import Path
 import json
 import sys
-import tty
-import termios
+import os
 
 
 def loadResolutionCache():
@@ -65,15 +64,54 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
     Returns:
         Index of selected item, or -1 if user chose unknown ('u')
     """
-    def getch():
-        """Get single character from stdin"""
-        fd = sys.stdin.fileno()
-        old = termios.tcgetattr(fd)
+    def readInput():
         try:
-            tty.setraw(fd)
-            return sys.stdin.read(1)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old)
+            if os.name == "nt":
+                import msvcrt
+                firstChar = msvcrt.getch()
+                if firstChar in (b'\x00', b'\xe0'):
+                    secondChar = msvcrt.getch()
+                    mapping = {
+                        b'H': 'UP',
+                        b'P': 'DOWN',
+                        b'K': 'LEFT',
+                        b'M': 'RIGHT',
+                    }
+                    return mapping.get(secondChar, None)
+                if firstChar == b'\r':
+                    return 'ENTER'
+
+                return firstChar.decode('utf-8')
+                
+            else:
+                import sys
+                import termios
+                import tty
+                """Get single character from stdin"""
+                fd = sys.stdin.fileno()
+                old = termios.tcgetattr(fd)
+                try:
+                    tty.setraw(fd)
+                    return sys.stdin.read(1)
+                    if ch == '\x1b':
+                        sys.stdin.read(1)  # skip '['
+                        direction = sys.stdin.read(1)
+
+                        mapping = {
+                            'A': 'UP',
+                            'B': 'DOWN',
+                            'C': 'RIGHT',
+                            'D': 'LEFT'
+                        }
+                        return mapping.get(direction)
+                    if ch == '\r':
+                        return 'ENTER'
+
+                    return ch
+                finally:
+                    termios.tcsetattr(fd, termios.TCSADRAIN, old)
+        except Exception:
+          pass
     
     ptr = 0
     while True:
@@ -92,16 +130,11 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
         print("\n↑↓ to navigate | Enter to select | 'u' for unknown")
         
         # Get input
-        ch = getch()
-        
-        if ch == '\x1b':  # ESC sequence (arrow keys)
-            getch()  # [
-            direction = getch()
-            if direction == 'A':  # Up
-                ptr = max(0, ptr - 1)
-            elif direction == 'B':  # Down
-                ptr = min(len(options) - 1, ptr + 1)
-        elif ch in ('\r', '\n'):  # Enter
+        key = readInput()
+        if (key == 'UP'):
+            ptr = max(0, ptr - 1)
+        elif (key == 'DOWN'):
+            ptr = min(len(options) - 1, ptr + 1)
+        elif (key == 'ENTER'): 
             return ptr
-        elif ch in ('u', 'U'):  # Unknown
-            return -1
+        return -1

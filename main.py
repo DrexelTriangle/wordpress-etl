@@ -35,7 +35,7 @@ def build():
 
     for key, commandSequence in commands.items():
         for command in commandSequence:
-            with open(f"./{key}_commands.txt", "a", encoding='utf-8') as file:
+            with open(f"./{key}_commands.txt", "w+", encoding='utf-8') as file:
                 file.write(command + '\n')
                 file.close()
     

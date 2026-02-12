@@ -97,6 +97,14 @@ class App:
                 encoding="utf-8",
             )
         self.runStep("Writing article output...", "Wrote article output", outputArticles)
+    
+    def mergeAuthLists(self, auths:list, gAuths:list):
+        for auth in gAuths:
+            newId = len(auths)
+            auth.data['id'] = newId
+            auths.append(auth)
+        return auths
+
 
     def printChecklist(self):
         os.system('cls' if os.name == 'nt' else 'clear')

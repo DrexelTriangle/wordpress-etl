@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import sys
 import os
 
 def collect_unique_author_names(data: list, clean_func) -> dict:
@@ -171,7 +172,7 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
                 old = termios.tcgetattr(fd)
                 try:
                     tty.setraw(fd)
-                    ch = sys.stdin.read(1)
+                    return sys.stdin.read(1)
                     if ch == '\x1b':
                         sys.stdin.read(1)  # skip '['
                         direction = sys.stdin.read(1)
@@ -216,5 +217,4 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
             ptr = min(len(options) - 1, ptr + 1)
         elif (key == 'ENTER'): 
             return ptr
-        elif key in ('u', 'U'):
-            return -1
+        return -1

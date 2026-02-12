@@ -6,11 +6,23 @@ class ArticleFormatter(Formatter):
         super().__init__(articleData)
 
     def format(self, table="articles"):
-        for id, obj in self.getObjDataDict().items():
-            obj = obj.data
+        createTbl = """CREATE TABLE articles (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR
+        pub_date DATETIME
+        mod_date DATETIME
+        description VARCHAR
+        comment_status VARCHAR
+        priority BOOL
+        breaking_news BOOL
+        tags VARCHAR
+        text STRING
+        ); """
+        self.sqlCommands.append(createTbl)
+        for obj in self.data:
             command = f"""INSERT INTO {table} (id, title, description, text, tags, pubDate, modDate, priority, breakingNews, commentStatus, featuredImgID, photoCred)
                 VALUES (
-                    {id},
+                    {self._esc(obj.get('id'))},
                     {self._esc(obj.get('title'))},
                     {self._esc(obj.get('description'))},
                     {self._esc(obj.get('text'))},
@@ -25,3 +37,4 @@ class ArticleFormatter(Formatter):
                 );
             """
             self.sqlCommands.append(command)
+        return self.sqlCommands

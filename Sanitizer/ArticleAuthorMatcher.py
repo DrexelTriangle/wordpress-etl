@@ -15,8 +15,8 @@ from Sanitizer.DiffChecker import DiffChecker
 
 
 class ArticleAuthorMatcher(Sanitizer):
-    def __init__(self, data: list, authors: list, guest_authors: list):
-        super().__init__(data, policies=ArticleAuthorMatchingPolicy([], authors, guest_authors))
+    def __init__(self, data: list, authors: list):
+        super().__init__(data, policies=ArticleAuthorMatchingPolicy([], authors))
         self.unknown_authors = {}
         self.author_matches = {}
         self.resolution_cache = loadResolutionCache()

@@ -1,7 +1,7 @@
 from Sanitizer.Policy import Policy
 
 class ArticleAuthorMatchingPolicy(Policy):
-    def __init__(self, data, authors, guest_authors):
+    def __init__(self, data, authors):
         # Map ambiguous/unknown author names to canonical authors
         specialEdits = {
             "paulie": "Paulie Loscalzo",
@@ -13,7 +13,6 @@ class ArticleAuthorMatchingPolicy(Policy):
         banList = []
         
         self.authors = authors or []
-        self.guest_authors = guest_authors or []
         self._author_lookup = self._buildAuthorLookup()
         self.specialEdits = specialEdits  # Store for use in matching logic
         
@@ -25,7 +24,7 @@ class ArticleAuthorMatchingPolicy(Policy):
         lookup = {}
         clean = nlp.cleanDocument
         
-        for author in [*self.authors, *self.guest_authors]:
+        for author in self.authors:
             if hasattr(author, "data"):
                 data = author.data
                 author_id = data.get("id")

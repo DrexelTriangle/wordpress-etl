@@ -1,5 +1,6 @@
 from Utils.Utility import Utility as U
 from Translator.WPObject import WPObject as WPO
+import re
 
 class Article(WPO):  
   # Constructor - blank object
@@ -9,7 +10,7 @@ class Article(WPO):
     authorIDs, authors, authorCleanNames,
     breakingNews, commentStatus, description,
     featuredImgID, id, priority, modDate, 
-    photoURL, pubDate, tags, text, title
+    photoURL, pubDate, tags, metadata, text, title
   ):
     self.data = {
       "authorIDs": authorIDs,
@@ -25,6 +26,7 @@ class Article(WPO):
       "photoURL": photoURL,
       "pubDate": pubDate,
       "tags": tags,
+      "metadata": metadata,
       "text": text,
       "title": title, 
     }
@@ -37,6 +39,8 @@ class Article(WPO):
     self.data[key] = value
   def __delitem__(self, key):
     del self.data[key]
+  def __str__(self):
+    return self.data
   
 
   def dataSanityCheck(self, debugMode=False):
@@ -86,6 +90,21 @@ class Article(WPO):
 
     resultTags.sort(reverse=True)
     self["tags"] = resultTags
+  
+  def processMetadata(self):
+    collection = {}
+    if (self.data['metadata']):
+      for itm in self.data['metadata']:
+        if isinstance(itm, dict):
+          key, value = itm.get('wp:meta_key'), itm.get('wp:meta_value')
+          if ('yoast') in key:
+            collection.update({key: value})
+        
+
+    self.data['metadata'] = collection
+
+
+
 
 
 

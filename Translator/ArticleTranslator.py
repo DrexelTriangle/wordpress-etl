@@ -32,6 +32,7 @@ class ArticleTranslator(Translator):
     modDate = data.get('wp:post_modified_gmt', Article.defaultValue)
     pubDate = data.get('wp:post_date_gmt', Article.defaultValue)
     tags = data.get('category')
+    metadata = data.get('wp:postmeta')
     text = textData
     title = U._html_text_norm(data.get('title', Article.defaultValue))
     photoURL = self._checkForImg(text)
@@ -39,7 +40,7 @@ class ArticleTranslator(Translator):
     chunk1 = [authorIDs, authors, authorCleanNames]
     chunk2 = [breakingNews, commentStatus, description]
     chunk3 = [featuredImgID, id, priority, modDate]
-    chunk4 = [photoURL, pubDate, tags, text, title]
+    chunk4 = [photoURL, pubDate, tags, metadata, text, title]
 
     # return all article data as one contiguous list
     data = [*chunk1, *chunk2, *chunk3, *chunk4]
@@ -65,6 +66,7 @@ class ArticleTranslator(Translator):
     for i, itm in enumerate(self.source):
       obj = self._getArticle(itm, debugMode)
       obj.processTags()
+      obj.processMetadata()
       # NOTE: using to only load 9k of the article data
       if self._shouldSkip(obj, debugMode):
         continue

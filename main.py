@@ -1,8 +1,4 @@
 from App import App
-from Formatter.Formatter import Formatter
-from Formatter.AuthorFormatter import AuthorFormatter
-from Formatter.ArticleFormatter import ArticleFormatter
-from Formatter.ArtAuthFormatter import ArtAuthFormatter
 
 app = App()
 
@@ -23,22 +19,7 @@ def build():
     authors = app.mergeAuthLists(authors, guestAuthors)
     sanitizedArticles = app.sanitizeArticleAuthors(translators, authors, guestAuthors)
     sanitizedArticles = app.sanitizeArticleContent(sanitizedArticles)
-    app.writeArticleOutput(sanitizedArticles)
-
-    # FORMATTING
-    formatters = {
-        'articles': ArticleFormatter(sanitizedArticles),
-        'authors': AuthorFormatter(authors),
-        'articles_authors': ArtAuthFormatter(sanitizedArticles)
-    }
-    commands = {k: v.format() for k, v in formatters.items()}
-
-    for key, commandSequence in commands.items():
-        for command in commandSequence:
-            with open(f"./{key}_commands.txt", "w+", encoding='utf-8') as file:
-                file.write(command + '\n')
-                file.close()
-    
+    app.writeArticleOutput(sanitizedArticles)    
     
     app.printChecklist()
 

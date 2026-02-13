@@ -25,8 +25,7 @@ def build():
     # Sanitize article
     sanitizedArticles = app.sanitizeArticleAuthors(translators, allAuthors)
     sanitizedArticles = app.sanitizeArticleContent(sanitizedArticles)
-    app.writeArticleOutput(sanitizedArticles)
-    
+    app.writeArticleOutput(sanitizedArticles)    
     
     app.printChecklist()
 

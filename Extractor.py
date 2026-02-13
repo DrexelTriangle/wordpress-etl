@@ -1,7 +1,6 @@
 from xmltodict import *
 from Utils.Utility import Utility as U
 from Utils.Constants import EXPORT_DIR
-import json
 
 class Extractor:
   def __init__(self, posts, guestAuths):
@@ -50,11 +49,6 @@ class Extractor:
     self._setData('auth', self._equery(postsDict, ['wp:author']))
     self._setData('art', self._equery(postsDict, ['item']))
     self._setData('guestAuth', self._equery(guestAuthDict, ['rss', 'channel', 'item']))
-
-    # with open('./investigation.txt', 'w+') as file:
-    #   json.dump(postsDict, file, indent=4)
-    #   file.close()
-
 
 
   

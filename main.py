@@ -10,7 +10,6 @@ def build():
     # TRANSLATION
     translators = app.translateData(extracted)
     app.logOutputs(translators)
-    exit(8)
     
     # Sanitize authors
     authors = app.sanitizeAuthors(translators, "auth", "authors")

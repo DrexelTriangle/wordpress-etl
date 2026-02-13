@@ -94,13 +94,12 @@ class Article(WPO):
   def processMetadata(self):
     collection = {}
     if (self.data['metadata']):
-      with open('./collections.txt', 'w+') as file:
-        for itm in self.data['metadata']:
-          if isinstance(itm, dict):
-            key, value = itm.get('wp:meta_key'), itm.get('wp:meta_value')
-            if ('yoast') in key:
-              collection.update({key: value})
-        file.close()
+      for itm in self.data['metadata']:
+        if isinstance(itm, dict):
+          key, value = itm.get('wp:meta_key'), itm.get('wp:meta_value')
+          if ('yoast') in key:
+            collection.update({key: value})
+        
 
     self.data['metadata'] = collection
 

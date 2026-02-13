@@ -9,6 +9,7 @@ ANSI_RESET = "\033[0m"
 ANSI_WHITE = "\033[37m"
 ANSI_CYAN = "\033[36m"
 ANSI_GREEN = "\033[32m"
+ANSI_RED = "\033[31m"
 ANSI_YELLOW = "\033[33m"
 ANSI_GRAY = "\033[90m"
 ANSI_INVERT = "\033[7m"
@@ -39,6 +40,9 @@ def _clearLine():
   print("\r" + (" " * CLEAR_LINE_WIDTH) + "\r", end="", flush=True)
 
 class Animator:
+  _activeHandles = set()
+  _activeLock = threading.Lock()
+
   @dataclass
   class _ColumnWidths:
     fieldWidth: int
@@ -130,17 +134,20 @@ class Animator:
 
   @staticmethod
   def spinner(onLoad, onDone, func, *args, showDone: bool = True):
-    stopEvent = threading.Event()
-    pauseEvent = threading.Event()
-    animThread = threading.Thread(
-      target=Animator._spinningAnimation, 
-      args=(SPINNER_CHARS, onLoad, onDone, stopEvent, pauseEvent, showDone)
-    )
-    animThread.start()
-    result = func() if (len(args) == 0) else func(*args) 
-    stopEvent.set()
-    animThread.join()
-
+    spinnerHandle = Animator.startSpinner(onLoad, onDone, showDone=False)
+    try:
+      result = func() if (len(args) == 0) else func(*args)
+    except Exception:
+      spinnerHandle.stop()
+      errorMark = Animator.colorWrap(ANSI_RED, "✗")
+      errorText = Animator.colorWrap(ANSI_GRAY, f"Error occurred: {onLoad}")
+      print(f"\r{errorMark} {errorText}    ")
+      raise
+    spinnerHandle.stop()
+    if showDone and onDone is not None:
+      checkmark = Animator.colorWrap(ANSI_GREEN, CHECKMARK_CHAR)
+      text = Animator.colorWrap(ANSI_GRAY, onDone)
+      print(f"\r{checkmark} {text}    ")
     return result
 
   @staticmethod
@@ -151,23 +158,53 @@ class Animator:
       target=Animator._spinningAnimation,
       args=(SPINNER_CHARS, onLoad, onDone, stopEvent, pauseEvent, showDone)
     )
+    spinnerHandle = SpinnerHandle(stopEvent, pauseEvent, animThread, Animator._onHandleStopped)
+    Animator._registerHandle(spinnerHandle)
     animThread.start()
-    return SpinnerHandle(stopEvent, pauseEvent, animThread)
+    return spinnerHandle
+
+  @staticmethod
+  def stopAllSpinners():
+    with Animator._activeLock:
+      handles = list(Animator._activeHandles)
+    for handle in handles:
+      handle.stop()
+
+  @staticmethod
+  def _registerHandle(handle):
+    with Animator._activeLock:
+      Animator._activeHandles.add(handle)
+
+  @staticmethod
+  def _onHandleStopped(handle):
+    with Animator._activeLock:
+      Animator._activeHandles.discard(handle)
 
 
 class SpinnerHandle:
-  def __init__(self, stopEvent, pauseEvent, thread):
+  def __init__(self, stopEvent, pauseEvent, thread, onStop):
     self._stopEvent = stopEvent
     self._pauseEvent = pauseEvent
     self._thread = thread
+    self._onStop = onStop
+    self._isStopped = threading.Event()
 
   def pause(self):
+    if self._isStopped.is_set():
+      return
     self._pauseEvent.set()
     _clearLine()
 
   def resume(self):
+    if self._isStopped.is_set():
+      return
     self._pauseEvent.clear()
 
   def stop(self):
+    if self._isStopped.is_set():
+      return
+    self._isStopped.set()
     self._stopEvent.set()
-    self._thread.join()
+    if self._thread.is_alive() and threading.current_thread() is not self._thread:
+      self._thread.join()
+    self._onStop(self)

@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 class Formatter():
-    def __init__(self, data):
+    def __init__(self, data:list):
         self.data = data
         self.sqlCommands = []
         

@@ -6,6 +6,8 @@ from Extractor import Extractor
 from Sanitizer.GuestAuthorPolicy import GuestAuthorPolicy
 from Sanitizer.AuthorPolicy import AuthorPolicy
 from Sanitizer.AuthorSanitizer import AuthorSanitizer
+from Sanitizer.ArticleAuthorMatcher import ArticleAuthorMatcher
+from Sanitizer.ArticleContentSanitizer import ArticleContentSanitizer
 from Translator.ArticleTranslator import ArticleTranslator
 from Translator.AuthorTranslator import AuthorTranslator
 from Translator.GuestAuthorTranslator import GuestAuthorTranslator
@@ -67,6 +69,40 @@ class App:
             encoding="utf-8",
             )
         self.runStep(f"Writing {name} output...", f"Wrote {name} output", outputAuthors)
+
+    def combineAndReindexAuthors(self, authors, guestAuthors):
+        combined = authors + guestAuthors
+        for idx, author in enumerate(combined):
+            author.data["id"] = idx
+        return combined
+
+    def sanitizeArticleAuthors(self, translators, allAuthors):
+        articles = translators["articles"].getObjList()
+        articleSanitizer = ArticleAuthorMatcher(articles, allAuthors)
+        articleSpinner = self.animator.startSpinner("Sanitizing article authors...", "Sanitized article authors", showDone=False)
+        def onManualStart():
+            articleSpinner.pause()
+
+        sanitizedArticles = articleSanitizer.sanitize(
+            manualStart=onManualStart,
+            manualEnd=articleSpinner.resume,
+        )
+        articleSpinner.stop()
+        self.completedSteps.append("Sanitized article authors")
+        return sanitizedArticles
+
+    def sanitizeArticleContent(self, sanitizedArticles):
+        contentSanitizer = ArticleContentSanitizer(sanitizedArticles)
+        self.runStep("Sanitizing article content...", "Sanitized article content", contentSanitizer.sanitize)
+        return sanitizedArticles
+
+    def writeArticleOutput(self, sanitizedArticles):
+        def outputArticles():
+            Path("logs/article_output.json").write_text(
+                json.dumps({str(i): (sanitizedArticles[i].data if hasattr(sanitizedArticles[i], "data") else sanitizedArticles[i]) for i in range(len(sanitizedArticles))}, indent=4),
+                encoding="utf-8",
+            )
+        self.runStep("Writing article output...", "Wrote article output", outputArticles)
 
     def printChecklist(self):
         os.system('cls' if os.name == 'nt' else 'clear')

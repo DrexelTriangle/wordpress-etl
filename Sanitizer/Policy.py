@@ -96,7 +96,9 @@ class Policy():
     
     def _autoResolve(self):
         banListNormalized = {nlp.cleanDocument(name, "similarity") for name in self.banList}
-        filteredAuthors, bannedAuthors, flaggedAuthors = [], [], []
+        filteredAuthors, bannedAuthors, flaggedAuthors, canonicals, keep, authorsMeta = [], [], [], [], [], []
+
+
         for author in self.data:
             name = author.data["display_name"]
             if name is None:
@@ -110,10 +112,10 @@ class Policy():
 
         authors = [nlp.cleanDocument(a.data["display_name"], "similarity") for a in filteredAuthors]
         authorsMeta = list(filteredAuthors)
-
         diffChecker = DiffChecker(authors)
         keep = [True] * len(authorsMeta)
-        canonicals = []
+        
+
         for i in range(len(authors)):
             if not keep[i]:
                 continue
@@ -166,16 +168,8 @@ class Policy():
                     diffs.append((key, lval, rval))
 
             for key, lval, rval in diffs:
-                Animator._renderTable(
-                    key,
-                    diffs,
-                    authorParams,
-                    left,
-                    right,
-                    clear,
-                    i,
-                    len(disputes),
-                )
+                params = [key, diffs, authorParams, left, right, clear, i, len(disputes)]
+                Animator._renderTable(*params)
                 while True:
                     choice = Utility._readChoice()
                     if choice in {"RIGHT", "LEFT"}:

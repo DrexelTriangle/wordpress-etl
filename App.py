@@ -13,6 +13,11 @@ from Translator.AuthorTranslator import AuthorTranslator
 from Translator.GuestAuthorTranslator import GuestAuthorTranslator
 from Utils.Constants import UNZIPPED_FILES, ZIP_FILE
 from Utils.Utility import Utility
+from Formatter.ArticleFormatter import ArticleFormatter
+from Formatter.ArtAuthFormatter import ArtAuthFormatter
+from Formatter.AuthorFormatter import AuthorFormatter
+from Formatter.Formatter import Formatter
+
 
 class App:
     def __init__(self):
@@ -98,6 +103,19 @@ class App:
             )
         self.runStep("Writing article output...", "Wrote article output", outputArticles)
     
+
+    def formatSqlTables(self, sanitizedArticles, authors):
+        formatters = {
+            'articles': ArticleFormatter(sanitizedArticles),
+            'authors': AuthorFormatter(authors),
+            'articles_authors': ArtAuthFormatter(sanitizedArticles)
+        }
+
+        commands = [formatters[key].format() for key in formatters]
+        Formatter.fileDump(commands)
+
+        return True
+
     def mergeAuthLists(self, auths:list, gAuths:list):
         for auth in gAuths:
             newId = len(auths)

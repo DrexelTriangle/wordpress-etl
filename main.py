@@ -19,8 +19,8 @@ def build():
     authors = app.mergeAuthLists(authors, guestAuthors)
     sanitizedArticles = app.sanitizeArticleAuthors(translators, authors, guestAuthors)
     sanitizedArticles = app.sanitizeArticleContent(sanitizedArticles)
-    app.writeArticleOutput(sanitizedArticles)    
-    
+    app.writeArticleOutput(sanitizedArticles)  
+    app.formatSqlTables(sanitizedArticles, authors)    
     app.printChecklist()
 
 build()

@@ -7,7 +7,7 @@ class ArtAuthFormatter(Formatter):
 
     def format(self, table="articles_authors"):
         createTbl = "CREATE TABLE articles (id INT AUTO_INCREMENT PRIMARY KEY, author_id INT, articles_id INT);"
-        insertPrefix = f"INSERT INTO {table} (id, author_id, articles_id)"
+        insertPrefix = f"INSERT INTO {table} (author_id, articles_id)"
         self.sqlCommands.append(createTbl)
         count = 1
         for obj in self.data:
@@ -18,7 +18,7 @@ class ArtAuthFormatter(Formatter):
 
             for authId in authIdLst:
                 authId = emptyValue if default else authId
-                values = f"VALUES ({count}, {artId}, {authId})"
+                values = f"VALUES ({artId}, {authId})"
                 command = f"{insertPrefix} {values};"
                 count += 1
                 self.sqlCommands.append(command)

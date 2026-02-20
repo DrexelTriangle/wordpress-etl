@@ -6,8 +6,8 @@ class ArticleFormatter(Formatter):
         super().__init__(articleData)
 
     def format(self, table="articles"):
-        createTbl = "CREATE TABLE articles (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255), description VARCHAR(255), `text` TEXT, tags VARCHAR(255), pub_date DATETIME, mod_date DATETIME, priority BOOL, breaking_news BOOL, comment_status VARCHAR(255), photoURL VARCHAR(255));"
-        insertPrefix = f"INSERT INTO {table} (id, title, description, text, tags, pubDate, modDate, priority, breakingNews, commentStatus, photoURL)"
+        createTbl = "CREATE TABLE articles (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255), description VARCHAR(255), `text` TEXT, tags TEXT, pub_date DATETIME, mod_date DATETIME, priority BOOL, breaking_news BOOL, comment_status VARCHAR(255), photo_url VARCHAR(255));"
+        insertPrefix = f"INSERT INTO {table} (title, description, text, tags, pub_date, mod_date, priority, breaking_news, comment_status, photo_url)"
 
         self.sqlCommands.append(createTbl)
         for obj in self.data:
@@ -23,7 +23,7 @@ class ArticleFormatter(Formatter):
             commentStatus = self._esc(obj.get('commentStatus'))
             photoURL = obj.get('featuredImgID') if obj.get('featuredImgID') is not None else "NULL"
 
-            values = f"VALUES({id}, {title}, {description}, {text}, {tags}, {pubDate}, {modDate}, {priority}, {breakingNews}, {commentStatus}, {photoURL});"
+            values = f"VALUES({title}, {description}, {text}, {tags}, {pubDate}, {modDate}, {priority}, {breakingNews}, {commentStatus}, {photoURL})"
 
             command = f"{insertPrefix} {values};"
             self.sqlCommands.append(command)

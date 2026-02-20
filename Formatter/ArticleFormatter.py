@@ -23,7 +23,7 @@ class ArticleFormatter(Formatter):
             commentStatus = self._esc(obj.get('commentStatus'))
             photoURL = obj.get('featuredImgID') if obj.get('featuredImgID') is not None else "NULL"
 
-            values = f"VALUES({id}, {title}, {description}, {text}, {tags}, {pubDate}, {modDate}, {priority}, {breakingNews}, {commentStatus}, {photoURL})"
+            values = f"VALUES({id}, {title}, {description}, {text}, {tags}, {pubDate}, {modDate}, {priority}, {breakingNews}, {commentStatus}, {photoURL});"
 
             command = f"{insertPrefix} {values};"
             self.sqlCommands.append(command)

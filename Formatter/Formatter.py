@@ -38,7 +38,7 @@ class Formatter():
                     for cmd in commandlst:
                         file.write(cmd + '\n')
             
-            file = 'C:\\Users\\kenne\\Documents\\GitHub-local\\Work\\Triangle\\wordpress-etl\\test.txt'
+            file = './test.txt'
             command = ["scp", file, destination]
             subprocess.run(command, check=True)
             print(f"File {file} dropped on {HOSTNAME} in {REMOTE_PATH}")

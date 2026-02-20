@@ -6,7 +6,7 @@ class ArticleFormatter(Formatter):
         super().__init__(articleData)
 
     def format(self, table="articles"):
-        createTbl = "CREATE TABLE articles (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR description VARCHAR text STRING tags VARCHAR pub_date DATETIME mod_date DATETIME priority BOOL breaking_news BOOL comment_status VARCHAR photoURL VARCHAR);"
+        createTbl = "CREATE TABLE articles (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR, description VARCHAR, text STRING, tags VARCHAR, pub_date DATETIME, mod_date DATETIME, priority BOOL, breaking_news BOOL, comment_status VARCHAR, photoURL VARCHAR);"
         insertPrefix = f"INSERT INTO {table} (id, title, description, text, tags, pubDate, modDate, priority, breakingNews, commentStatus, photoURL)"
 
         self.sqlCommands.append(createTbl)

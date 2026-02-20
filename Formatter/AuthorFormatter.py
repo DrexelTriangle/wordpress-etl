@@ -5,7 +5,7 @@ class AuthorFormatter(Formatter):
         super().__init__(authData)
         
     def format(self, table="authors"):
-        createTbl = "CREATE TABLE authors (id INT AUTO_INCREMENT PRIMARY KEY, first_name VARCHAR, last_name VARCHAR, email VARCHAR, role INT);"
+        createTbl = "CREATE TABLE authors (id INT AUTO_INCREMENT PRIMARY KEY, first_name VARCHAR(255), last_name VARCHAR(255), email VARCHAR(255), role INT);"
         insertPrefix = f"INSERT INTO {table} (id, display_name, first_name, last_name, email, login)"
         self.sqlCommands.append(createTbl)
         for auth in self.data:

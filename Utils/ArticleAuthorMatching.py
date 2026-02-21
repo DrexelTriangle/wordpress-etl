@@ -62,11 +62,12 @@ def apply_similarity_match(clean_key, occurrences, lookup, diff_checker_cls, log
         return
 
     candidates = list(lookup.items())
-    checker = diff_checker_cls([clean_key] + [k for k, _ in candidates])
+    checker = diff_checker_cls()
     best, best_sim, similar = None, 0.0, []
 
     for i, (_, (aid, dname)) in enumerate(candidates):
-        sim = checker.compare(0, i + 1)
+        candidate_key = candidates[i][0]
+        sim = checker.compare(clean_key, candidate_key)
         if sim >= 0.9 and sim > best_sim:
             best, best_sim = (aid, dname), sim
         elif sim >= 0.8:

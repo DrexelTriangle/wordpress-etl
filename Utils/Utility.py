@@ -3,8 +3,37 @@ from Utils.Constants import *
 import zipfile
 import shutil
 import os
+import re
+
+# Precompiled regex patterns to avoid recompilation overhead on hot paths.
+_AMP_PATTERN = re.compile("&amp;")
+_DOT_PATTERN = re.compile("\\.(?=\\w\\w)")
+_AUTHOR_CLEAN_PATTERN = re.compile("^by-|^By-|^By |^by |[^\\w ^'^\\.^-]|_|\\d")
+_AUTHOR_SPLIT_PATTERN = re.compile(r"&amp;|&|\\band\\b|,")
+_SIMILARITY_PATTERN = re.compile("[^\\w]| |\\d|_")
 
 class Utility:
+  def cleanDocument(document: str, type: str):
+    def uppercaseMatch(match):
+      return match.group(0).upper()
+
+    match type:
+      case "author_single":
+        document = document.split("@")
+        document = _AMP_PATTERN.sub("&", document[0])
+        document = _DOT_PATTERN.sub(" ", document)
+        document = _AUTHOR_CLEAN_PATTERN.sub("", document).strip()
+        document = re.sub("^\\w| \\w", uppercaseMatch, document)
+        return document
+      case "author_multiple":
+        documents = _AUTHOR_SPLIT_PATTERN.split(document)
+        return [_AUTHOR_CLEAN_PATTERN.sub("", doc).strip() for doc in documents]
+      case "similarity":
+        return _SIMILARITY_PATTERN.sub("", document).lower()
+      case "article":
+        return document
+    return document
+
   def unzip(zipPath):
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(zipPath, 'r') as zip_ref:

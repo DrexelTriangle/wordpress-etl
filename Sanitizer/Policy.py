@@ -1,9 +1,8 @@
 import re
-from Utils import NLP as nlp
 from Utils.Utility import Utility
 from Translator.Author import Author
 from Animator import Animator
-from Sanitizer.DiffChecker import DiffChecker
+from minhashlib import DiffChecker
 
 class Policy():
     def __init__(self,
@@ -24,6 +23,8 @@ class Policy():
         self.changes = []
         self.conflicts = []
         self.priorityId = set()
+
+        self.diffChecker = DiffChecker()
 
     @staticmethod
     def _buildDisplayName(firstName, lastName):
@@ -95,7 +96,7 @@ class Policy():
         return None
     
     def _autoResolve(self):
-        banListNormalized = {nlp.cleanDocument(name, "similarity") for name in self.banList}
+        banListNormalized = {Utility.cleanDocument(name, "similarity") for name in self.banList}
         filteredAuthors, bannedAuthors, flaggedAuthors, canonicals, keep, authorsMeta = [], [], [], [], [], []
 
 
@@ -104,15 +105,14 @@ class Policy():
             if name is None:
                 bannedAuthors.append(author)
                 continue
-            nameNormalized = nlp.cleanDocument(name, "similarity")
+            nameNormalized = Utility.cleanDocument(name, "similarity")
             if nameNormalized in banListNormalized:
                 bannedAuthors.append(author)
                 continue
             filteredAuthors.append(author)
 
-        authors = [nlp.cleanDocument(a.data["display_name"], "similarity") for a in filteredAuthors]
+        authors = [Utility.cleanDocument(a.data["display_name"], "similarity") for a in filteredAuthors]
         authorsMeta = list(filteredAuthors)
-        diffChecker = DiffChecker(authors)
         keep = [True] * len(authorsMeta)
         
 
@@ -124,7 +124,7 @@ class Policy():
             for j in range(i+1, len(authors)):
                 if not keep[j]:
                     continue
-                sim = diffChecker.compare(i, j)
+                sim = self.diffChecker.compare(authors[i], authors[j])
                 if sim >= .9:
                     canonical = self._merge(canonical, authorsMeta[j])
                     self._logChange(authorsMeta[j], canonical)

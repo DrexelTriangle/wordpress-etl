@@ -1,3 +1,4 @@
-joblib==1.5.3
-numpy==2.4.2
-xmltodict==1.0.2
+numpy>=2.4.2
+xmltodict>=1.0.2
+minhashlib>=0.1.1
+numba>=2.2.6

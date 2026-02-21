@@ -76,9 +76,22 @@ class App:
         self.runStep(f"Writing {name} output...", f"Wrote {name} output", outputAuthors)
 
     def combineAndReindexAuthors(self, authors, guestAuthors):
-        combined = authors + guestAuthors
-        for idx, author in enumerate(combined):
-            author.data["id"] = idx
+        combined = authors
+        authNames = [auth.data["display_name"] for auth in authors]
+        dupes = {}
+        for idx, gAuth in enumerate(guestAuthors):
+            # only merge in guest author if name doesn't exist within author list
+            # TODO: 
+            # correctness 
+            # -> ~all~ first + last names correspond to unique name => every author has unique name
+            # -> currently exists edge case where Jake Billman from 2004 is different than Jake Billman from 2024
+            gAuthName = gAuth.data["display_name"]
+            if not (gAuthName in authNames):
+                newId = len(authors)
+                gAuth.data["id"] = newId
+                combined.append(gAuth)
+            else:
+                dupes.update({len(dupes):str(gAuth)})
         return combined
 
     def sanitizeArticleAuthors(self, translators, allAuthors):

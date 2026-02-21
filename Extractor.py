@@ -50,11 +50,6 @@ class Extractor:
     self._setData('art', self._equery(postsDict, ['item']))
     self._setData('guestAuth', self._equery(guestAuthDict, ['rss', 'channel', 'item']))
 
-    # with open('./investigation.txt', 'w+') as file:
-    #   json.dump(postsDict, file, indent=4)
-    #   file.close()
-
-
 
   
   

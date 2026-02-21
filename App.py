@@ -18,6 +18,9 @@ class App:
     def __init__(self):
         self.animator = Animator()
         self.completedSteps = []
+
+    def shutdown(self):
+        self.animator.stopAllSpinners()
     
     def runStep(self, onLoad, onDone, func, *args, showDone: bool = True):
         result = self.animator.spinner(onLoad, onDone, func, *args, showDone=showDone)
@@ -54,11 +57,13 @@ class App:
         def onManualStart():
             authSpinner.pause()
 
-        authors = authSanitizer.sanitize(
-            manualStart=onManualStart,
-            manualEnd=authSpinner.resume,
-        )
-        authSpinner.stop()
+        try:
+            authors = authSanitizer.sanitize(
+                manualStart=onManualStart,
+                manualEnd=authSpinner.resume,
+            )
+        finally:
+            authSpinner.stop()
         self.completedSteps.append(f"Sanitized {name}")
         return authors
 
@@ -96,11 +101,13 @@ class App:
         def onManualStart():
             articleSpinner.pause()
 
-        sanitizedArticles = articleSanitizer.sanitize(
-            manualStart=onManualStart,
-            manualEnd=articleSpinner.resume,
-        )
-        articleSpinner.stop()
+        try:
+            sanitizedArticles = articleSanitizer.sanitize(
+                manualStart=onManualStart,
+                manualEnd=articleSpinner.resume,
+            )
+        finally:
+            articleSpinner.stop()
         self.completedSteps.append("Sanitized article authors")
         return sanitizedArticles
 

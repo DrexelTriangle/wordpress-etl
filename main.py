@@ -1,11 +1,11 @@
 from App import App
+import traceback
 
 app = App()
 
-# MASS IMPORT/EXPORT
 def build():
-    # Extract and translate
-    extracted = app.extractData()
+    try:
+        extracted = app.extractData()
 
     # TRANSLATION
     translators = app.translateData(extracted)

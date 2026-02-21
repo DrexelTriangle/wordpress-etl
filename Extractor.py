@@ -1,7 +1,6 @@
 from xmltodict import *
 from Utils.Utility import Utility as U
 from Utils.Constants import EXPORT_DIR
-import json
 
 class Extractor:
   def __init__(self, posts, guestAuths):

@@ -1,7 +1,7 @@
 import json
-from Utils import NLP as nlp
 import re
 from pathlib import Path
+from Utils.Utility import Utility
 from Translator.Author import Author
 from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.Policy import Policy
@@ -44,9 +44,9 @@ class AuthorSanitizer(Sanitizer):
                 self.priorityId.add(str(author.data.get("id")))
             if author.data["display_name"] is not None:
                 if any(indicator in author.data["display_name"] for indicator in self.policies.multipleAuthorIndicators):
-                    authors = nlp.cleanDocument(author.data["display_name"], "author_multiple")
+                    authors = Utility.cleanDocument(author.data["display_name"], "author_multiple")
                     for name in authors:
-                        cleanedName = nlp.cleanDocument(name, "author_single")
+                        cleanedName = Utility.cleanDocument(name, "author_single")
                         firstName, lastName = self._splitDisplayName(cleanedName)
                         self.lastAuid += 1
                         newAuthor = Author(int(self.lastAuid), cleanedName, firstName, lastName, None, None)
@@ -54,7 +54,7 @@ class AuthorSanitizer(Sanitizer):
                         self._logSplitChange(author, newAuthor)
                     self.data.remove(author)
                     continue
-                author.data["display_name"] = nlp.cleanDocument(author.data["display_name"], "author_single")
+                author.data["display_name"] = Utility.cleanDocument(author.data["display_name"], "author_single")
 
                 if author.data["first_name"] is None or author.data["last_name"] is None:
                     firstName, lastName = self._splitDisplayName(author.data["display_name"])

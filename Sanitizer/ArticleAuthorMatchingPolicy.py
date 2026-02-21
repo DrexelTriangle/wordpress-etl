@@ -1,4 +1,5 @@
 from Sanitizer.Policy import Policy
+from Utils.Utility import Utility
 
 class ArticleAuthorMatchingPolicy(Policy):
     def __init__(self, data, authors):
@@ -20,9 +21,8 @@ class ArticleAuthorMatchingPolicy(Policy):
     
     def _buildAuthorLookup(self):
         # Build a lookup dictionary for all authors by their cleaned names and logins
-        from Utils import NLP as nlp
         lookup = {}
-        clean = nlp.cleanDocument
+        clean = Utility.cleanDocument
         
         for author in self.authors:
             if hasattr(author, "data"):

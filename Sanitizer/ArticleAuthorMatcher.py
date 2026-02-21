@@ -1,4 +1,4 @@
-from Utils import NLP as nlp
+from Utils.Utility import Utility
 from Utils.ArticleAuthorMatching import (
     selectFromList,
     loadResolutionCache,
@@ -11,7 +11,7 @@ from Utils.ArticleAuthorMatching import (
 )
 from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.ArticleAuthorMatchingPolicy import ArticleAuthorMatchingPolicy
-from Sanitizer.DiffChecker import DiffChecker
+from minhashlib import DiffChecker
 
 
 class ArticleAuthorMatcher(Sanitizer):
@@ -42,11 +42,11 @@ class ArticleAuthorMatcher(Sanitizer):
 
     def _matchArticleAuthors(self, manualStart=None, manualEnd=None, clear: bool = True):
         lookup = self.policies._author_lookup
-        unique = collect_unique_author_names(self.data, nlp.cleanDocument)
+        unique = collect_unique_author_names(self.data, Utility.cleanDocument)
         flagged = []
 
         for clean_key, occurrences in unique.items():
-            if apply_special_edits(clean_key, occurrences, lookup, self.policies.specialEdits, nlp.cleanDocument, self._logChange, self.author_matches):
+            if apply_special_edits(clean_key, occurrences, lookup, self.policies.specialEdits, Utility.cleanDocument, self._logChange, self.author_matches):
                 continue
             if apply_exact_match(clean_key, occurrences, lookup, self.author_matches):
                 continue

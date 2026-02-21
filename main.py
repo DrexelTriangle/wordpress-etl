@@ -6,6 +6,8 @@ app = App()
 def build():
     try:
         extracted = app.extractData()
+    except:
+      exit(0)
 
     # TRANSLATION
     translators = app.translateData(extracted)

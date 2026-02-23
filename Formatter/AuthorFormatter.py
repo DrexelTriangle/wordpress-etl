@@ -10,11 +10,11 @@ class AuthorFormatter(Formatter):
         self.sqlCommands.append(createTbl)
         for auth in self.data:
             obj = auth.data
-            id = self._esc(obj.get('id')),
-            displayName = self._esc(obj.get('display_name')),
-            firstName = self._esc(obj.get('first_name')),
-            lastName = self._esc(obj.get('last_name')),
-            email = self._esc(obj.get('email')),
+            id = self._esc(obj.get('id'))
+            displayName = self._esc(obj.get('display_name'))
+            firstName = self._esc(obj.get('first_name'))
+            lastName = self._esc(obj.get('last_name'))
+            email = self._esc(obj.get('email'))
             login = self._esc(obj.get('login'))
 
             command = f"{insertPrefix} VALUES ({displayName},{firstName},{lastName},{email},{login});"

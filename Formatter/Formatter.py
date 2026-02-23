@@ -13,8 +13,7 @@ class Formatter():
     def _esc(self, value):
         if value is None:
             return "NULL"
-        safe_value = str(value).replace("'", "''")
-        return f"'{safe_value}'"
+        return str(value).strip("'")
 
     def _logCommands(self, fileDestination):
         filePath = Path(fileDestination)

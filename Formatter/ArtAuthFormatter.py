@@ -6,7 +6,7 @@ class ArtAuthFormatter(Formatter):
         super().__init__(articleData)
 
     def format(self, table="articles_authors"):
-        createTbl = "CREATE TABLE articles (id INT AUTO_INCREMENT PRIMARY KEY, author_id INT, articles_id INT);"
+        createTbl = f"CREATE TABLE {table} (id INT AUTO_INCREMENT PRIMARY KEY, author_id INT, articles_id INT);"
         insertPrefix = f"INSERT INTO {table} (author_id, articles_id)"
         self.sqlCommands.append(createTbl)
         count = 1

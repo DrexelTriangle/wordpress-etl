@@ -1,24 +1,28 @@
 from Formatter.Formatter import Formatter
-import json
+
 
 class ArtAuthFormatter(Formatter):
     def __init__(self, articleData):
         super().__init__(articleData)
 
     def format(self, table="articles_authors"):
-        createTbl = "CREATE TABLE articles (id INT AUTO_INCREMENT PRIMARY KEY, author_id INT, articles_id INT);"
+        createTbl = (
+            f"CREATE TABLE {table} ("
+            "id BIGINT PRIMARY KEY, "
+            "author_id BIGINT NOT NULL, "
+            "articles_id BIGINT NOT NULL"
+            ");"
+        )
         insertPrefix = f"INSERT INTO {table} (id, author_id, articles_id)"
         self.sqlCommands.append(createTbl)
+
         count = 1
         for obj in self.data:
-            artId = obj['id']
-            authIdLst = obj['authorIDs']
-            emptyValue = -1
-            default = len(authIdLst) == 0
+            artId = obj.get('id')
+            authIdLst = obj.get('authorIDs') or []
 
             for authId in authIdLst:
-                authId = emptyValue if default else authId
-                values = f"VALUES ({count}, {artId}, {authId})"
+                values = f"VALUES ({count}, {authId}, {artId})"
                 command = f"{insertPrefix} {values};"
                 count += 1
                 self.sqlCommands.append(command)

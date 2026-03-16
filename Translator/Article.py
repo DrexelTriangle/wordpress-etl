@@ -26,6 +26,7 @@ class Article(WPO):
       "photoURL": photoURL,
       "pubDate": pubDate,
       "tags": tags,
+      "categories": [],
       "metadata": metadata,
       "text": text,
       "title": title, 
@@ -59,26 +60,40 @@ class Article(WPO):
   # processTags: tags are stored in the 'category' WP key where its value should be a list of dict objects
   def processTags(self):
     resultTags = []
+    resultCategories = []
     try:
-      for i in range(len(self.data["tags"])):
+      terms = self.data["tags"]
+      if terms is None or terms == Article.defaultValue:
+        terms = []
+      elif isinstance(terms, dict):
+        terms = [terms]
+      elif not isinstance(terms, list):
+        terms = []
+
+      for tagData in terms:
+        if not isinstance(tagData, dict):
+          continue
+
         # Grab tag data [KEYS-> author name: "@nicename" tag data: "@domain"]
-        tagData = self["tags"][i]
         nicename = tagData.get("@nicename", Article.defaultValue)
         domain = tagData.get("@domain", Article.defaultValue)
-        text = tagData.get("#text", Article.defaultValue)
+        text = U._html_text_norm(tagData.get("#text", Article.defaultValue))
 
-        # Check whether or not we're dealing with crossowrd/comics post
+        # Check whether or not we're dealing with crossword/comics post
         # TODO: implement handling these later, for now just flag for 
         #       skipping, along with any empty posts
         isCrosswordOrComics = nicename in {"crossword", "comics"}
-        isNoTags = self["tags"] == "None" 
-        isNoText = self["text"] == "None"
+        isNoTags = self["tags"] is None or self["tags"] == Article.defaultValue
+        isNoText = self["text"] is None or self["text"] == Article.defaultValue
         if (isCrosswordOrComics or isNoTags or isNoText):
           self.data["tags"] = -1
+          self.data["categories"] = -1
           return
-        
-        if (domain == "post_tag"):
+
+        if (domain == "post_tag" and text is not None and text != Article.defaultValue):
           resultTags.append(text)
+        elif (domain == "category" and text is not None and text != Article.defaultValue):
+          resultCategories.append(text)
         elif (domain == "author"):
           cleanName = text.translate(str.maketrans('', '', '.-_ ')).lower()
           self["authorCleanNames"].append(cleanName)
@@ -89,28 +104,27 @@ class Article(WPO):
       resultTags.append('NO_TAGS')
 
     resultTags.sort(reverse=True)
+    resultCategories.sort(reverse=True)
     self["tags"] = resultTags
+    self["categories"] = resultCategories
   
   def processMetadata(self):
     collection = {}
-    if (self.data['metadata']):
-      for itm in self.data['metadata']:
-        if isinstance(itm, dict):
-          key, value = itm.get('wp:meta_key'), itm.get('wp:meta_value')
-          if ('yoast') in key:
-            collection.update({key: value})
+    metadata = self.data.get('metadata')
+    if metadata is None or metadata == Article.defaultValue:
+      self.data['metadata'] = collection
+      return
+
+    if isinstance(metadata, dict):
+      metadata = [metadata]
+    elif not isinstance(metadata, list):
+      metadata = []
+
+    for itm in metadata:
+      if isinstance(itm, dict):
+        key, value = itm.get('wp:meta_key'), itm.get('wp:meta_value')
+        if isinstance(key, str) and ('yoast' in key):
+          collection.update({key: value})
         
 
     self.data['metadata'] = collection
-
-
-
-
-
-
-
-  
-
-
-
-

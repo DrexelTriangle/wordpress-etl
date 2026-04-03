@@ -77,7 +77,13 @@ class App:
 
     def combineAndReindexAuthors(self, authors, guestAuthors):
         combined = authors
-        authNames = [auth.data["display_name"] for auth in authors]
+        authNames = {auth.data["display_name"] for auth in authors}
+        usedIds = {
+            auth.data["id"]
+            for auth in authors
+            if auth.data.get("id") is not None
+        }
+        nextId = (max(usedIds) + 1) if usedIds else 0
         dupes = {}
         for idx, gAuth in enumerate(guestAuthors):
             # only merge in guest author if name doesn't exist within author list
@@ -86,9 +92,13 @@ class App:
             # -> ~all~ first + last names correspond to unique name => every author has unique name
             # -> currently exists edge case where Jake Billman from 2004 is different than Jake Billman from 2024
             gAuthName = gAuth.data["display_name"]
-            if not (gAuthName in authNames):
-                newId = len(authors)
-                gAuth.data["id"] = newId
+            if gAuthName not in authNames:
+                while nextId in usedIds:
+                    nextId += 1
+                gAuth.data["id"] = nextId
+                usedIds.add(nextId)
+                nextId += 1
+                authNames.add(gAuthName)
                 combined.append(gAuth)
             else:
                 dupes.update({len(dupes):str(gAuth)})

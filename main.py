@@ -1,5 +1,4 @@
 from App import App
-import traceback
 from pathlib import Path
 from Formatter.ArticleFormatter import ArticleFormatter
 from Formatter.SeoFormatter import SeoFormatter

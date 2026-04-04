@@ -29,7 +29,7 @@ class Article(WPO):
       "categories": [],
       "metadata": metadata,
       "text": text,
-      "title": title, 
+      "title": title,
     }
   
   

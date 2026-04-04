@@ -118,4 +118,3 @@ class ArticleTranslator(Translator):
 
 
   
-

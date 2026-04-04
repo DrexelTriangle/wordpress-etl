@@ -2,6 +2,7 @@ from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.ArticlePolicy import ArticlePolicy
 from Utils.WPContentSanitization import (
     sanitize_backslashes,
+    convert_caption_shortcodes,
     log_shortcodes,
     log_inline_styles,
     log_problematic_chars,
@@ -51,6 +52,11 @@ class ArticleContentSanitizer(Sanitizer):
             sanitized_text = sanitize_backslashes(sanitized_text)
             if sanitized_text != original_text:
                 fixes.append("backslashes stripped")
+
+            sanitized_text_before_captions = sanitized_text
+            sanitized_text = convert_caption_shortcodes(sanitized_text)
+            if sanitized_text != sanitized_text_before_captions:
+                fixes.append("caption shortcodes converted")
 
             sanitized_text_before_paragraphs = sanitized_text
             sanitized_text = add_missing_paragraph_tags(sanitized_text)

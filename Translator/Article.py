@@ -30,6 +30,7 @@ class Article(WPO):
       "categories": [],
       "metadata": metadata,
       "text": text,
+      "excerpt": "",
       "title": title,
     }
   

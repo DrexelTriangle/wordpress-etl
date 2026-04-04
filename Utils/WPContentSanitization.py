@@ -7,6 +7,11 @@ _BLOCK_TAG_PATTERN = re.compile(
     r'(?is)^<(?:figure|figcaption|blockquote|ul|ol|li|h[1-6]|table|thead|tbody|tr|td|th|pre|code|hr|iframe|script|style)\b'
 )
 _COMMENT_PATTERN = re.compile(r'(?is)^<!--')
+_CAPTION_SHORTCODE_PATTERN = re.compile(
+    r'(?is)(?:<p>\s*)?\[caption(?P<attrs>[^\]]*)\](?P<body>.*?)\[/caption\](?:\s*</p>)?'
+)
+_SHORTCODE_ATTR_PATTERN = re.compile(r'(\w+)\s*=\s*"([^"]*)"')
+_FIRST_IMAGE_PATTERN = re.compile(r'(?is)<img\b[^>]*>')
 
 
 def sanitize_backslashes(content: str) -> str:
@@ -109,6 +114,51 @@ def add_missing_paragraph_tags(content: str) -> str:
     if not rebuilt:
         return content
     return "\n".join(rebuilt)
+
+
+def convert_caption_shortcodes(content: str) -> str:
+    def normalize_id(value: str) -> str:
+        normalized = value.strip().lower().replace("_", "-")
+        return re.sub(r'[^a-z0-9-]+', '-', normalized).strip("-")
+
+    def build_figure(match: re.Match) -> str:
+        attrs = dict(_SHORTCODE_ATTR_PATTERN.findall(match.group("attrs") or ""))
+        body = (match.group("body") or "").strip()
+        image_match = _FIRST_IMAGE_PATTERN.search(body)
+        if not image_match:
+            return match.group(0)
+
+        image_html = image_match.group(0).strip()
+        caption_html = body[image_match.end():].strip()
+
+        raw_id = attrs.get("id", "").strip()
+        normalized_id = normalize_id(raw_id) if raw_id else ""
+        align = attrs.get("align", "").strip()
+        width = attrs.get("width", "").strip()
+
+        figure_attrs = []
+        if raw_id:
+            figure_attrs.append(f'id="{raw_id}"')
+        if normalized_id:
+            figure_attrs.append(f'aria-describedby="caption-{normalized_id}"')
+        if width.isdigit():
+            figure_attrs.append(f'style="width: {width}px"')
+
+        classes = ["wp-caption"]
+        if align:
+            classes.append(align)
+        figure_attrs.append(f'class="{" ".join(classes)}"')
+
+        figcaption_html = ""
+        if caption_html:
+            figcaption_attrs = ['class="wp-caption-text"']
+            if normalized_id:
+                figcaption_attrs.insert(0, f'id="caption-{normalized_id}"')
+            figcaption_html = f'<figcaption {" ".join(figcaption_attrs)}>{caption_html}</figcaption>'
+
+        return f'<figure {" ".join(figure_attrs)}>{image_html}{figcaption_html}</figure>'
+
+    return _CAPTION_SHORTCODE_PATTERN.sub(build_figure, content)
 
 
 def write_detailed_logs(shortcode_log: list, inline_style_log: list, problematic_chars_log: dict):

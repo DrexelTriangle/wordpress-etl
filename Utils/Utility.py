@@ -4,6 +4,7 @@ import zipfile
 import shutil
 import os
 import re
+import html
 
 # Precompiled regex patterns to avoid recompilation overhead on hot paths.
 _AMP_PATTERN = re.compile("&amp;")
@@ -11,6 +12,10 @@ _DOT_PATTERN = re.compile("\\.(?=\\w\\w)")
 _AUTHOR_CLEAN_PATTERN = re.compile("^by-|^By-|^By |^by |[^\\w ^'^\\.^-]|_|\\d")
 _AUTHOR_SPLIT_PATTERN = re.compile(r",|&|&amp;|\band\b")
 _SIMILARITY_PATTERN = re.compile("[^\\w]| |\\d|_")
+_FIGURE_PATTERN = re.compile(r"<figure\b[^>]*>.*?</figure>", re.IGNORECASE | re.DOTALL)
+_IMG_PATTERN = re.compile(r"<img\b[^>]*>", re.IGNORECASE)
+_TAG_PATTERN = re.compile(r"<[^>]+>")
+_WHITESPACE_PATTERN = re.compile(r"\s+")
 
 class Utility:
   def cleanDocument(document: str, type: str):
@@ -58,6 +63,25 @@ class Utility:
     result = text.replace('&amp;', '&')
     result = result.replace('&nbsp;', ' ')
     return result
+
+  def _build_excerpt(text, max_words=100):
+    if text is None:
+      return ""
+
+    text_without_media = _FIGURE_PATTERN.sub(" ", str(text))
+    text_without_media = _IMG_PATTERN.sub(" ", text_without_media)
+
+    plain = html.unescape(text_without_media)
+    plain = _TAG_PATTERN.sub(" ", plain)
+    plain = _WHITESPACE_PATTERN.sub(" ", plain).strip()
+
+    if not plain:
+      return ""
+
+    words = plain.split(" ")
+    if len(words) <= max_words:
+      return plain
+    return " ".join(words[:max_words])
 
   def _readChoice():
       try:

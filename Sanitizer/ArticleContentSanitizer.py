@@ -5,7 +5,7 @@ from Utils.WPContentSanitization import (
     log_shortcodes,
     log_inline_styles,
     log_problematic_chars,
-    replace_problematic_chars,
+    add_missing_paragraph_tags,
     write_detailed_logs
 )
 
@@ -31,14 +31,10 @@ class ArticleContentSanitizer(Sanitizer):
         })
     
     def _normalizeData(self):
-        """Ensure all articles end with punctuation"""
+        """Ensure all articles include a text field."""
         for article in self.data:
             if 'text' not in article:
                 article['text'] = ""
-            
-            text = article.get('text', '')
-            if text and not text.endswith(('.', '!', '?', ':', ';', '"', "'")):
-                article['text'] = text + "."
         
     def sanitize(self):
         self._normalizeData()
@@ -55,8 +51,13 @@ class ArticleContentSanitizer(Sanitizer):
             sanitized_text = sanitize_backslashes(sanitized_text)
             if sanitized_text != original_text:
                 fixes.append("backslashes stripped")
+
+            sanitized_text_before_paragraphs = sanitized_text
+            sanitized_text = add_missing_paragraph_tags(sanitized_text)
+            if sanitized_text != sanitized_text_before_paragraphs:
+                fixes.append("paragraph tags restored")
             
-            # Log and replace problematic chars
+            # Log problematic chars without rewriting article content.
             problematic_chars = log_problematic_chars(sanitized_text, article_id, self.policies.problematic_char_patterns)
             for char_type, data in problematic_chars.items():
                 if char_type not in self.problematic_chars_log:
@@ -64,11 +65,6 @@ class ArticleContentSanitizer(Sanitizer):
                 else:
                     self.problematic_chars_log[char_type]["unicodes"].update(data["unicodes"])
                     self.problematic_chars_log[char_type]["occurrences"].extend(data["occurrences"])
-            
-            sanitized_text_before_replace = sanitized_text
-            sanitized_text = replace_problematic_chars(sanitized_text, self.policies.problematic_char_patterns)
-            if sanitized_text != sanitized_text_before_replace:
-                fixes.append("problematic characters replaced")
             
             # Log other issues
             self.shortcode_log.extend(log_shortcodes(sanitized_text, article_id, self.policies.shortcode_pattern))

@@ -19,8 +19,6 @@ class ArticlePolicy(Policy):
         
         # Problematic character patterns to detect and log
         self.problematic_char_patterns = [
-            (r'[\u0000-\u001F]', 'control character'),
+            (r'[\u0000-\u0008\u000B\u000C\u000E-\u001F]', 'control character'),
             (r'[\u200B-\u200D\uFEFF]', 'zero-width character'),
-            (r'\u00A0', 'non-breaking space'),
-            (r'[^\x00-\x7F]', 'non_ascii'),
         ]

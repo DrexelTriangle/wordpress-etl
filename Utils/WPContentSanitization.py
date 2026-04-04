@@ -2,6 +2,12 @@ import json
 import re
 from pathlib import Path
 
+_HAS_PARAGRAPHS_PATTERN = re.compile(r'(?is)<p\b')
+_BLOCK_TAG_PATTERN = re.compile(
+    r'(?is)^<(?:figure|figcaption|blockquote|ul|ol|li|h[1-6]|table|thead|tbody|tr|td|th|pre|code|hr|iframe|script|style)\b'
+)
+_COMMENT_PATTERN = re.compile(r'(?is)^<!--')
+
 
 def sanitize_backslashes(content: str) -> str:
     # Strip excessive backlashes
@@ -77,6 +83,32 @@ def replace_problematic_chars(content: str, problematic_char_patterns: list) -> 
             return unicode_repr
         content = re.sub(pattern, replace_func, content)
     return content
+
+
+def add_missing_paragraph_tags(content: str) -> str:
+    # Keep already-paragraphized content untouched.
+    if _HAS_PARAGRAPHS_PATTERN.search(content):
+        return content
+
+    normalized = content.replace('\r\n', '\n').replace('\r', '\n')
+    chunks = re.split(r'\n\s*\n+', normalized)
+    rebuilt = []
+
+    for chunk in chunks:
+        block = chunk.strip()
+        if not block:
+            continue
+
+        # Preserve existing block-level structures without wrapping.
+        if _BLOCK_TAG_PATTERN.match(block) or _COMMENT_PATTERN.match(block):
+            rebuilt.append(block)
+            continue
+
+        rebuilt.append(f"<p>{block}</p>")
+
+    if not rebuilt:
+        return content
+    return "\n".join(rebuilt)
 
 
 def write_detailed_logs(shortcode_log: list, inline_style_log: list, problematic_chars_log: dict):

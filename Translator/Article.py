@@ -9,7 +9,7 @@ class Article(WPO):
     self, 
     authorIDs, authors, authorCleanNames,
     breakingNews, commentStatus, description,
-    featuredImgID, id, priority, modDate, 
+    featuredImgID, id, slug, priority, modDate, 
     photoURL, pubDate, tags, metadata, text, title
   ):
     self.data = {
@@ -21,6 +21,7 @@ class Article(WPO):
       "description": description,
       "featuredImgID": featuredImgID,
       "id": id,
+      "slug": slug,
       "priority": priority,
       "modDate": modDate,
       "photoURL": photoURL,

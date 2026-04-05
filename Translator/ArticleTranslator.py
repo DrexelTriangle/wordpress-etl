@@ -35,7 +35,7 @@ class ArticleTranslator(Translator):
     tags = data.get('category')
     metadata = data.get('wp:postmeta')
     text = textData
-    title = U._html_text_norm(data.get('title', Article.defaultValue))
+    title = self._normalizeTitle(U._html_text_norm(data.get('title', Article.defaultValue)))
     photoURL = self._checkForImg(text)
 
     chunk1 = [authorIDs, authors, authorCleanNames]
@@ -53,8 +53,15 @@ class ArticleTranslator(Translator):
     title = obj["title"]
     if (title is None or not obj.dataSanityCheck(debugMode) or obj["tags"] == -1):
       return True 
-    obj["title"] = title.replace('"', '\\"')
     return False
+
+  def _normalizeTitle(self, title):
+    if title is None:
+      return None
+    if not isinstance(title, str):
+      return title
+    # WP export payloads sometimes carry slashed quotes in title text.
+    return title.replace('\\"', '"').replace("\\'", "'")
   
   def _checkForImg(self, text:str):
     matchObj = re.search(r"wp-content\/uploads\/(.*?)\\", text) 

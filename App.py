@@ -21,7 +21,7 @@ class App:
 
     def shutdown(self):
         self.animator.stopAllSpinners()
-    
+
     def runStep(self, onLoad, onDone, func, *args, showDone: bool = True):
         result = self.animator.spinner(onLoad, onDone, func, *args, showDone=showDone)
         self.completedSteps.append(onDone)
@@ -124,7 +124,7 @@ class App:
     def sanitizeArticleContent(self, sanitizedArticles):
         contentSanitizer = ArticleContentSanitizer(sanitizedArticles)
         self.runStep("Sanitizing article content...", "Sanitized article content", contentSanitizer.sanitize)
-2        for article in sanitizedArticles:
+        for article in sanitizedArticles:
             text = article.get("text", "")
             article["excerpt"] = Utility._build_excerpt(text, max_words=100)
         return sanitizedArticles

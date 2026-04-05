@@ -4,6 +4,7 @@ from Formatter.ArticleFormatter import ArticleFormatter
 from Formatter.SeoFormatter import SeoFormatter
 from Formatter.AuthorFormatter import AuthorFormatter
 from Formatter.ArtAuthFormatter import ArtAuthFormatter
+from Utils.Utility import Utility
 
 app = App()
 
@@ -26,17 +27,21 @@ def build():
     # Sanitize authors
     authors = app.sanitizeAuthors(translators, "auth", "authors")
     guestAuthors = app.sanitizeAuthors(translators, "gAuth", "guest authors")
+    Utility.canonicalizeAuthorLogins(authors)
+    Utility.canonicalizeAuthorLogins(guestAuthors)
     app.writeAuthorOutput(authors, "logs/auth_output.json", "author")
     app.writeAuthorOutput(guestAuthors, "logs/gauth_output.json", "guest author")
     
     # Combine auth
     allAuthors = app.combineAndReindexAuthors(authors, guestAuthors)
+    Utility.canonicalizeAuthorLogins(allAuthors)
     del guestAuthors
     app.writeAuthorOutput(allAuthors, "logs/merged_auth_output.json", "merged authors")
     
     # Sanitize article
     sanitizedArticles = app.sanitizeArticleAuthors(translators, allAuthors)
     sanitizedArticles = app.sanitizeArticleContent(sanitizedArticles)
+    Utility.canonicalizeArticleSlugs(sanitizedArticles)
     app.writeArticleOutput(sanitizedArticles)
 
     # SQL formatting outputs

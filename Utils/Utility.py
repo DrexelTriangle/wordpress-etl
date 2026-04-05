@@ -16,8 +16,47 @@ _FIGURE_PATTERN = re.compile(r"<figure\b[^>]*>.*?</figure>", re.IGNORECASE | re.
 _IMG_PATTERN = re.compile(r"<img\b[^>]*>", re.IGNORECASE)
 _TAG_PATTERN = re.compile(r"<[^>]+>")
 _WHITESPACE_PATTERN = re.compile(r"\s+")
+_SLUG_PATTERN = re.compile(r"[^a-z0-9]+")
 
 class Utility:
+  def _obj_data(item):
+    return item.data if hasattr(item, "data") else item
+
+  def canonicalize_slug(value):
+    if value is None:
+      return ""
+    return _SLUG_PATTERN.sub("-", str(value).strip().lower()).strip("-")
+
+  def dedupe_slug(used, base, fallback_prefix, item_id):
+    candidate_base = base if base else f"{fallback_prefix}-{item_id}"
+    candidate = candidate_base
+    if candidate in used:
+      candidate = f"{candidate_base}-{item_id}"
+    counter = 1
+    while candidate in used:
+      candidate = f"{candidate_base}-{counter}"
+      counter += 1
+    used.add(candidate)
+    return candidate
+
+  def canonicalizeAuthorLogins(authors):
+    used = set()
+    sorted_authors = sorted(authors, key=lambda a: (Utility._obj_data(a).get("id") is None, Utility._obj_data(a).get("id")))
+    for author in sorted_authors:
+      data = Utility._obj_data(author)
+      author_id = data.get("id")
+      base = Utility.canonicalize_slug(data.get("login")) or Utility.canonicalize_slug(data.get("display_name"))
+      data["login"] = Utility.dedupe_slug(used, base, "author", author_id)
+
+  def canonicalizeArticleSlugs(articles):
+    used = set()
+    sorted_articles = sorted(articles, key=lambda a: (Utility._obj_data(a).get("id") is None, Utility._obj_data(a).get("id")))
+    for article in sorted_articles:
+      data = Utility._obj_data(article)
+      article_id = data.get("id")
+      base = Utility.canonicalize_slug(data.get("slug")) or Utility.canonicalize_slug(data.get("title"))
+      data["slug"] = Utility.dedupe_slug(used, base, "article", article_id)
+
   def cleanDocument(document: str, type: str):
     def uppercaseMatch(match):
       return match.group(0).upper()

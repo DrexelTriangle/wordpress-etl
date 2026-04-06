@@ -10,6 +10,9 @@ _COMMENT_PATTERN = re.compile(r'(?is)^<!--')
 _CAPTION_SHORTCODE_PATTERN = re.compile(
     r'(?is)(?:<p>\s*)?\[caption(?P<attrs>[^\]]*)\](?P<body>.*?)\[/caption\](?:\s*</p>)?'
 )
+_PUZZLEME_SHORTCODE_PATTERN = re.compile(
+    r'(?is)(?:<p>\s*)?(?:<strong>\s*)?\[puzzleme(?P<attrs>[^\]]*)\](?:\s*</strong>)?(?:\s*</p>)?'
+)
 _SHORTCODE_ATTR_PATTERN = re.compile(r'(\w+)\s*=\s*"([^"]*)"')
 _FIRST_IMAGE_PATTERN = re.compile(r'(?is)<img\b[^>]*>')
 
@@ -159,6 +162,32 @@ def convert_caption_shortcodes(content: str) -> str:
         return f'<figure {" ".join(figure_attrs)}>{image_html}{figcaption_html}</figure>'
 
     return _CAPTION_SHORTCODE_PATTERN.sub(build_figure, content)
+
+
+def convert_puzzleme_shortcodes(content: str) -> str:
+    puzzle_height_by_type = {
+        "crossword": "700px",
+        "wordsearch": "700px",
+        "wordrow": "700px",
+    }
+
+    def build_embed(match: re.Match) -> str:
+        attrs = dict(_SHORTCODE_ATTR_PATTERN.findall(match.group("attrs") or ""))
+        embed_set = attrs.get("set", "").strip()
+        embed_id = attrs.get("id", "").strip()
+        puzzle_type = attrs.get("type", "").strip().lower()
+        if not embed_set or not embed_id or not puzzle_type:
+            return match.group(0)
+
+        embed_height = puzzle_height_by_type.get(puzzle_type, "700px")
+        return (
+            f'<div class="pm-embed-div" '
+            f'data-id="{embed_id}" data-set="{embed_set}" '
+            f'data-puzzleType="{puzzle_type}" data-height="{embed_height}" '
+            f'data-embedparams="embed=wp"></div>'
+        )
+
+    return _PUZZLEME_SHORTCODE_PATTERN.sub(build_embed, content)
 
 
 def write_detailed_logs(shortcode_log: list, inline_style_log: list, problematic_chars_log: dict):

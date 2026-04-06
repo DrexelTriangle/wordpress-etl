@@ -3,6 +3,7 @@ from Sanitizer.ArticlePolicy import ArticlePolicy
 from Utils.WPContentSanitization import (
     sanitize_backslashes,
     convert_caption_shortcodes,
+    convert_puzzleme_shortcodes,
     log_shortcodes,
     log_inline_styles,
     log_problematic_chars,
@@ -57,6 +58,11 @@ class ArticleContentSanitizer(Sanitizer):
             sanitized_text = convert_caption_shortcodes(sanitized_text)
             if sanitized_text != sanitized_text_before_captions:
                 fixes.append("caption shortcodes converted")
+
+            sanitized_text_before_puzzleme = sanitized_text
+            sanitized_text = convert_puzzleme_shortcodes(sanitized_text)
+            if sanitized_text != sanitized_text_before_puzzleme:
+                fixes.append("puzzleme shortcodes converted")
 
             sanitized_text_before_paragraphs = sanitized_text
             sanitized_text = add_missing_paragraph_tags(sanitized_text)

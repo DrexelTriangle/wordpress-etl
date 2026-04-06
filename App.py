@@ -126,6 +126,26 @@ class App:
         self.runStep("Sanitizing article content...", "Sanitized article content", contentSanitizer.sanitize)
         for article in sanitizedArticles:
             text = article.get("text", "")
+            categories = article.get("categories", [])
+            normalized_categories = {
+                str(category).strip().lower() for category in categories if category is not None
+            }
+            is_comics_or_puzzles = bool(
+                normalized_categories
+                & {
+                    "comics",
+                    "comic",
+                    "comics & puzzles",
+                    "puzzles",
+                    "crossword",
+                    "sudoku",
+                }
+            )
+            has_puzzle_embed = "[puzzleme" in text.lower() or "pm-embed-div" in text.lower()
+            if is_comics_or_puzzles or has_puzzle_embed:
+                article["excerpt"] = ""
+                continue
+
             article["excerpt"] = Utility._build_excerpt(text, max_words=100)
         return sanitizedArticles
 

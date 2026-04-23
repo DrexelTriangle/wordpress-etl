@@ -44,6 +44,27 @@ The project boils down into 4 main components:
 4. The Formatter formats our data to fit into SQL tables.
 
 The rest of the README will explain each one of these steps in further detail.
+
+## Running ETL
+
+From the `wordpress-etl` repo root:
+
+```bash
+python3 main.py
+```
+
+Optional embeddings SQL output (`logs/sql/article_embeddings.sql`):
+
+```bash
+python3 main.py --generate-embeddings
+```
+
+Optional embedding overrides:
+
+```bash
+python3 main.py --generate-embeddings --embedding-model sentence-transformers/paraphrase-MiniLM-L3-v2 --embedding-batch-size 64 --embedding-max-chars 5000
+```
+
 ---
 ## 1. Extractor
 ```python

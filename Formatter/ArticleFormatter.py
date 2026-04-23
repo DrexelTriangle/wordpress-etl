@@ -26,7 +26,7 @@ class ArticleFormatter(Formatter):
         "title",
     ]
     CMS_SCHEMA = {
-        "id": "BIGINT PRIMARY KEY",
+        "id": "BIGINT PRIMARY KEY AUTO_INCREMENT",
         "created_at": "DATETIME",
         "slug": "LONGTEXT",
         "author_ids": "LONGTEXT",
@@ -61,7 +61,6 @@ class ArticleFormatter(Formatter):
     def _to_cms_row(self, obj):
         created_at = self._normalize_datetime(
             obj.get("createdAt")
-            or obj.get("creationDate")
             or obj.get("created_at")
             or obj.get("pubDate")
             or obj.get("modDate")

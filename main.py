@@ -53,8 +53,9 @@ def parse_args():
 def build(args):
     try:
         extracted = app.extractData()
-    except:
-      exit(0)
+    except Exception as exc:
+        print(f"Extraction failed: {exc}", file=sys.stderr)
+        raise SystemExit(1)
 
     # TRANSLATION
     translators = app.translateData(extracted)

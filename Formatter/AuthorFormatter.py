@@ -8,7 +8,7 @@ class AuthorFormatter(Formatter):
     def format(self, table="authors"):
         createTbl = (
             f"CREATE TABLE {table} ("
-            "id BIGINT PRIMARY KEY, "
+            "id BIGINT PRIMARY KEY AUTO_INCREMENT, "
             "display_name VARCHAR(255), "
             "first_name VARCHAR(255), "
             "last_name VARCHAR(255), "

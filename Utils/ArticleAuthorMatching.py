@@ -150,6 +150,8 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
                     return mapping.get(secondChar, None)
                 if firstChar == b'\r':
                     return 'ENTER'
+                if firstChar in (b"u", b"U"):
+                    return "UNKNOWN"
 
                 return firstChar.decode('utf-8')
                 
@@ -157,14 +159,15 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
                 import sys
                 import termios
                 import tty
-                """Get single character from stdin"""
                 fd = sys.stdin.fileno()
                 old = termios.tcgetattr(fd)
                 try:
                     tty.setraw(fd)
-                    return sys.stdin.read(1)
+                    ch = sys.stdin.read(1)
                     if ch == '\x1b':
-                        sys.stdin.read(1)  # skip '['
+                        second = sys.stdin.read(1)
+                        if second != "[":
+                            return None
                         direction = sys.stdin.read(1)
 
                         mapping = {
@@ -174,8 +177,10 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
                             'D': 'LEFT'
                         }
                         return mapping.get(direction)
-                    if ch == '\r':
+                    if ch in ('\r', '\n'):
                         return 'ENTER'
+                    if ch in ("u", "U"):
+                        return "UNKNOWN"
 
                     return ch
                 finally:
@@ -207,4 +212,5 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
             ptr = min(len(options) - 1, ptr + 1)
         elif (key == 'ENTER'): 
             return ptr
-        return -1
+        elif key == "UNKNOWN":
+            return -1

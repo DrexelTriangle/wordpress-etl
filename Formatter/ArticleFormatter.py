@@ -6,7 +6,7 @@ class ArticleFormatter(Formatter):
     EXCLUDED_SQL_FIELDS = {"authorCleanNames"}
     CMS_COLUMNS = [
         "id",
-        "created_at",
+        "creation_date",
         "slug",
         "author_ids",
         "authors",
@@ -27,7 +27,7 @@ class ArticleFormatter(Formatter):
     ]
     CMS_SCHEMA = {
         "id": "BIGINT PRIMARY KEY AUTO_INCREMENT",
-        "created_at": "DATETIME",
+        "creation_date": "DATETIME",
         "slug": "LONGTEXT",
         "author_ids": "LONGTEXT",
         "authors": "LONGTEXT",
@@ -59,9 +59,9 @@ class ArticleFormatter(Formatter):
         return value
 
     def _to_cms_row(self, obj):
-        created_at = self._normalize_datetime(
-            obj.get("createdAt")
-            or obj.get("created_at")
+        creation_date = self._normalize_datetime(
+            obj.get("creationDate")
+            or obj.get("creation_date")
             or obj.get("pubDate")
             or obj.get("modDate")
         )
@@ -86,7 +86,7 @@ class ArticleFormatter(Formatter):
 
         return {
             "id": obj.get("id"),
-            "created_at": created_at,
+            "creation_date": creation_date,
             "slug": obj.get("slug"),
             "author_ids": obj.get("authorIDs"),
             "authors": obj.get("authors"),

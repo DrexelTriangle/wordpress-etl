@@ -28,7 +28,7 @@ class GuestAuthorPolicy(Policy):
             "myDoc",
             "Triangle News Desk",
             "Editorial Board",
-            "Drexel Sport Management Council"
+            "Drexel Sport Management Council",
             "Triangle Staff",
             "Center for Sport Management",
             "Arts and Entertainment Staff",

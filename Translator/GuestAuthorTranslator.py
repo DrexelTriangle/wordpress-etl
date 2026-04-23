@@ -13,24 +13,36 @@ class GuestAuthorTranslator(Translator):
         firstName = None
         lastName = None
         login = None
+        if data is None:
+            data = []
+        elif isinstance(data, dict):
+            data = [data]
+        elif not isinstance(data, list):
+            data = []
         for metadata in data:
-            match metadata['wp:meta_key']:
+            if not isinstance(metadata, dict):
+                continue
+            key = metadata.get('wp:meta_key')
+            value = metadata.get('wp:meta_value')
+            if key is None:
+                continue
+            match key:
                 case 'cap-display_name':
-                    displayName = metadata['wp:meta_value']
+                    displayName = value
                 case 'cap-user_email':
-                    email = metadata['wp:meta_value']
+                    email = value
                 case 'cap-first_name':
-                    firstName = metadata['wp:meta_value']
+                    firstName = value
                 case 'cap-last_name':
-                    lastName = metadata['wp:meta_value']
+                    lastName = value
                 case 'cap-user_login':
-                    login = metadata['wp:meta_value']
+                    login = value
         return [self.objCount, displayName, firstName, lastName, email, login]
 
 
     def translate(self):
         for guestAuthorData in self.source:
-            metadata = self._extractMetadata(guestAuthorData['wp:postmeta'])
+            metadata = self._extractMetadata(guestAuthorData.get('wp:postmeta'))
             guestAuthorObject = Author(*metadata)
             self.addObject(guestAuthorObject)
 

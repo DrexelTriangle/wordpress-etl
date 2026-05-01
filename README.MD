@@ -5,36 +5,22 @@ The Triangle's current website is hosted on Wordpress, using a large number of P
 # General Idea
 ```mermaid
 flowchart LR
-    db[(Wordpress Data)] 
-    db --> g1
-    g1 --> ma[Main]
-    ma --> g2
-    ma --> g4
-    g4 --> cmd@{ shape: docs, label: "SQL_Commands.txt"} --> in[Injector] --> pr[(PRISM)] --> sc@{ shape: tri, label: "Scalene"}
-
-subgraph g1[1]
-    ex[Extractor]
-end
-
-subgraph g2[2]
-direction LR
-    tr[Translator]
-    tr --> au[Authors]
-    tr --> ga[Guest Authors]
-    tr --> ar[Articles]
-end
-
-g2 --> g3
-
-subgraph g3[3]
-    sa[Sanitizer]
-end
-
-sa --> ma
-
-subgraph g4[4]
-    fm[Formatter]
-end
+    z[(Data/wp-export.zip)] --> ex[Extractor]
+    ex --> tr[Translator]
+    tr --> a1[Author Sanitizer]
+    tr --> g1[Guest Author Sanitizer]
+    a1 --> mg[Merge and Reindex Authors]
+    g1 --> mg
+    tr --> aa[Article Author Matcher]
+    mg --> aa
+    aa --> ac[Article Content Sanitizer]
+    ac --> fmt[Formatters]
+    fmt --> s1[(logs/sql/articles.sql)]
+    fmt --> s2[(logs/sql/seo.sql)]
+    fmt --> s3[(logs/sql/authors.sql)]
+    fmt --> s4[(logs/sql/articles_authors.sql)]
+    ac --> emb{--generate-embeddings}
+    emb -->|yes| s5[(logs/sql/article_embeddings.sql)]
 
 ```
 The project boils down into 4 main components:

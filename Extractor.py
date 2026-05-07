@@ -25,7 +25,7 @@ class Extractor:
   # METHODS
   def _eparse(self, xmlFile):
     with open(xmlFile, "r", encoding="utf-8") as file:
-      content = file.read()
+      content = file.read().lstrip()
     parsedDict = parse(content)
     return parsedDict
   

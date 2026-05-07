@@ -12,6 +12,8 @@ venv/*
 temp.txt
 *.json
 result.txt
+passwords.txt
+logs/
 skenanigans-rawdata.zip
 cacheDirectory/joblib/Utils/NLP/generateKShingles/*
 cacheDirectory/joblib/Utils/NLP/generateSparseVector/*
@@ -19,4 +21,3 @@ cacheDirectory/joblib/Utils/NLP/generateSignatureMatrix/*
 Utils/cacheDirectory/Utils/NLP/_generateKShingles_impl/*
 Utils/cacheDirectory/Utils/NLP/_generateSignatureMatrix_impl/*
 Utils/cacheDirectory/Utils/NLP/_generateSparseVector_impl/*
-passwords.txt

@@ -79,9 +79,9 @@ class Utility:
     return document
 
   def unzip(zipPath):
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    EXPORT_DIR.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(zipPath, 'r') as zip_ref:
-      zip_ref.extractall(DATA_DIR)
+      zip_ref.extractall(EXPORT_DIR)
 
 
   def _delete_dir(dir):
@@ -131,9 +131,9 @@ class Utility:
                   if ch in (b"\x00", b"\xe0"):
                       code = msvcrt.getch()
                       if code == b"K":
-                          return "RIGHT"
-                      if code == b"M":
                           return "LEFT"
+                      if code == b"M":
+                          return "RIGHT"
                   elif ch in (b"e", b"E"):
                       return "E"
                   elif ch in (b"l", b"L", b"\r", b"\n"):
@@ -152,9 +152,9 @@ class Utility:
                   if ch == "\x1b":
                       seq = sys.stdin.read(2)
                       if seq == "[D":
-                          return "RIGHT"
-                      if seq == "[C":
                           return "LEFT"
+                      if seq == "[C":
+                          return "RIGHT"
                   elif ch in ("e", "E"):
                       return "E"
                   elif ch in ("l", "L", "\r", "\n"):

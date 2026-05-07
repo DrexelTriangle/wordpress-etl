@@ -132,8 +132,11 @@ def logUnknownAuthors(unknown_authors):
         json.dump({"unknown_authors": existing}, f, indent=4)
 
 
-def selectFromList(prompt: str, options: list, format_option=None) -> int:
-    # TUI selection
+def selectFromList(prompt: str, options: list, format_option=None, headers=None) -> int:
+    ANSI_RESET = "\033[0m"
+    ANSI_GREEN = "\033[32m"
+    ANSI_GRAY  = "\033[90m"
+
     def readInput():
         try:
             if os.name == "nt":
@@ -141,22 +144,14 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
                 firstChar = msvcrt.getch()
                 if firstChar in (b'\x00', b'\xe0'):
                     secondChar = msvcrt.getch()
-                    mapping = {
-                        b'H': 'UP',
-                        b'P': 'DOWN',
-                        b'K': 'LEFT',
-                        b'M': 'RIGHT',
-                    }
+                    mapping = {b'H': 'UP', b'P': 'DOWN', b'K': 'LEFT', b'M': 'RIGHT'}
                     return mapping.get(secondChar, None)
                 if firstChar == b'\r':
                     return 'ENTER'
                 if firstChar in (b"u", b"U"):
                     return "UNKNOWN"
-
                 return firstChar.decode('utf-8')
-                
             else:
-                import sys
                 import termios
                 import tty
                 fd = sys.stdin.fileno()
@@ -169,48 +164,63 @@ def selectFromList(prompt: str, options: list, format_option=None) -> int:
                         if second != "[":
                             return None
                         direction = sys.stdin.read(1)
-
-                        mapping = {
-                            'A': 'UP',
-                            'B': 'DOWN',
-                            'C': 'RIGHT',
-                            'D': 'LEFT'
-                        }
+                        mapping = {'A': 'UP', 'B': 'DOWN', 'C': 'RIGHT', 'D': 'LEFT'}
                         return mapping.get(direction)
                     if ch in ('\r', '\n'):
                         return 'ENTER'
                     if ch in ("u", "U"):
                         return "UNKNOWN"
-
                     return ch
                 finally:
                     termios.tcsetattr(fd, termios.TCSADRAIN, old)
         except Exception:
-          pass
-    
+            pass
+
+    def renderTable(ptr):
+        print("\033[2J\033[H")
+        print(f"{prompt}\n")
+
+        use_table = headers and format_option
+        if use_table:
+            rows = [format_option(i, opt) for i, opt in enumerate(options)]
+            rows = [r if isinstance(r, list) else [r] for r in rows]
+            col_widths = [len(str(h)) for h in headers]
+            for row in rows:
+                for j, cell in enumerate(row):
+                    if j < len(col_widths):
+                        col_widths[j] = max(col_widths[j], len(str(cell)))
+
+            header_line = "    " + "  ".join(str(headers[j]).ljust(col_widths[j]) for j in range(len(headers)))
+            sep_line    = "    " + "  ".join("─" * col_widths[j] for j in range(len(headers)))
+            print(f"{ANSI_GRAY}{header_line}{ANSI_RESET}")
+            print(f"{ANSI_GRAY}{sep_line}{ANSI_RESET}")
+
+            for i, row in enumerate(rows):
+                selected = i == ptr
+                marker = f"{ANSI_GREEN}→{ANSI_RESET}" if selected else " "
+                cells = "  ".join(str(row[j]).ljust(col_widths[j]) for j in range(len(row)))
+                line = f"  {marker} {cells}"
+                if selected:
+                    print(f"{ANSI_GREEN}{line}{ANSI_RESET}")
+                else:
+                    print(line)
+        else:
+            for i, option in enumerate(options):
+                marker = "→" if i == ptr else " "
+                text = format_option(i, option) if format_option else str(option)
+                print(f"  {marker} {text}")
+
+        print("\n↑↓ to navigate  |  Enter to select  |  U = unknown")
+
     ptr = 0
     while True:
-        # Clear and display
-        print("\033[2J\033[H")  # Clear screen
-        print(f"{prompt}\n")
-        
-        for i, option in enumerate(options):
-            marker = "→" if i == ptr else " "
-            if format_option:
-                text = format_option(i, option)
-            else:
-                text = str(option)
-            print(f"  {marker} {text}")
-        
-        print("\n↑↓ to navigate | Enter to select | 'u' for unknown")
-        
-        # Get input
+        renderTable(ptr)
         key = readInput()
-        if (key == 'UP'):
+        if key == 'UP':
             ptr = max(0, ptr - 1)
-        elif (key == 'DOWN'):
+        elif key == 'DOWN':
             ptr = min(len(options) - 1, ptr + 1)
-        elif (key == 'ENTER'): 
+        elif key == 'ENTER':
             return ptr
         elif key == "UNKNOWN":
             return -1

@@ -64,57 +64,60 @@ class Animator:
         return 120
 
     termWidth = _clearAndGetTermWidth()
-    minCol = 10
-    maxCol = 40
-    widths = Animator._ColumnWidths(fieldWidth=14, markerWidth=16, colWidth=minCol)
-    maxLeft = max((len(str(lval)) for _, lval, _ in diffs), default=len("LEFT"))
-    maxRight = max((len(str(rval)) for _, _, rval in diffs), default=len("RIGHT"))
-    maxChosen = max((len(str(authorParams.get(key, ""))) for key, _, _ in diffs), default=len("CHOSEN"))
-    baseWidth = max(len("CHOSEN"), maxLeft, maxRight, maxChosen, minCol)
-    widths.colWidth = max(minCol, min(baseWidth, maxCol))
-    totalWidth = widths.fieldWidth + (widths.markerWidth * 2) + (widths.colWidth * 3) + 5
-    while totalWidth > termWidth and widths.colWidth > minCol:
-      widths.colWidth -= 1
-      totalWidth = widths.fieldWidth + (widths.markerWidth * 2) + (widths.colWidth * 3) + 5
-    fieldLabel = _padValue("FIELD", widths.fieldWidth)
-    leftLabel = _padValue("LEFT", widths.colWidth)
-    chosenLabel = _padValue("CHOSEN", widths.colWidth)
-    rightLabel = _padValue("RIGHT", widths.colWidth)
-    leftMarkerLabel = _padValue("", widths.colWidth)
-    rightMarkerLabel = _padValue("", widths.colWidth)
-    print(
-      f"{ANSI_WHITE}{fieldLabel}{ANSI_RESET} "
-      f"{ANSI_CYAN}{leftLabel}{ANSI_RESET} "
-      f"{leftMarkerLabel} "
-      f"{ANSI_GREEN}{chosenLabel}{ANSI_RESET} "
-      f"{rightMarkerLabel} "
-      f"{ANSI_YELLOW}{rightLabel}{ANSI_RESET}"
-    )
+
+    # Column sizing — no marker columns
+    fieldWidth = 14
+    minCol, maxCol = 10, 40
+    maxLeft   = max((len(str(lval)) for _, lval, _ in diffs), default=len("LEFT"))
+    maxRight  = max((len(str(rval)) for _, _, rval in diffs), default=len("RIGHT"))
+    maxChosen = max((len(str(authorParams.get(k, ""))) for k, _, _ in diffs), default=len("CHOSEN"))
+    colWidth  = max(minCol, min(max(maxLeft, maxRight, maxChosen, len("CHOSEN")), maxCol))
+    tableWidth = 2 + fieldWidth + 3 * colWidth + 3
+    while tableWidth > termWidth and colWidth > minCol:
+      colWidth -= 1
+      tableWidth = 2 + fieldWidth + 3 * colWidth + 3
+
+    # Box header
+    title    = f"CONFLICT {conflictIndex + 1}/{conflictTotal}"
+    subtitle = "Duplicate author entries — pick a value for each field"
+    boxInner = f"  {title}  │  {subtitle}  "
+    boxWidth = max(len(boxInner), tableWidth)
+    boxInner = boxInner.ljust(boxWidth)
+    print(f"{ANSI_CYAN}╔{'═' * boxWidth}╗{ANSI_RESET}")
+    print(f"{ANSI_CYAN}║{ANSI_RESET}{ANSI_WHITE}{boxInner}{ANSI_RESET}{ANSI_CYAN}║{ANSI_RESET}")
+    print(f"{ANSI_CYAN}╚{'═' * boxWidth}╝{ANSI_RESET}")
     print()
+
+    # Column headers + top separator
+    sep = "─" * tableWidth
+    print(f"  {ANSI_GRAY}{_padValue('FIELD', fieldWidth)} {_padValue('LEFT', colWidth)} {_padValue('CHOSEN', colWidth)} {_padValue('RIGHT', colWidth)}{ANSI_RESET}")
+    print(f"  {ANSI_GRAY}{sep}{ANSI_RESET}")
+    print()
+
+    # Rows
     chosenMap = {key: authorParams.get(key, "") for key, _, _ in diffs}
     for key, lval, rval in diffs:
-      ltxt = f"{ANSI_CYAN}{_padValue(lval, widths.colWidth)}{ANSI_RESET}"
-      rtxt = f"{ANSI_YELLOW}{_padValue(rval, widths.colWidth)}{ANSI_RESET}"
+      isActive  = key == activeKey
       chosenRaw = chosenMap.get(key, "")
-      chosen = _padValue(chosenRaw, widths.colWidth) if chosenRaw else (" " * widths.colWidth)
-      ctxt = f"{ANSI_GREEN}{chosen}{ANSI_RESET}"
-      prefix = "> " if key == activeKey else "  "
-      keyTxt = _padValue(f"{prefix}{key}", widths.fieldWidth)
-      leftMarker = LEFT_MARKER if key in authorParams and authorParams.get(key) == left.get(key) else ""
-      rightMarker = RIGHT_MARKER if key in authorParams and authorParams.get(key) == right.get(key) else ""
-      leftMarkerTxt = _centerColored(leftMarker, widths.colWidth, ANSI_CYAN)
-      rightMarkerTxt = _centerColored(rightMarker, widths.colWidth, ANSI_YELLOW)
-      row = f"{keyTxt} {ltxt} {leftMarkerTxt} {ctxt} {rightMarkerTxt} {rtxt}"
-      print(row)
-    count = f"CONFLICT {conflictIndex + 1}/{conflictTotal}"
-    countText = f"{ANSI_CYAN}{ANSI_INVERT}{count}{ANSI_RESET}"
-    instructions = f"Use {RIGHT_ARROW} for left, {LEFT_ARROW} for right, or E to edit."
-    pad = max(0, termWidth - len(count) - len(instructions) - 1)
+      keyTxt    = _padValue(key, fieldWidth)
+      ltxt      = _padValue(lval, colWidth)
+      rtxt      = _padValue(rval, colWidth)
+      chosen    = _padValue(chosenRaw, colWidth) if chosenRaw else " " * colWidth
+      marker    = "▶ " if isActive else "  "
+
+      if isActive:
+        print(f"{ANSI_GREEN}{marker}{keyTxt} {ltxt} {chosen} {rtxt}{ANSI_RESET}")
+      else:
+        chosenColored = f"{ANSI_GREEN}{chosen}{ANSI_RESET}" if chosenRaw else " " * colWidth
+        print(f"  {ANSI_GRAY}{keyTxt}{ANSI_RESET} {ANSI_CYAN}{ltxt}{ANSI_RESET} {chosenColored} {ANSI_YELLOW}{rtxt}{ANSI_RESET}")
+
+    # Footer separator + instructions
     print()
-    print(f"{instructions}{' ' * pad}{countText}")
+    print(f"  {ANSI_GRAY}{sep}{ANSI_RESET}")
+    print(f"  {LEFT_ARROW} left  │  {RIGHT_ARROW} right  │  E to edit")
 
   @staticmethod
-  def _spinningAnimation(chars, onLoad, onDone, stopEvent, pauseEvent, showDone):
+  def _spinningAnimation(chars, onLoad, onDone, stopEvent, pauseEvent, showDone, getSubStep=None):
     for char in cycle(chars):
       if stopEvent.is_set():
         break
@@ -122,12 +125,14 @@ class Animator:
         time.sleep(PAUSE_SLEEP_SECONDS)
         continue
       wrappedChar = Animator.colorWrap(ANSI_GRAY, char)
-      print(f"\r{wrappedChar} {onLoad}", end="", flush=True)
+      subStep = getSubStep() if getSubStep else ""
+      subStepText = f"  {ANSI_GRAY}→ {subStep}{ANSI_RESET}" if subStep else ""
+      print(f"\r\033[2K{wrappedChar} {onLoad}{subStepText}", end="", flush=True)
       time.sleep(SPINNER_SLEEP_SECONDS)
     if showDone and onDone is not None:
       checkmark = Animator.colorWrap(ANSI_GREEN, CHECKMARK_CHAR)
       text = Animator.colorWrap(ANSI_GRAY, onDone)
-      print(f"\r{checkmark} {text}    ")
+      print(f"\r\033[2K{checkmark} {text}")
     else:
       _clearLine()
 
@@ -154,11 +159,12 @@ class Animator:
   def startSpinner(onLoad, onDone, showDone: bool = True):
     stopEvent = threading.Event()
     pauseEvent = threading.Event()
+    subStepContainer = [""]
     animThread = threading.Thread(
       target=Animator._spinningAnimation,
-      args=(SPINNER_CHARS, onLoad, onDone, stopEvent, pauseEvent, showDone)
+      args=(SPINNER_CHARS, onLoad, onDone, stopEvent, pauseEvent, showDone, lambda: subStepContainer[0])
     )
-    spinnerHandle = SpinnerHandle(stopEvent, pauseEvent, animThread, Animator._onHandleStopped)
+    spinnerHandle = SpinnerHandle(stopEvent, pauseEvent, animThread, Animator._onHandleStopped, subStepContainer)
     Animator._registerHandle(spinnerHandle)
     animThread.start()
     return spinnerHandle
@@ -182,12 +188,17 @@ class Animator:
 
 
 class SpinnerHandle:
-  def __init__(self, stopEvent, pauseEvent, thread, onStop):
+  def __init__(self, stopEvent, pauseEvent, thread, onStop, subStepContainer=None):
     self._stopEvent = stopEvent
     self._pauseEvent = pauseEvent
     self._thread = thread
     self._onStop = onStop
     self._isStopped = threading.Event()
+    self._subStepContainer = subStepContainer if subStepContainer is not None else [""]
+
+  def report(self, msg):
+    if not self._isStopped.is_set():
+      self._subStepContainer[0] = msg
 
   def pause(self):
     if self._isStopped.is_set():

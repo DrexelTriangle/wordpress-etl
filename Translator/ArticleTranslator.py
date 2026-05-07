@@ -69,8 +69,10 @@ class ArticleTranslator(Translator):
       return matchObj.group(0).replace('\\', '')
 
 
-  def translate(self):
+  def translate(self, on_progress=None):
     debugMode = False
+    if on_progress:
+      on_progress(f"translating {len(self.source)} articles")
     for i, itm in enumerate(self.source):
       obj = self._getArticle(itm, debugMode)
       obj.processTags()

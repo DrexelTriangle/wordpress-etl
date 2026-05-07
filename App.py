@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from Animator import Animator
+from Animator import Animator, ANSI_GREEN, ANSI_GRAY, ANSI_RED, CHECKMARK_CHAR
 from Extractor import Extractor
 from Sanitizer.GuestAuthorPolicy import GuestAuthorPolicy
 from Sanitizer.AuthorPolicy import AuthorPolicy
@@ -30,9 +30,24 @@ class App:
         return result
 
     def extractData(self):
-        Utility.unzip(ZIP_FILE)
-        extractor = Extractor(*UNZIPPED_FILES)
-        return self.runStep("Extracting...", "Extracted", extractor.getData)
+        self.stepCount += 1
+        spinner = self.animator.startSpinner(f"[{self.stepCount}] Extracting...", "Extracted", showDone=False)
+        try:
+            spinner.report("unzipping wp-export.zip")
+            Utility.unzip(ZIP_FILE)
+            extractor = Extractor(*UNZIPPED_FILES)
+            result = extractor.getData(on_progress=spinner.report)
+        except Exception:
+            spinner.stop()
+            errorMark = Animator.colorWrap(ANSI_RED, '✗')
+            errorText = Animator.colorWrap(ANSI_GRAY, f"Error occurred: [{self.stepCount}] Extracting...")
+            print(f"\r{errorMark} {errorText}    ")
+            raise
+        spinner.stop()
+        checkmark = Animator.colorWrap(ANSI_GREEN, CHECKMARK_CHAR)
+        print(f"\r{checkmark} {Animator.colorWrap(ANSI_GRAY, 'Extracted')}    ")
+        self.completedSteps.append("Extracted")
+        return result
 
     def translateData(self, extracted):
         translators = {
@@ -40,7 +55,22 @@ class App:
             "gAuth": GuestAuthorTranslator(extracted["guestAuth"]),
             "auth": AuthorTranslator(extracted["auth"]),
         }
-        self.runStep("Translating...", "Translated", lambda: [translators[key].translate() for key in translators])
+        self.stepCount += 1
+        spinner = self.animator.startSpinner(f"[{self.stepCount}] Translating...", "Translated", showDone=False)
+        try:
+            translators["auth"].translate(on_progress=spinner.report)
+            translators["gAuth"].translate(on_progress=spinner.report)
+            translators["articles"].translate(on_progress=spinner.report)
+        except Exception:
+            spinner.stop()
+            errorMark = Animator.colorWrap(ANSI_RED, '✗')
+            errorText = Animator.colorWrap(ANSI_GRAY, f"Error occurred: [{self.stepCount}] Translating...")
+            print(f"\r{errorMark} {errorText}    ")
+            raise
+        spinner.stop()
+        checkmark = Animator.colorWrap(ANSI_GREEN, CHECKMARK_CHAR)
+        print(f"\r{checkmark} {Animator.colorWrap(ANSI_GRAY, 'Translated')}    ")
+        self.completedSteps.append("Translated")
         return translators
 
     def logOutputs(self, translators):
@@ -64,6 +94,7 @@ class App:
             authors = authSanitizer.sanitize(
                 manualStart=onManualStart,
                 manualEnd=authSpinner.resume,
+                on_progress=authSpinner.report,
             )
         finally:
             authSpinner.stop()
@@ -124,6 +155,7 @@ class App:
             sanitizedArticles = articleSanitizer.sanitize(
                 manualStart=manualStart,
                 manualEnd=manualEnd,
+                on_progress=articleSpinner.report,
             )
         finally:
             articleSpinner.stop()

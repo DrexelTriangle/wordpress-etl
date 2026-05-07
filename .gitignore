@@ -21,3 +21,4 @@ cacheDirectory/joblib/Utils/NLP/generateSignatureMatrix/*
 Utils/cacheDirectory/Utils/NLP/_generateKShingles_impl/*
 Utils/cacheDirectory/Utils/NLP/_generateSignatureMatrix_impl/*
 Utils/cacheDirectory/Utils/NLP/_generateSparseVector_impl/*
+Data/

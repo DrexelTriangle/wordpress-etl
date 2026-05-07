@@ -64,6 +64,8 @@ class Animator:
         return 120
 
     termWidth = _clearAndGetTermWidth()
+    count_header = f"CONFLICT {conflictIndex + 1}/{conflictTotal}"
+    print(f"{ANSI_CYAN}{ANSI_INVERT} {count_header} {ANSI_RESET}  Duplicate author entries — select the correct value for each field.\n")
     minCol = 10
     maxCol = 40
     widths = Animator._ColumnWidths(fieldWidth=14, markerWidth=16, colWidth=minCol)
@@ -106,12 +108,9 @@ class Animator:
       rightMarkerTxt = _centerColored(rightMarker, widths.colWidth, ANSI_YELLOW)
       row = f"{keyTxt} {ltxt} {leftMarkerTxt} {ctxt} {rightMarkerTxt} {rtxt}"
       print(row)
-    count = f"CONFLICT {conflictIndex + 1}/{conflictTotal}"
-    countText = f"{ANSI_CYAN}{ANSI_INVERT}{count}{ANSI_RESET}"
-    instructions = f"Use {RIGHT_ARROW} for left, {LEFT_ARROW} for right, or E to edit."
-    pad = max(0, termWidth - len(count) - len(instructions) - 1)
+    instructions = f"{LEFT_ARROW} left  |  {RIGHT_ARROW} right  |  E to edit"
     print()
-    print(f"{instructions}{' ' * pad}{countText}")
+    print(instructions)
 
   @staticmethod
   def _spinningAnimation(chars, onLoad, onDone, stopEvent, pauseEvent, showDone):

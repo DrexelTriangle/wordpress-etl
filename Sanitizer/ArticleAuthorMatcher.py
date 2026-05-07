@@ -15,11 +15,12 @@ from minhashlib import DiffChecker
 
 
 class ArticleAuthorMatcher(Sanitizer):
-    def __init__(self, data: list, authors: list):
+    def __init__(self, data: list, authors: list, best_guess: bool = False):
         super().__init__(data, policies=ArticleAuthorMatchingPolicy([], authors))
         self.unknown_authors = {}
         self.author_matches = {}
         self.resolution_cache = loadResolutionCache()
+        self.best_guess = best_guess
     
     def _normalizeData(self):
         for article in self.data:
@@ -73,10 +74,24 @@ class ArticleAuthorMatcher(Sanitizer):
                 print(f"Cached: '{name}' → '{dname}' (Article {aid})")
                 continue
             
+            if self.best_guess:
+                best = max(cands, key=lambda c: c[2])
+                author_id, dname, sim = best
+                self.resolution_cache[name] = (author_id, dname)
+                self.author_matches.setdefault(aid, {})[name] = (author_id, dname)
+                self._logChange(aid, name, dname)
+                self._logConflict(aid, name, cands)
+                print(f"  Auto: '{name}' → '{dname}' ({sim:.0%})")
+                continue
+
             # Interactive selection
-            prompt = f"Article {aid}: '{name}' ({i+1}/{len(flagged)})"
-            choice = selectFromList(prompt, cands, lambda i, c: f"{c[1]} ({c[2]:.0%})")
-            
+            prompt = f"Article {aid}: Ambiguous author '{name}'  [{i+1}/{len(flagged)} to resolve]\nSelect the best match:"
+            choice = selectFromList(
+                prompt, cands,
+                format_option=lambda i, c: [c[1], f"{c[2]:.0%}"],
+                headers=["Name", "Match"],
+            )
+
             if choice == -1:  # Unknown
                 self.unknown_authors.setdefault(name, []).append(aid)
                 print("  → Unknown")

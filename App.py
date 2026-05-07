@@ -18,12 +18,14 @@ class App:
     def __init__(self):
         self.animator = Animator()
         self.completedSteps = []
+        self.stepCount = 0
 
     def shutdown(self):
         self.animator.stopAllSpinners()
 
     def runStep(self, onLoad, onDone, func, *args, showDone: bool = True):
-        result = self.animator.spinner(onLoad, onDone, func, *args, showDone=showDone)
+        self.stepCount += 1
+        result = self.animator.spinner(f"[{self.stepCount}] {onLoad}", onDone, func, *args, showDone=showDone)
         self.completedSteps.append(onDone)
         return result
 
@@ -53,7 +55,8 @@ class App:
     def sanitizeAuthors(self, translators, key, name):
         authors = translators[key].listAuthors()
         authSanitizer = AuthorSanitizer(authors, AuthorPolicy(authors)) if key == "auth" else AuthorSanitizer(authors, GuestAuthorPolicy(authors))
-        authSpinner = self.animator.startSpinner(f"Sanitizing {name}...", f"Sanitized {name}", showDone=False)
+        self.stepCount += 1
+        authSpinner = self.animator.startSpinner(f"[{self.stepCount}] Sanitizing {name}...", f"Sanitized {name}", showDone=False)
         def onManualStart():
             authSpinner.pause()
 
@@ -104,17 +107,23 @@ class App:
                 dupes.update({len(dupes):str(gAuth)})
         return combined
 
-    def sanitizeArticleAuthors(self, translators, allAuthors):
+    def sanitizeArticleAuthors(self, translators, allAuthors, best_guess=False):
         articles = translators["articles"].getObjList()
-        articleSanitizer = ArticleAuthorMatcher(articles, allAuthors)
-        articleSpinner = self.animator.startSpinner("Sanitizing article authors...", "Sanitized article authors", showDone=False)
-        def onManualStart():
-            articleSpinner.pause()
+        articleSanitizer = ArticleAuthorMatcher(articles, allAuthors, best_guess=best_guess)
+        self.stepCount += 1
+        articleSpinner = self.animator.startSpinner(f"[{self.stepCount}] Sanitizing article authors...", "Sanitized article authors", showDone=False)
+
+        manualStart = None
+        manualEnd = None
+        if not best_guess:
+            def manualStart():
+                articleSpinner.pause()
+            manualEnd = articleSpinner.resume
 
         try:
             sanitizedArticles = articleSanitizer.sanitize(
-                manualStart=onManualStart,
-                manualEnd=articleSpinner.resume,
+                manualStart=manualStart,
+                manualEnd=manualEnd,
             )
         finally:
             articleSpinner.stop()

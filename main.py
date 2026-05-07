@@ -47,6 +47,11 @@ def parse_args():
         default=int(os.getenv("WP_EMBED_MAX_CHARS", "5000")),
         help="Maximum characters per article for embedding input",
     )
+    parser.add_argument(
+        "--best-guess",
+        action="store_true",
+        help="Resolve ambiguous author matches automatically using the highest similarity score instead of prompting",
+    )
     return parser.parse_args()
 
 
@@ -76,7 +81,7 @@ def build(args):
     app.writeAuthorOutput(allAuthors, "logs/merged_auth_output.json", "merged authors")
     
     # Sanitize article
-    sanitizedArticles = app.sanitizeArticleAuthors(translators, allAuthors)
+    sanitizedArticles = app.sanitizeArticleAuthors(translators, allAuthors, best_guess=args.best_guess)
     sanitizedArticles = app.sanitizeArticleContent(sanitizedArticles)
     Utility.canonicalizeArticleSlugs(sanitizedArticles)
     app.writeArticleOutput(sanitizedArticles)

@@ -1,7 +1,6 @@
 import re
 from Utils.Utility import Utility
 from Translator.Author import Author
-from Animator import Animator
 from minhashlib import DiffChecker
 
 class Policy():
@@ -140,7 +139,7 @@ class Policy():
         self.data = filteredAuthors + canonicals + bannedAuthors
         return flaggedAuthors
     
-    def _manualResolve(self, disputes: list, clear: bool = True):
+    def _manualResolve(self, disputes: list, resolve_conflict=None, clear: bool = True):
         authors, toRemove = [], []
 
         for i, dispute in enumerate(disputes):
@@ -167,18 +166,13 @@ class Policy():
                 else:
                     diffs.append((key, lval, rval))
 
-            for key, lval, rval in diffs:
-                params = [key, diffs, authorParams, left, right, clear, i, len(disputes)]
-                Animator._renderTable(*params)
-                while True:
-                    choice = Utility._readChoice()
-                    if choice in {"RIGHT", "LEFT"}:
-                        authorParams[key] = right.get(key) if choice == "RIGHT" else left.get(key)
-                        break
-                    if choice == "E":
-                        authorParams[key] = input("Value: ")
-                        break
-                    print("Input not recognized -- try again")
+            if diffs:
+                if resolve_conflict is None:
+                    raise SystemExit("Conflict resolution required but no resolver provided")
+                resolved = resolve_conflict(diffs, left, right, i, len(disputes))
+                if resolved is None:
+                    raise SystemExit("Conflict resolution cancelled")
+                authorParams.update(resolved)
 
             canonical = Author(*(authorParams[key] for key in keys))
             self.priorityId.add(str(canonical.data.get("id")))
@@ -189,7 +183,7 @@ class Policy():
             self._logConflict(rightAuthor, canonical)
         if toRemove:
             self.data = [author for author in self.data if author not in toRemove]
-        self.data.extend(authors) 
+        self.data.extend(authors)
 
     def _logChange(self, a, b):
         for change in self.changes:

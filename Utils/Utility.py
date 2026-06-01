@@ -2,7 +2,6 @@ from pathlib import Path
 from Utils.Constants import *
 import zipfile
 import shutil
-import os
 import re
 import html
 
@@ -122,46 +121,3 @@ class Utility:
       return plain
     return " ".join(words[:max_words])
 
-  def _readChoice():
-      try:
-          if os.name == "nt":
-              import msvcrt
-              while True:
-                  ch = msvcrt.getch()
-                  if ch in (b"\x00", b"\xe0"):
-                      code = msvcrt.getch()
-                      if code == b"K":
-                          return "RIGHT"
-                      if code == b"M":
-                          return "LEFT"
-                  elif ch in (b"e", b"E"):
-                      return "E"
-                  elif ch in (b"l", b"L", b"\r", b"\n"):
-                      return "LEFT"
-                  elif ch in (b"r", b"R"):
-                      return "RIGHT"
-          else:
-              import sys
-              import termios
-              import tty
-              fd = sys.stdin.fileno()
-              old = termios.tcgetattr(fd)
-              try:
-                  tty.setraw(fd)
-                  ch = sys.stdin.read(1)
-                  if ch == "\x1b":
-                      seq = sys.stdin.read(2)
-                      if seq == "[D":
-                          return "RIGHT"
-                      if seq == "[C":
-                          return "LEFT"
-                  elif ch in ("e", "E"):
-                      return "E"
-                  elif ch in ("l", "L", "\r", "\n"):
-                      return "LEFT"
-                  elif ch in ("r", "R"):
-                      return "RIGHT"
-              finally:
-                  termios.tcsetattr(fd, termios.TCSADRAIN, old)
-      except Exception:
-          pass

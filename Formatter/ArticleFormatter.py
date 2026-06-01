@@ -111,6 +111,8 @@ class ArticleFormatter(Formatter):
             return "NULL"
         if isinstance(value, bool):
             return "1" if value else "0"
+        if isinstance(value, int):
+            return str(value)
         if isinstance(value, (dict, list)):
             return self._esc(json.dumps(value, ensure_ascii=False))
         return self._esc(value)

@@ -17,14 +17,16 @@ class SeoFormatter(Formatter):
         insertPrefix = f"INSERT INTO {table} (id, article_id, yoast_tag_data)"
 
         self.sqlCommands.append(createTbl)
+        count = 1
         for obj in self.data:
-            row_id = self._esc(obj.get('id'))
+            article_id = self._esc(obj.get('id'))
             metadata = obj.get('metadata')
             if isinstance(metadata, (dict, list)):
                 yoast_tag_data = self._esc(json.dumps(metadata, ensure_ascii=False))
             else:
                 yoast_tag_data = self._esc(metadata)
-            values = f"VALUES({row_id}, {row_id}, {yoast_tag_data})"
+            values = f"VALUES({count}, {article_id}, {yoast_tag_data})"
+            count += 1
             command = f"{insertPrefix} {values};"
             self.sqlCommands.append(command)
         return self.sqlCommands

@@ -4,7 +4,6 @@ from Utils.Constants import EXPORT_DIR
 
 class Extractor:
   def __init__(self, posts, guestAuths):
-    self.value = 0
     self.postsFile = posts
     self.guestAuthsFile = guestAuths
     self.data = {
@@ -37,7 +36,7 @@ class Extractor:
         return None
       else:
         result = result.get(query, failsafe)
-    return result
+    return None if result == failsafe else result
   
   def _xml2Dict(self, posts, guestAuths):
     postsDict, guestAuthDict = {}, {}

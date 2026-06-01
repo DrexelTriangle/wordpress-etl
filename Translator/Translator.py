@@ -24,9 +24,6 @@ class Translator:
         self.objDataDict.update({payload["id"]: payload})
         self.objCount += 1
         
-    def getObjDataDict(self):
-        return self.objDataDict
-    
     def getObjList(self):
         return list(self.objDataDict.values())
         

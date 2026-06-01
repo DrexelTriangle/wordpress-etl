@@ -9,7 +9,7 @@ from Sanitizer.Policy import Policy
 class AuthorSanitizer(Sanitizer):
     def __init__(self, data: list, policies: Policy):
         super().__init__(data, policies)
-        self.lastAuid = int(data[-1].data["id"])
+        self.lastAuid = int(data[-1].data["id"]) if data else 0
         self.conflictsCache = None
         self.priorityId = set()
         self.type = "auth" if policies.isAuthor else "gauth"
@@ -98,17 +98,13 @@ class AuthorSanitizer(Sanitizer):
         self.conflictsCache = conflicts if isinstance(conflicts, list) else []
         return self.conflictsCache
 
-    def sanitize(self, manualStart=None, manualEnd=None, clear: bool = True):
+    def sanitize(self, resolve_conflict=None, clear: bool = True):
         self._normalizeData()
         self.policies.conflicts = self._loadConflicts()
         flaggedAuthors = self.policies._autoResolve()
         self.data = self.policies.data
-        if flaggedAuthors and manualStart:
-            manualStart()
-        self.policies._manualResolve(flaggedAuthors, clear=clear)
+        self.policies._manualResolve(flaggedAuthors, resolve_conflict=resolve_conflict, clear=clear)
         self.data = self.policies.data
-        if flaggedAuthors and manualEnd:
-            manualEnd()
         self.policies._autoResolve()
         self.data = self.policies.data
         self.changes = self.policies.changes

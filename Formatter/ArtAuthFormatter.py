@@ -22,7 +22,9 @@ class ArtAuthFormatter(Formatter):
             authIdLst = obj.get('authorIDs') or []
 
             for authId in authIdLst:
-                values = f"VALUES ({count}, {authId}, {artId})"
+                if authId is None or artId is None:
+                    continue
+                values = f"VALUES ({count}, {int(authId)}, {int(artId)})"
                 command = f"{insertPrefix} {values};"
                 count += 1
                 self.sqlCommands.append(command)

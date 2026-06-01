@@ -1,6 +1,5 @@
 from Utils.Utility import Utility
 from Utils.ArticleAuthorMatching import (
-    selectFromList,
     loadResolutionCache,
     saveResolutionCache,
     logUnknownAuthors,
@@ -33,14 +32,14 @@ class ArticleAuthorMatcher(Sanitizer):
     def _logConflict(self, article_id, author_name, candidates):
         self.conflicts.append({"article_id": article_id, "author_name": author_name, "candidates": candidates})
     
-    def sanitize(self, manualStart=None, manualEnd=None, clear: bool = True):
+    def sanitize(self, select_author=None, clear: bool = True):
         self._normalizeData()
-        self._matchArticleAuthors(manualStart, manualEnd, clear)
+        self._matchArticleAuthors(select_author)
         logUnknownAuthors(self.unknown_authors)
         self._log("article-sanitizer/article_author_mappings", "article-sanitizer/article_author_conflicts")
         return self.data
 
-    def _matchArticleAuthors(self, manualStart=None, manualEnd=None, clear: bool = True):
+    def _matchArticleAuthors(self, select_author=None):
         lookup = self.policies._author_lookup
         unique = collect_unique_author_names(self.data, Utility.cleanDocument)
         flagged = []
@@ -53,40 +52,32 @@ class ArticleAuthorMatcher(Sanitizer):
             apply_similarity_match(clean_key, occurrences, lookup, DiffChecker, self._logChange, self.author_matches, self.unknown_authors, flagged)
 
         if flagged:
-            manualStart and manualStart()
-            self._manualResolve(flagged)
+            self._manualResolve(flagged, select_author)
             saveResolutionCache(self.resolution_cache)
-            manualEnd and manualEnd()
 
         self._applyMatches()
-    
-    
-    def _manualResolve(self, flagged: list):
+
+    def _manualResolve(self, flagged: list, select_author=None):
         for i, item in enumerate(flagged):
             aid, name, cands = item["article_id"], item["author_name"], item["candidates"]
-            
-            # Check cache
+
             if name in self.resolution_cache:
                 author_id, dname = self.resolution_cache[name]
                 self.author_matches.setdefault(aid, {})[name] = (author_id, dname)
                 self._logChange(aid, name, dname)
-                print(f"Cached: '{name}' → '{dname}' (Article {aid})")
                 continue
-            
-            # Interactive selection
-            prompt = f"Article {aid}: '{name}' ({i+1}/{len(flagged)})"
-            choice = selectFromList(prompt, cands, lambda i, c: f"{c[1]} ({c[2]:.0%})")
-            
-            if choice == -1:  # Unknown
+
+            prompt = f"Article {aid}: '{name}' ({i + 1}/{len(flagged)})"
+            choice = select_author(prompt, cands, lambda i, c: f"{c[1]} ({c[2]:.0%})") if select_author else -1
+
+            if choice == -1:
                 self.unknown_authors.setdefault(name, []).append(aid)
-                print("  → Unknown")
             else:
                 author_id, dname, sim = cands[choice]
                 self.resolution_cache[name] = (author_id, dname)
                 self.author_matches.setdefault(aid, {})[name] = (author_id, dname)
                 self._logChange(aid, name, dname)
                 self._logConflict(aid, name, cands)
-                print(f"  → {dname}")
     
     def _applyMatches(self):
         # Apply matched authors to articles

@@ -1,7 +1,5 @@
 from pathlib import Path
 import json
-import sys
-import os
 
 def collect_unique_author_names(data: list, clean_func) -> dict:
     unique = {}
@@ -131,86 +129,3 @@ def logUnknownAuthors(unknown_authors):
     with log_path.open("w", encoding="utf-8") as f:
         json.dump({"unknown_authors": existing}, f, indent=4)
 
-
-def selectFromList(prompt: str, options: list, format_option=None) -> int:
-    # TUI selection
-    def readInput():
-        try:
-            if os.name == "nt":
-                import msvcrt
-                firstChar = msvcrt.getch()
-                if firstChar in (b'\x00', b'\xe0'):
-                    secondChar = msvcrt.getch()
-                    mapping = {
-                        b'H': 'UP',
-                        b'P': 'DOWN',
-                        b'K': 'LEFT',
-                        b'M': 'RIGHT',
-                    }
-                    return mapping.get(secondChar, None)
-                if firstChar == b'\r':
-                    return 'ENTER'
-                if firstChar in (b"u", b"U"):
-                    return "UNKNOWN"
-
-                return firstChar.decode('utf-8')
-                
-            else:
-                import sys
-                import termios
-                import tty
-                fd = sys.stdin.fileno()
-                old = termios.tcgetattr(fd)
-                try:
-                    tty.setraw(fd)
-                    ch = sys.stdin.read(1)
-                    if ch == '\x1b':
-                        second = sys.stdin.read(1)
-                        if second != "[":
-                            return None
-                        direction = sys.stdin.read(1)
-
-                        mapping = {
-                            'A': 'UP',
-                            'B': 'DOWN',
-                            'C': 'RIGHT',
-                            'D': 'LEFT'
-                        }
-                        return mapping.get(direction)
-                    if ch in ('\r', '\n'):
-                        return 'ENTER'
-                    if ch in ("u", "U"):
-                        return "UNKNOWN"
-
-                    return ch
-                finally:
-                    termios.tcsetattr(fd, termios.TCSADRAIN, old)
-        except Exception:
-          pass
-    
-    ptr = 0
-    while True:
-        # Clear and display
-        print("\033[2J\033[H")  # Clear screen
-        print(f"{prompt}\n")
-        
-        for i, option in enumerate(options):
-            marker = "→" if i == ptr else " "
-            if format_option:
-                text = format_option(i, option)
-            else:
-                text = str(option)
-            print(f"  {marker} {text}")
-        
-        print("\n↑↓ to navigate | Enter to select | 'u' for unknown")
-        
-        # Get input
-        key = readInput()
-        if (key == 'UP'):
-            ptr = max(0, ptr - 1)
-        elif (key == 'DOWN'):
-            ptr = min(len(options) - 1, ptr + 1)
-        elif (key == 'ENTER'): 
-            return ptr
-        elif key == "UNKNOWN":
-            return -1

@@ -82,17 +82,6 @@ def log_problematic_chars(content: str, article_id: str, problematic_char_patter
     return problematic_chars_log
 
 
-def replace_problematic_chars(content: str, problematic_char_patterns: list) -> str:
-    # Replace problematic char w Unicode escape representation
-    for pattern, _ in problematic_char_patterns:
-        def replace_func(match):
-            char = match.group(0)
-            unicode_repr = f"[U+{ord(char):04X}]"
-            return unicode_repr
-        content = re.sub(pattern, replace_func, content)
-    return content
-
-
 def add_missing_paragraph_tags(content: str) -> str:
     # Keep already-paragraphized content untouched.
     if _HAS_PARAGRAPHS_PATTERN.search(content):

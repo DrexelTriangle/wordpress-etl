@@ -1,5 +1,4 @@
 from pathlib import Path
-import os as OS
 import json
 from Translator.Translator import Translator
 from Translator.Article import Article
@@ -10,7 +9,6 @@ class ArticleTranslator(Translator):
   # Constructor
   def __init__(self, incomingData):
     super().__init__(incomingData)
-    self.uniqueAuthorCleanNames = set()
 
   def _getArticle(self, data, noTextGrab=False):
     textData = ''
@@ -80,26 +78,6 @@ class ArticleTranslator(Translator):
         continue
       else:
         self.addObject(obj)
-
-
-  def _printUniqueAuthors(self):
-    terminal_size = OS.get_terminal_size()
-    names = sorted(list(self.uniqueAuthorCleanNames))
-    if not names:
-      return
-    longestName = len(max(names, key=len))
-    columns = terminal_size.columns // longestName
-
-
-    for i in range(len(names)):
-      authorName = names[i]
-      spaces = longestName - len(authorName)
-      buf = (' ' * spaces) + authorName
-      print(buf, end=' ')
-      if (i + 1) % columns == 0:
-        print()
-    print('\n')
-  
   def _log(self, fileDestination):                      
     fileBuckets = []
     dictLen = len(self.objDataDict)

@@ -16,7 +16,9 @@ class AuthorTranslator(Translator):
         return Author(*data)
         
     
-    def translate(self):
+    def translate(self, on_progress=None):
+        if on_progress:
+            on_progress(f"translating {len(self.source)} authors")
         for author in self.source:
             self.addObject(self._getAuthor(author))
     

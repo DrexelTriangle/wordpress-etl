@@ -78,9 +78,9 @@ class Utility:
     return document
 
   def unzip(zipPath):
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    EXPORT_DIR.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(zipPath, 'r') as zip_ref:
-      zip_ref.extractall(DATA_DIR)
+      zip_ref.extractall(EXPORT_DIR)
 
 
   def _delete_dir(dir):

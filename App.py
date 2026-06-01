@@ -33,9 +33,24 @@ class Pipeline:
         return result
 
     def extractData(self):
-        Utility.unzip(ZIP_FILE)
-        extractor = Extractor(*UNZIPPED_FILES)
-        return self.runStep("Extracting...", "Extracted", extractor.getData)
+        self.stepCount += 1
+        spinner = self.animator.startSpinner(f"[{self.stepCount}] Extracting...", "Extracted", showDone=False)
+        try:
+            spinner.report("unzipping wp-export.zip")
+            Utility.unzip(ZIP_FILE)
+            extractor = Extractor(*UNZIPPED_FILES)
+            result = extractor.getData(on_progress=spinner.report)
+        except Exception:
+            spinner.stop()
+            errorMark = Animator.colorWrap(ANSI_RED, '✗')
+            errorText = Animator.colorWrap(ANSI_GRAY, f"Error occurred: [{self.stepCount}] Extracting...")
+            print(f"\r{errorMark} {errorText}    ")
+            raise
+        spinner.stop()
+        checkmark = Animator.colorWrap(ANSI_GREEN, CHECKMARK_CHAR)
+        print(f"\r{checkmark} {Animator.colorWrap(ANSI_GRAY, 'Extracted')}    ")
+        self.completedSteps.append("Extracted")
+        return result
 
     def translateData(self, extracted):
         translators = {
@@ -43,7 +58,22 @@ class Pipeline:
             "gAuth": GuestAuthorTranslator(extracted["guestAuth"]),
             "auth": AuthorTranslator(extracted["auth"]),
         }
-        self.runStep("Translating...", "Translated", lambda: [translators[key].translate() for key in translators])
+        self.stepCount += 1
+        spinner = self.animator.startSpinner(f"[{self.stepCount}] Translating...", "Translated", showDone=False)
+        try:
+            translators["auth"].translate(on_progress=spinner.report)
+            translators["gAuth"].translate(on_progress=spinner.report)
+            translators["articles"].translate(on_progress=spinner.report)
+        except Exception:
+            spinner.stop()
+            errorMark = Animator.colorWrap(ANSI_RED, '✗')
+            errorText = Animator.colorWrap(ANSI_GRAY, f"Error occurred: [{self.stepCount}] Translating...")
+            print(f"\r{errorMark} {errorText}    ")
+            raise
+        spinner.stop()
+        checkmark = Animator.colorWrap(ANSI_GREEN, CHECKMARK_CHAR)
+        print(f"\r{checkmark} {Animator.colorWrap(ANSI_GRAY, 'Translated')}    ")
+        self.completedSteps.append("Translated")
         return translators
 
     def logOutputs(self, translators):
@@ -93,7 +123,7 @@ class Pipeline:
                 combined.append(gAuth)
         return combined
 
-    def sanitizeArticleAuthors(self, translators, allAuthors):
+    def sanitizeArticleAuthors(self, translators, allAuthors, best_guess=False):
         articles = translators["articles"].getObjList()
         articleSanitizer = ArticleAuthorMatcher(articles, allAuthors)
         self.on_start("Sanitizing article authors...")

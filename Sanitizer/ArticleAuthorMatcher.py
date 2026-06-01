@@ -14,11 +14,13 @@ from minhashlib import DiffChecker
 
 
 class ArticleAuthorMatcher(Sanitizer):
-    def __init__(self, data: list, authors: list):
+    def __init__(self, data: list, authors: list, best_guess: bool = False):
         super().__init__(data, policies=ArticleAuthorMatchingPolicy([], authors))
         self.unknown_authors = {}
         self.author_matches = {}
         self.resolution_cache = loadResolutionCache()
+        self.best_guess = best_guess
+        self._on_progress = None
     
     def _normalizeData(self):
         for article in self.data:
@@ -41,9 +43,11 @@ class ArticleAuthorMatcher(Sanitizer):
 
     def _matchArticleAuthors(self, select_author=None):
         lookup = self.policies._author_lookup
+        progress("collecting unique author names")
         unique = collect_unique_author_names(self.data, Utility.cleanDocument)
         flagged = []
 
+        progress("matching authors")
         for clean_key, occurrences in unique.items():
             if apply_special_edits(clean_key, occurrences, lookup, self.policies.specialEdits, Utility.cleanDocument, self._logChange, self.author_matches):
                 continue

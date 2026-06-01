@@ -101,6 +101,7 @@ class AuthorSanitizer(Sanitizer):
     def sanitize(self, resolve_conflict=None, clear: bool = True):
         self._normalizeData()
         self.policies.conflicts = self._loadConflicts()
+        progress("auto-resolving duplicates")
         flaggedAuthors = self.policies._autoResolve()
         self.data = self.policies.data
         self.policies._manualResolve(flaggedAuthors, resolve_conflict=resolve_conflict, clear=clear)

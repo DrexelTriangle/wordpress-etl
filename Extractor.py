@@ -13,8 +13,8 @@ class Extractor:
     }
 
   # GETTERS/SETTERS
-  def getData(self):
-    self._xml2Dict(self.postsFile, self.guestAuthsFile)
+  def getData(self, on_progress=None):
+    self._xml2Dict(self.postsFile, self.guestAuthsFile, on_progress)
     U._delete_dir(EXPORT_DIR)
     return self.data
 
@@ -24,7 +24,7 @@ class Extractor:
   # METHODS
   def _eparse(self, xmlFile):
     with open(xmlFile, "r", encoding="utf-8") as file:
-      content = file.read()
+      content = file.read().lstrip()
     parsedDict = parse(content)
     return parsedDict
   
@@ -38,13 +38,17 @@ class Extractor:
         result = result.get(query, failsafe)
     return None if result == failsafe else result
   
-  def _xml2Dict(self, posts, guestAuths):
-    postsDict, guestAuthDict = {}, {}
+  def _xml2Dict(self, posts, guestAuths, on_progress=None):
+    def progress(msg):
+      if on_progress:
+        on_progress(msg)
 
+    progress("parsing wp-posts.xml")
     postsDict = self._eparse(posts)
+    progress("parsing wp-guestAuths.xml")
     guestAuthDict = self._eparse(guestAuths)
     postsDict = self._equery(postsDict, ['rss', 'channel'])
-    
+    progress("indexing authors and articles")
     self._setData('auth', self._equery(postsDict, ['wp:author']))
     self._setData('art', self._equery(postsDict, ['item']))
     self._setData('guestAuth', self._equery(guestAuthDict, ['rss', 'channel', 'item']))

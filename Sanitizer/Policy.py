@@ -1,7 +1,7 @@
 import re
 from Utils.Utility import Utility
 from Translator.Author import Author
-from minhashlib import DiffChecker
+from minhashlib import MinHash, MinHashLSH, similarity
 
 class Policy():
     def __init__(self,
@@ -23,7 +23,7 @@ class Policy():
         self.conflicts = []
         self.priorityId = set()
 
-        self.diffChecker = DiffChecker()
+        self.diffChecker = MinHash()
 
     @staticmethod
     def _buildDisplayName(firstName, lastName):
@@ -113,17 +113,31 @@ class Policy():
         authors = [Utility.cleanDocument(a.data["display_name"], "similarity") for a in filteredAuthors]
         authorsMeta = list(filteredAuthors)
         keep = [True] * len(authorsMeta)
-        
+
+        # Compute one MinHash signature per author name (O(n)) and index them in an
+        # LSH so each author is only compared against likely-similar candidates,
+        # replacing the former O(n^2) all-pairs compare(). The exact decision
+        # thresholds below are unchanged: similarity(sig_i, sig_j) is identical to
+        # the previous compare(name_i, name_j). The LSH threshold is set below 0.8
+        # so every pair the merge/flag logic cares about is surfaced as a candidate.
+        signatures = [self.diffChecker.signature(name) for name in authors]
+        lsh = MinHashLSH(threshold=0.7, num_perm=self.diffChecker.num_perm)
+        for index, signature in enumerate(signatures):
+            lsh.insert(index, signature)
+        candidatesByIndex = [
+            sorted(c for c in lsh.query(signatures[i]) if c > i)
+            for i in range(len(authors))
+        ]
 
         for i in range(len(authors)):
             if not keep[i]:
                 continue
             canonical = authorsMeta[i]
             mergedAny = False
-            for j in range(i+1, len(authors)):
+            for j in candidatesByIndex[i]:
                 if not keep[j]:
                     continue
-                sim = self.diffChecker.compare(authors[i], authors[j])
+                sim = similarity(signatures[i], signatures[j])
                 if sim >= .9:
                     canonical = self._merge(canonical, authorsMeta[j])
                     self._logChange(authorsMeta[j], canonical)

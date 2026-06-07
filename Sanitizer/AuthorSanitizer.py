@@ -98,7 +98,11 @@ class AuthorSanitizer(Sanitizer):
         self.conflictsCache = conflicts if isinstance(conflicts, list) else []
         return self.conflictsCache
 
-    def sanitize(self, resolve_conflict=None, clear: bool = True):
+    def sanitize(self, resolve_conflict=None, clear: bool = True, on_progress=None):
+        def progress(message):
+            if on_progress:
+                on_progress(message)
+
         self._normalizeData()
         self.policies.conflicts = self._loadConflicts()
         progress("auto-resolving duplicates")

@@ -1,6 +1,51 @@
 from pathlib import Path
 import json
 
+from minhashlib import MinHash, MinHashLSH, similarity
+
+
+class AuthorSimilarityIndex:
+    """Precomputes a MinHash signature for every author in the lookup and indexes
+    them in an LSH, built once and reused for all unknown names.
+
+    Previously each unknown name constructed a fresh MinHash and compared itself
+    against the entire lookup, recomputing both signatures on every comparison.
+    This computes each author signature once and only scores the handful of
+    candidates LSH surfaces, while preserving the exact match/flag thresholds and
+    lookup-order tie-breaking of the original scan.
+    """
+
+    def __init__(self, lookup: dict, threshold: float = 0.7):
+        self.lookup = lookup
+        self.minhash = MinHash()
+        self.keys = list(lookup.keys())
+        self.signatures = {key: self.minhash.signature(key) for key in self.keys}
+        self.lsh = MinHashLSH(threshold=threshold, num_perm=self.minhash.num_perm)
+        for key in self.keys:
+            self.lsh.insert(key, self.signatures[key])
+
+    def match(self, clean_key: str):
+        """Return ``(best, similar)`` for ``clean_key``.
+
+        ``best`` is ``(author_id, display_name)`` for the highest-scoring candidate
+        with similarity >= 0.9, else ``None``. ``similar`` is the list of
+        ``(author_id, display_name, similarity)`` candidates in ``[0.8, 0.9)``,
+        in lookup order.
+        """
+        signature = self.minhash.signature(clean_key)
+        candidates = set(self.lsh.query(signature))
+        best, best_sim, similar = None, 0.0, []
+        for candidate_key in self.keys:
+            if candidate_key not in candidates:
+                continue
+            sim = similarity(signature, self.signatures[candidate_key])
+            aid, dname = self.lookup[candidate_key]
+            if sim >= 0.9 and sim > best_sim:
+                best, best_sim = (aid, dname), sim
+            elif sim >= 0.8:
+                similar.append((aid, dname, sim))
+        return best, similar
+
 def collect_unique_author_names(data: list, clean_func) -> dict:
     unique = {}
     for article in data:
@@ -53,23 +98,13 @@ def apply_exact_match(clean_key, occurrences, lookup, author_matches) -> bool:
     return True
 
 
-def apply_similarity_match(clean_key, occurrences, lookup, diff_checker_cls, log_change, author_matches, unknown_authors, flagged):
-    if not lookup:
+def apply_similarity_match(clean_key, occurrences, index, log_change, author_matches, unknown_authors, flagged):
+    if not index.lookup:
         for art_id, name in occurrences:
             unknown_authors.setdefault(name, []).append(art_id)
         return
 
-    candidates = list(lookup.items())
-    checker = diff_checker_cls()
-    best, best_sim, similar = None, 0.0, []
-
-    for i, (_, (aid, dname)) in enumerate(candidates):
-        candidate_key = candidates[i][0]
-        sim = checker.compare(clean_key, candidate_key)
-        if sim >= 0.9 and sim > best_sim:
-            best, best_sim = (aid, dname), sim
-        elif sim >= 0.8:
-            similar.append((aid, dname, sim))
+    best, similar = index.match(clean_key)
 
     if best:
         for art_id, name in occurrences:

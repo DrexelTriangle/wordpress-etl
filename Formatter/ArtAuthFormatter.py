@@ -5,17 +5,7 @@ class ArtAuthFormatter(Formatter):
     def __init__(self, articleData):
         super().__init__(articleData)
 
-    def format(self, table="articles_authors"):
-        createTbl = (
-            f"CREATE TABLE {table} ("
-            "id BIGINT PRIMARY KEY, "
-            "author_id BIGINT NOT NULL, "
-            "articles_id BIGINT NOT NULL"
-            ");"
-        )
-        insertPrefix = f"INSERT INTO {table} (id, author_id, articles_id)"
-        self.sqlCommands.append(createTbl)
-
+    def _row_values(self):
         count = 1
         for obj in self.data:
             artId = obj.get('id')
@@ -24,9 +14,21 @@ class ArtAuthFormatter(Formatter):
             for authId in authIdLst:
                 if authId is None or artId is None:
                     continue
-                values = f"VALUES ({count}, {int(authId)}, {int(artId)})"
-                command = f"{insertPrefix} {values};"
+                yield f"({count}, {int(authId)}, {int(artId)})"
                 count += 1
-                self.sqlCommands.append(command)
 
+    def iter_format(self, table="articles_authors"):
+        createTbl = (
+            f"CREATE TABLE {table} ("
+            "id BIGINT PRIMARY KEY, "
+            "author_id BIGINT NOT NULL, "
+            "articles_id BIGINT NOT NULL"
+            ");"
+        )
+        insertPrefix = f"INSERT INTO {table} (id, author_id, articles_id)"
+        yield createTbl
+        yield from self._insert_batches(insertPrefix, self._row_values())
+
+    def format(self, table="articles_authors"):
+        self.sqlCommands = list(self.iter_format(table))
         return self.sqlCommands

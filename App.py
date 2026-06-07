@@ -10,7 +10,7 @@ from Sanitizer.ArticleContentSanitizer import ArticleContentSanitizer
 from Translator.ArticleTranslator import ArticleTranslator
 from Translator.AuthorTranslator import AuthorTranslator
 from Translator.GuestAuthorTranslator import GuestAuthorTranslator
-from Utils.Constants import UNZIPPED_FILES, ZIP_FILE
+from Utils.Constants import ZIP_FILE
 from Utils.Utility import Utility
 
 
@@ -33,23 +33,15 @@ class Pipeline:
         return result
 
     def extractData(self):
-        self.stepCount += 1
-        spinner = self.animator.startSpinner(f"[{self.stepCount}] Extracting...", "Extracted", showDone=False)
+        self.on_start("Extracting...")
         try:
-            spinner.report("unzipping wp-export.zip")
-            Utility.unzip(ZIP_FILE)
-            extractor = Extractor(*UNZIPPED_FILES)
-            result = extractor.getData(on_progress=spinner.report)
+            self.on_start("Extracting... (opening wp-export.zip)")
+            extractor = Extractor(*Utility.resolveExportZipMembers(ZIP_FILE))
+            result = extractor.getData(on_progress=self.on_start)
         except Exception:
-            spinner.stop()
-            errorMark = Animator.colorWrap(ANSI_RED, '✗')
-            errorText = Animator.colorWrap(ANSI_GRAY, f"Error occurred: [{self.stepCount}] Extracting...")
-            print(f"\r{errorMark} {errorText}    ")
+            self.on_error("Error: Extracting...")
             raise
-        spinner.stop()
-        checkmark = Animator.colorWrap(ANSI_GREEN, CHECKMARK_CHAR)
-        print(f"\r{checkmark} {Animator.colorWrap(ANSI_GRAY, 'Extracted')}    ")
-        self.completedSteps.append("Extracted")
+        self.on_done("Extracted")
         return result
 
     def translateData(self, extracted):
@@ -58,25 +50,21 @@ class Pipeline:
             "gAuth": GuestAuthorTranslator(extracted["guestAuth"]),
             "auth": AuthorTranslator(extracted["auth"]),
         }
-        self.stepCount += 1
-        spinner = self.animator.startSpinner(f"[{self.stepCount}] Translating...", "Translated", showDone=False)
+        self.on_start("Translating...")
         try:
-            translators["auth"].translate(on_progress=spinner.report)
-            translators["gAuth"].translate(on_progress=spinner.report)
-            translators["articles"].translate(on_progress=spinner.report)
+            translators["auth"].translate(on_progress=self.on_start)
+            translators["gAuth"].translate(on_progress=self.on_start)
+            translators["articles"].translate(on_progress=self.on_start)
         except Exception:
-            spinner.stop()
-            errorMark = Animator.colorWrap(ANSI_RED, '✗')
-            errorText = Animator.colorWrap(ANSI_GRAY, f"Error occurred: [{self.stepCount}] Translating...")
-            print(f"\r{errorMark} {errorText}    ")
+            self.on_error("Error: Translating...")
             raise
-        spinner.stop()
-        checkmark = Animator.colorWrap(ANSI_GREEN, CHECKMARK_CHAR)
-        print(f"\r{checkmark} {Animator.colorWrap(ANSI_GRAY, 'Translated')}    ")
-        self.completedSteps.append("Translated")
+        self.on_done("Translated")
         return translators
 
     def logOutputs(self, translators):
+        if os.getenv("WP_TRANSLATOR_LOGS", "").strip().lower() not in ("1", "true", "yes", "on"):
+            return
+
         logTargets = [
             ("Logging articles...", "Logged articles", translators["articles"]._log, Path("logs") / "articles"),
             ("Logging guest authors...", "Logged guest authors", translators["gAuth"]._log, Path("logs") / "gAuth.json"),
@@ -90,7 +78,7 @@ class Pipeline:
         policy = AuthorPolicy(authors) if key == "auth" else GuestAuthorPolicy(authors)
         authSanitizer = AuthorSanitizer(authors, policy)
         self.on_start(f"Sanitizing {name}...")
-        authors = authSanitizer.sanitize(resolve_conflict=self.resolve_conflict)
+        authors = authSanitizer.sanitize(resolve_conflict=self.resolve_conflict, on_progress=self.on_start)
         self.on_done(f"Sanitized {name}")
         return authors
 
@@ -123,7 +111,7 @@ class Pipeline:
                 combined.append(gAuth)
         return combined
 
-    def sanitizeArticleAuthors(self, translators, allAuthors, best_guess=False):
+    def sanitizeArticleAuthors(self, translators, allAuthors):
         articles = translators["articles"].getObjList()
         articleSanitizer = ArticleAuthorMatcher(articles, allAuthors)
         self.on_start("Sanitizing article authors...")
@@ -132,35 +120,20 @@ class Pipeline:
         return sanitizedArticles
 
     def sanitizeArticleContent(self, sanitizedArticles):
+        # ArticleContentSanitizer.sanitize now also builds excerpts as part of its
+        # (parallelized) per-article pass, so no separate excerpt loop is needed.
         contentSanitizer = ArticleContentSanitizer(sanitizedArticles)
         self.runStep("Sanitizing article content...", "Sanitized article content", contentSanitizer.sanitize)
-        for article in sanitizedArticles:
-            text = article.get("text", "")
-            categories = article.get("categories", [])
-            normalized_categories = {
-                str(category).strip().lower() for category in categories if category is not None
-            }
-            is_comics_or_puzzles = bool(
-                normalized_categories
-                & {
-                    "comics",
-                    "comic",
-                    "comics & puzzles",
-                    "puzzles",
-                    "crossword",
-                    "sudoku",
-                }
-            )
-            has_puzzle_embed = "[puzzleme" in text.lower() or "pm-embed-div" in text.lower()
-            if is_comics_or_puzzles or has_puzzle_embed:
-                article["excerpt"] = ""
-                continue
-            article["excerpt"] = Utility._build_excerpt(text, max_words=100)
         return sanitizedArticles
 
     def writeArticleOutput(self, sanitizedArticles):
+        if os.getenv("WP_ARTICLE_OUTPUT_LOGS", "").strip().lower() not in ("1", "true", "yes", "on"):
+            return
+
         def outputArticles():
-            Path("logs/article_output.json").write_text(
+            output_path = Path("logs/article_output.json")
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(
                 json.dumps(
                     {str(i): (sanitizedArticles[i].data if hasattr(sanitizedArticles[i], "data") else sanitizedArticles[i])
                      for i in range(len(sanitizedArticles))},

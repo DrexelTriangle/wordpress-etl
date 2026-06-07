@@ -1,5 +1,6 @@
 from Utils.Utility import Utility
 from Utils.ArticleAuthorMatching import (
+    AuthorSimilarityIndex,
     loadResolutionCache,
     saveResolutionCache,
     logUnknownAuthors,
@@ -10,7 +11,6 @@ from Utils.ArticleAuthorMatching import (
 )
 from Sanitizer.Sanitizer import Sanitizer
 from Sanitizer.ArticleAuthorMatchingPolicy import ArticleAuthorMatchingPolicy
-from minhashlib import DiffChecker
 
 
 class ArticleAuthorMatcher(Sanitizer):
@@ -42,10 +42,17 @@ class ArticleAuthorMatcher(Sanitizer):
         return self.data
 
     def _matchArticleAuthors(self, select_author=None):
+        def progress(message):
+            if self._on_progress:
+                self._on_progress(message)
+
         lookup = self.policies._author_lookup
         progress("collecting unique author names")
         unique = collect_unique_author_names(self.data, Utility.cleanDocument)
         flagged = []
+
+        progress("indexing authors")
+        index = AuthorSimilarityIndex(lookup)
 
         progress("matching authors")
         for clean_key, occurrences in unique.items():
@@ -53,7 +60,7 @@ class ArticleAuthorMatcher(Sanitizer):
                 continue
             if apply_exact_match(clean_key, occurrences, lookup, self.author_matches):
                 continue
-            apply_similarity_match(clean_key, occurrences, lookup, DiffChecker, self._logChange, self.author_matches, self.unknown_authors, flagged)
+            apply_similarity_match(clean_key, occurrences, index, self._logChange, self.author_matches, self.unknown_authors, flagged)
 
         if flagged:
             self._manualResolve(flagged, select_author)

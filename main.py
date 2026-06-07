@@ -18,7 +18,10 @@ import os
 def write_sql_file(path, commands):
     outputPath = Path(path)
     outputPath.parent.mkdir(parents=True, exist_ok=True)
-    outputPath.write_text("\n".join(commands) + "\n", encoding="utf-8")
+    with outputPath.open("w", encoding="utf-8") as file:
+        for command in commands:
+            file.write(command)
+            file.write("\n")
 
 
 def parse_args():
@@ -26,7 +29,7 @@ def parse_args():
     parser.add_argument(
         "--generate-embeddings",
         action="store_true",
-        help="Generate logs/sql/article_embeddings.sql from logs/article_output.json",
+        help="Generate logs/sql/article_embeddings.sql from sanitized article content",
     )
     parser.add_argument(
         "--embedding-model",
@@ -88,19 +91,16 @@ def _run_pipeline(tui: ETLApp, args) -> None:
     Utility.canonicalizeArticleSlugs(sanitizedArticles)
     pipeline.writeArticleOutput(sanitizedArticles)
 
-    pipeline.runStep(
-        "Formatting SQL...",
-        "Wrote SQL",
-        lambda: [
-            write_sql_file(path, fmt())
-            for path, fmt in [
-                ("logs/sql/articles.sql", lambda: ArticleFormatter(sanitizedArticles).format("articles")),
-                ("logs/sql/seo.sql", lambda: SeoFormatter(sanitizedArticles).format("seo")),
-                ("logs/sql/authors.sql", lambda: AuthorFormatter(allAuthors).format("authors")),
-                ("logs/sql/articles_authors.sql", lambda: ArtAuthFormatter(sanitizedArticles).format("articles_authors")),
-            ]
-        ],
-    )
+    def write_sql_outputs():
+        for path, commands in [
+            ("logs/sql/articles.sql", ArticleFormatter(sanitizedArticles).iter_format("articles")),
+            ("logs/sql/seo.sql", SeoFormatter(sanitizedArticles).iter_format("seo")),
+            ("logs/sql/authors.sql", AuthorFormatter(allAuthors).iter_format("authors")),
+            ("logs/sql/articles_authors.sql", ArtAuthFormatter(sanitizedArticles).iter_format("articles_authors")),
+        ]:
+            write_sql_file(path, commands)
+
+    pipeline.runStep("Formatting SQL...", "Wrote SQL", write_sql_outputs)
 
     if args.generate_embeddings:
         try:

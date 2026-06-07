@@ -117,21 +117,28 @@ class ArticleFormatter(Formatter):
             return self._esc(json.dumps(value, ensure_ascii=False))
         return self._esc(value)
 
-    def format(self, table="articles"):
-        objects = [self._normalize_obj(item) for item in self.data if isinstance(self._normalize_obj(item), dict)]
-        if not objects:
-            return self.sqlCommands
+    def _row_values(self, objects, columns):
+        for obj in objects:
+            row = self._to_cms_row(obj)
+            yield f"({', '.join(self._to_sql_literal(row.get(col)) for col in columns)})"
 
-        rows = [self._to_cms_row(obj) for obj in objects]
+    def iter_format(self, table="articles"):
+        objects = [
+            obj
+            for item in self.data
+            for obj in [self._normalize_obj(item)]
+            if isinstance(obj, dict)
+        ]
+        if not objects:
+            return
+
         columns = self.CMS_COLUMNS
         columnDefs = [f"`{column}` {self.CMS_SCHEMA[column]}" for column in columns]
-        createTbl = f"CREATE TABLE {table} ({', '.join(columnDefs)});"
+        yield f"CREATE TABLE {table} ({', '.join(columnDefs)});"
         insertPrefix = f"INSERT INTO {table} ({', '.join(f'`{col}`' for col in columns)})"
 
-        self.sqlCommands.append(createTbl)
-        for row in rows:
-            values = ", ".join(self._to_sql_literal(row.get(col)) for col in columns)
-            values = f"VALUES({values})"
-            command = f"{insertPrefix} {values};"
-            self.sqlCommands.append(command)
+        yield from self._insert_batches(insertPrefix, self._row_values(objects, columns))
+
+    def format(self, table="articles"):
+        self.sqlCommands = list(self.iter_format(table))
         return self.sqlCommands

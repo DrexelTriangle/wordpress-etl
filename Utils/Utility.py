@@ -15,6 +15,7 @@ _FIGURE_PATTERN = re.compile(r"<figure\b[^>]*>.*?</figure>", re.IGNORECASE | re.
 _IMG_PATTERN = re.compile(r"<img\b[^>]*>", re.IGNORECASE)
 _TAG_PATTERN = re.compile(r"<[^>]+>")
 _WHITESPACE_PATTERN = re.compile(r"\s+")
+_NONSPACE_PATTERN = re.compile(r"\S+")
 _SLUG_PATTERN = re.compile(r"[^a-z0-9]+")
 
 class Utility:
@@ -82,6 +83,39 @@ class Utility:
     with zipfile.ZipFile(zipPath, 'r') as zip_ref:
       zip_ref.extractall(EXPORT_DIR)
 
+  def _find_one(directory, pattern):
+    # WP exports vary in naming/nesting (e.g. wp-posts[09-25-2025].xml inside a
+    # nested wp-export/ folder), so resolve files by glob rather than exact path.
+    matches = sorted(Path(directory).rglob(pattern))
+    if not matches:
+      raise FileNotFoundError(f"No file matching '{pattern}' under {directory}")
+    return matches[0]
+
+  def _find_zip_member(names, prefix):
+    matches = sorted(
+      name for name in names
+      if not name.endswith("/")
+      and Path(name).name.startswith(prefix)
+      and Path(name).suffix.lower() == ".xml"
+    )
+    if not matches:
+      raise FileNotFoundError(f"No zip member matching '{prefix}*.xml'")
+    return matches[0]
+
+  def resolveExportZipMembers(zipPath=ZIP_FILE):
+    with zipfile.ZipFile(zipPath, "r") as zip_ref:
+      names = zip_ref.namelist()
+    return (
+      (zipPath, Utility._find_zip_member(names, "wp-posts")),
+      (zipPath, Utility._find_zip_member(names, "wp-guestAuths")),
+    )
+
+  def resolveExportFiles(exportDir=EXPORT_DIR):
+    return (
+      Utility._find_one(exportDir, "wp-posts*.xml"),
+      Utility._find_one(exportDir, "wp-guestAuths*.xml"),
+    )
+
 
   def _delete_dir(dir):
     path = Path(dir)
@@ -106,18 +140,23 @@ class Utility:
     if text is None:
       return ""
 
-    text_without_media = _FIGURE_PATTERN.sub(" ", str(text))
-    text_without_media = _IMG_PATTERN.sub(" ", text_without_media)
+    text_without_media = str(text)
+    if _FIGURE_PATTERN.search(text_without_media):
+      text_without_media = _FIGURE_PATTERN.sub(" ", text_without_media)
+    if _IMG_PATTERN.search(text_without_media):
+      text_without_media = _IMG_PATTERN.sub(" ", text_without_media)
 
-    plain = html.unescape(text_without_media)
-    plain = _TAG_PATTERN.sub(" ", plain)
-    plain = _WHITESPACE_PATTERN.sub(" ", plain).strip()
+    plain = html.unescape(text_without_media) if "&" in text_without_media else text_without_media
+    if "<" in plain:
+      plain = _TAG_PATTERN.sub(" ", plain)
 
-    if not plain:
+    words = []
+    for match in _NONSPACE_PATTERN.finditer(plain):
+      words.append(match.group(0))
+      if len(words) > max_words:
+        return " ".join(words[:max_words])
+
+    if not words:
       return ""
 
-    words = plain.split(" ")
-    if len(words) <= max_words:
-      return plain
-    return " ".join(words[:max_words])
-
+    return _WHITESPACE_PATTERN.sub(" ", plain).strip()

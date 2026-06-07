@@ -15,6 +15,13 @@ _PUZZLEME_SHORTCODE_PATTERN = re.compile(
 )
 _SHORTCODE_ATTR_PATTERN = re.compile(r'(\w+)\s*=\s*"([^"]*)"')
 _FIRST_IMAGE_PATTERN = re.compile(r'(?is)<img\b[^>]*>')
+_SLUG_NON_ALNUM_PATTERN = re.compile(r'[^a-z0-9-]+')
+_PARAGRAPH_SPLIT_PATTERN = re.compile(r'\n\s*\n+')
+# Union of every problematic-character class, for a single cheap pre-scan before
+# the per-type finditer work below.
+_ANY_PROBLEMATIC_CHAR_PATTERN = re.compile(
+    '[\u0000-\u0008\u000B\u000C\u000E-\u001F\u200B-\u200D\uFEFF]'
+)
 
 
 def sanitize_backslashes(content: str) -> str:
@@ -23,10 +30,10 @@ def sanitize_backslashes(content: str) -> str:
     content = content.replace('\\\\', '\\')
     return content
 
-def log_shortcodes(content: str, article_id: str, shortcode_pattern: str) -> list:
+def log_shortcodes(content: str, article_id: str, shortcode_pattern: re.Pattern) -> list:
     # Log WP shortcodes
     shortcode_log = []
-    matches = re.findall(shortcode_pattern, content)
+    matches = shortcode_pattern.findall(content)
     
     if matches:
         unique_codes = set(matches)
@@ -41,9 +48,9 @@ def log_shortcodes(content: str, article_id: str, shortcode_pattern: str) -> lis
     return shortcode_log
 
 
-def log_inline_styles(content: str, article_id: str, inline_style_pattern: str) -> list:
+def log_inline_styles(content: str, article_id: str, inline_style_pattern: re.Pattern) -> list:
     inline_style_log = []
-    matches = re.findall(inline_style_pattern, content)
+    matches = inline_style_pattern.findall(content)
     
     if matches:
         for style in matches:
@@ -57,9 +64,14 @@ def log_inline_styles(content: str, article_id: str, inline_style_pattern: str) 
 
 def log_problematic_chars(content: str, article_id: str, problematic_char_patterns: list) -> dict:
     problematic_chars_log = {}
-    
+
+    # One cheap pass over the union class; the vast majority of articles have no
+    # problematic characters, so skip the per-type finditer work entirely.
+    if not _ANY_PROBLEMATIC_CHAR_PATTERN.search(content):
+        return problematic_chars_log
+
     for pattern, char_type in problematic_char_patterns:
-        matches = re.finditer(pattern, content)
+        matches = pattern.finditer(content)
         for match in matches:
             unicode_code = f"U+{ord(match.group(0)):04X}"
             
@@ -88,7 +100,7 @@ def add_missing_paragraph_tags(content: str) -> str:
         return content
 
     normalized = content.replace('\r\n', '\n').replace('\r', '\n')
-    chunks = re.split(r'\n\s*\n+', normalized)
+    chunks = _PARAGRAPH_SPLIT_PATTERN.split(normalized)
     rebuilt = []
 
     for chunk in chunks:
@@ -109,9 +121,14 @@ def add_missing_paragraph_tags(content: str) -> str:
 
 
 def convert_caption_shortcodes(content: str) -> str:
+    # The pattern always requires the literal "[caption"; skip the DOTALL scan
+    # entirely when it can't possibly match.
+    if '[caption' not in content:
+        return content
+
     def normalize_id(value: str) -> str:
         normalized = value.strip().lower().replace("_", "-")
-        return re.sub(r'[^a-z0-9-]+', '-', normalized).strip("-")
+        return _SLUG_NON_ALNUM_PATTERN.sub('-', normalized).strip("-")
 
     def build_figure(match: re.Match) -> str:
         attrs = dict(_SHORTCODE_ATTR_PATTERN.findall(match.group("attrs") or ""))
@@ -154,6 +171,11 @@ def convert_caption_shortcodes(content: str) -> str:
 
 
 def convert_puzzleme_shortcodes(content: str) -> str:
+    # The pattern always requires the literal "[puzzleme"; skip the DOTALL scan
+    # entirely when it can't possibly match.
+    if '[puzzleme' not in content.lower():
+        return content
+
     puzzle_height_by_type = {
         "crossword": "700px",
         "wordsearch": "700px",

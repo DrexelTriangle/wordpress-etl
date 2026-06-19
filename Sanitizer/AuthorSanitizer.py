@@ -63,13 +63,15 @@ class AuthorSanitizer(Sanitizer):
                         author.data["last_name"] = lastName
 
     def _logChange(self, a: Author, b: Author):
+        a_id = a.data.get("id")
+        b_id = b.data.get("id")
         for change in self.changes:
-            if change and change[-1].data.get("id") == a.data.get("id"):
-                if change[-1].data.get("id") == b.data.get("id"):
+            if change and change[-1].data.get("id") == a_id:
+                if b_id == a_id:
                     return
                 change.append(b)
                 return
-        if a.data.get("id") == b.data.get("id"):
+        if a_id == b_id:
             return
         self.changes.append([a, b])
 

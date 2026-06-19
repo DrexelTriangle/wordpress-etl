@@ -5,6 +5,7 @@ from Utils.ArticleAuthorMatching import (
     saveResolutionCache,
     logUnknownAuthors,
     collect_unique_author_names,
+    build_special_edits_index,
     apply_special_edits,
     apply_exact_match,
     apply_similarity_match,
@@ -53,10 +54,11 @@ class ArticleAuthorMatcher(Sanitizer):
 
         progress("indexing authors")
         index = AuthorSimilarityIndex(lookup)
+        special_index = build_special_edits_index(self.policies.specialEdits, lookup, Utility.cleanDocument)
 
         progress("matching authors")
         for clean_key, occurrences in unique.items():
-            if apply_special_edits(clean_key, occurrences, lookup, self.policies.specialEdits, Utility.cleanDocument, self._logChange, self.author_matches):
+            if apply_special_edits(clean_key, occurrences, special_index, self._logChange, self.author_matches):
                 continue
             if apply_exact_match(clean_key, occurrences, lookup, self.author_matches):
                 continue

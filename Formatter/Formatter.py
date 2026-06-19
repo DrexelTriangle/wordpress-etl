@@ -4,7 +4,7 @@ import os
 
 class Formatter():
     _ZERO_DATE_RE = re.compile(r"^0{4}-0{2}-0{2}(?: 0{2}:0{2}:0{2})?$")
-    DEFAULT_SQL_BATCH_SIZE = 250
+    DEFAULT_SQL_BATCH_SIZE = 50
 
     def __init__(self, data: list):
         self.data = data

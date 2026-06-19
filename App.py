@@ -61,6 +61,23 @@ class Pipeline:
         self.on_done("Translated")
         return translators
 
+    def extractAndTranslateData(self):
+        translators = {
+            "articles": ArticleTranslator([]),
+            "gAuth": GuestAuthorTranslator([]),
+            "auth": AuthorTranslator([]),
+        }
+        self.on_start("Extracting and translating...")
+        try:
+            self.on_start("Extracting and translating... (opening wp-export.zip)")
+            extractor = Extractor(*Utility.resolveExportZipMembers(ZIP_FILE))
+            extractor.translateData(translators, on_progress=self.on_start)
+        except Exception:
+            self.on_error("Error: Extracting and translating...")
+            raise
+        self.on_done("Extracted and translated")
+        return translators
+
     def logOutputs(self, translators):
         if os.getenv("WP_TRANSLATOR_LOGS", "").strip().lower() not in ("1", "true", "yes", "on"):
             return

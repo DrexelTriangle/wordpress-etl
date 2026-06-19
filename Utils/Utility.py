@@ -17,6 +17,7 @@ _TAG_PATTERN = re.compile(r"<[^>]+>")
 _WHITESPACE_PATTERN = re.compile(r"\s+")
 _NONSPACE_PATTERN = re.compile(r"\S+")
 _SLUG_PATTERN = re.compile(r"[^a-z0-9]+")
+_AUTHOR_CASE_PATTERN = re.compile("^\\w| \\w")
 
 class Utility:
   def _obj_data(item):
@@ -39,9 +40,13 @@ class Utility:
     used.add(candidate)
     return candidate
 
+  def _id_sort_key(item):
+    item_id = Utility._obj_data(item).get("id")
+    return (item_id is None, item_id)
+
   def canonicalizeAuthorLogins(authors):
     used = set()
-    sorted_authors = sorted(authors, key=lambda a: (Utility._obj_data(a).get("id") is None, Utility._obj_data(a).get("id")))
+    sorted_authors = sorted(authors, key=Utility._id_sort_key)
     for author in sorted_authors:
       data = Utility._obj_data(author)
       author_id = data.get("id")
@@ -50,7 +55,7 @@ class Utility:
 
   def canonicalizeArticleSlugs(articles):
     used = set()
-    sorted_articles = sorted(articles, key=lambda a: (Utility._obj_data(a).get("id") is None, Utility._obj_data(a).get("id")))
+    sorted_articles = sorted(articles, key=Utility._id_sort_key)
     for article in sorted_articles:
       data = Utility._obj_data(article)
       article_id = data.get("id")
@@ -67,7 +72,7 @@ class Utility:
         document = _AMP_PATTERN.sub("&", document[0])
         document = _DOT_PATTERN.sub(" ", document)
         document = _AUTHOR_CLEAN_PATTERN.sub("", document).strip()
-        document = re.sub("^\\w| \\w", uppercaseMatch, document)
+        document = _AUTHOR_CASE_PATTERN.sub(uppercaseMatch, document)
         return document
       case "author_multiple":
         documents = _AUTHOR_SPLIT_PATTERN.split(document)
@@ -128,13 +133,13 @@ class Utility:
 
   
   def _html_text_norm(text):
-    result = ''
-    
-    if (text is None):
-      return None 
-    result = text.replace('&amp;', '&')
-    result = result.replace('&nbsp;', ' ')
-    return result
+    if text is None:
+      return None
+    # Both substitutions target '&'-containing entities, so most strings (which
+    # have no '&' at all) can skip the two replace passes entirely.
+    if '&' not in text:
+      return text
+    return text.replace('&amp;', '&').replace('&nbsp;', ' ')
 
   def _build_excerpt(text, max_words=100):
     if text is None:

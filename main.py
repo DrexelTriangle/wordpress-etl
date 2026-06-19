@@ -1,16 +1,5 @@
 from pathlib import Path
 
-from App import Pipeline
-from TUI import ETLApp
-from Formatter.ArticleFormatter import ArticleFormatter
-from Formatter.SeoFormatter import SeoFormatter
-from Formatter.AuthorFormatter import AuthorFormatter
-from Formatter.ArtAuthFormatter import ArtAuthFormatter
-from Formatter.ArticleEmbeddingsFormatter import (
-    ArticleEmbeddingsFormatter,
-    EmbeddingsDependencyError,
-)
-from Utils.Utility import Utility
 import argparse
 import os
 
@@ -56,7 +45,18 @@ def parse_args():
     return parser.parse_args()
 
 
-def _run_pipeline(tui: ETLApp, args) -> None:
+def _run_pipeline(tui, args) -> None:
+    from App import Pipeline
+    from Formatter.ArticleFormatter import ArticleFormatter
+    from Formatter.SeoFormatter import SeoFormatter
+    from Formatter.AuthorFormatter import AuthorFormatter
+    from Formatter.ArtAuthFormatter import ArtAuthFormatter
+    from Formatter.ArticleEmbeddingsFormatter import (
+        ArticleEmbeddingsFormatter,
+        EmbeddingsDependencyError,
+    )
+    from Utils.Utility import Utility
+
     pipeline = Pipeline(
         on_start=tui.step_start,
         on_done=tui.step_done,
@@ -65,13 +65,19 @@ def _run_pipeline(tui: ETLApp, args) -> None:
         select_author=tui.show_select,
     )
 
-    try:
-        extracted = pipeline.extractData()
-    except Exception as exc:
-        tui.step_error(f"Extraction failed: {exc}")
-        raise SystemExit(1)
-
-    translators = pipeline.translateData(extracted)
+    if os.getenv("WP_FUSED_EXTRACT_TRANSLATE", "1").strip().lower() in ("0", "false", "no", "off"):
+        try:
+            extracted = pipeline.extractData()
+        except Exception as exc:
+            tui.step_error(f"Extraction failed: {exc}")
+            raise SystemExit(1)
+        translators = pipeline.translateData(extracted)
+    else:
+        try:
+            translators = pipeline.extractAndTranslateData()
+        except Exception as exc:
+            tui.step_error(f"Extraction/translation failed: {exc}")
+            raise SystemExit(1)
     pipeline.logOutputs(translators)
 
     authors = pipeline.sanitizeAuthors(translators, "auth", "authors")
@@ -120,5 +126,7 @@ def _run_pipeline(tui: ETLApp, args) -> None:
 
 
 if __name__ == "__main__":
+    from TUI import ETLApp
+
     args = parse_args()
     ETLApp(lambda tui: _run_pipeline(tui, args)).run()

@@ -19,6 +19,9 @@ class AuthorSimilarityIndex:
         self.lookup = lookup
         self.minhash = MinHash()
         self.keys = list(lookup.keys())
+        # Position of each key in lookup order, so candidates can be scored in
+        # that order (preserving tie-breaking) without scanning every key.
+        self._order = {key: i for i, key in enumerate(self.keys)}
         self.signatures = {key: self.minhash.signature(key) for key in self.keys}
         self.lsh = MinHashLSH(threshold=threshold, num_perm=self.minhash.num_perm)
         for key in self.keys:
@@ -33,11 +36,11 @@ class AuthorSimilarityIndex:
         in lookup order.
         """
         signature = self.minhash.signature(clean_key)
-        candidates = set(self.lsh.query(signature))
+        # LSH surfaces only the handful of likely-similar keys; scan just those,
+        # in lookup order, instead of walking the entire lookup.
+        candidates = sorted(self.lsh.query(signature), key=self._order.__getitem__)
         best, best_sim, similar = None, 0.0, []
-        for candidate_key in self.keys:
-            if candidate_key not in candidates:
-                continue
+        for candidate_key in candidates:
             sim = similarity(signature, self.signatures[candidate_key])
             aid, dname = self.lookup[candidate_key]
             if sim >= 0.9 and sim > best_sim:
@@ -61,30 +64,48 @@ def collect_unique_author_names(data: list, clean_func) -> dict:
     return unique
 
 
-def apply_special_edits(clean_key, occurrences, lookup, special_edits, clean_func, log_change, author_matches) -> bool:
-    special = next(
-        (v for k, v in special_edits.items() if clean_func(str(k), "similarity") == clean_key),
-        None,
-    )
-    if not special:
-        return False
+def build_special_edits_index(special_edits, lookup, clean_func) -> dict:
+    """Resolve every special-edit entry to lookup authors once, up front.
 
-    names = special if isinstance(special, list) else [special]
-    authors = [
-        next(
-            ((aid, dn) for _, (aid, dn) in lookup.items()
-             if dn and (dn == n or clean_func(dn, "similarity") == clean_func(n, "similarity"))),
-            None,
-        )
-        for n in names
-    ]
-    authors = [a for a in authors if a]
+    Returns ``{clean_key: [(author_id, display_name), ...]}``. Replaces the
+    former per-name scan that re-cleaned all special_edits keys and the whole
+    lookup on every call. Semantics are preserved exactly: for each entry the
+    first special_edits key (in dict order) wins for a given cleaned key, and
+    each name resolves to the first lookup author (in lookup order) whose
+    display name matches exactly or after cleaning.
+    """
+    exact, cleaned = {}, {}
+    for order, (_, (aid, dn)) in enumerate(lookup.items()):
+        if not dn:
+            continue
+        exact.setdefault(dn, (order, (aid, dn)))
+        cleaned.setdefault(clean_func(dn, "similarity"), (order, (aid, dn)))
+
+    def resolve(name):
+        matches = [m for m in (exact.get(name), cleaned.get(clean_func(name, "similarity"))) if m]
+        return min(matches, key=lambda m: m[0])[1] if matches else None
+
+    index, seen = {}, set()
+    for key, value in special_edits.items():
+        clean_key = clean_func(str(key), "similarity")
+        if clean_key in seen:
+            continue
+        seen.add(clean_key)
+        names = value if isinstance(value, list) else [value]
+        authors = [a for a in (resolve(n) for n in names) if a]
+        if authors:
+            index[clean_key] = authors
+    return index
+
+
+def apply_special_edits(clean_key, occurrences, special_index, log_change, author_matches) -> bool:
+    authors = special_index.get(clean_key)
     if not authors:
         return False
 
     for art_id, name in occurrences:
         author_matches.setdefault(art_id, {})[name] = authors if len(authors) > 1 else authors[0]
-        log_name = ", ".join([n for _, n in authors]) if len(authors) > 1 else authors[0][1]
+        log_name = ", ".join(n for _, n in authors) if len(authors) > 1 else authors[0][1]
         log_change(art_id, name, log_name)
     return True
 

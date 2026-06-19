@@ -44,9 +44,13 @@ class GuestAuthorTranslator(Translator):
         if on_progress:
             on_progress(f"translating {len(self.source)} guest authors")
         for guestAuthorData in self.source:
-            metadata = self._extractMetadata(guestAuthorData.get('wp:postmeta'))
-            guestAuthorObject = Author(*metadata)
-            self.addObject(guestAuthorObject)
+            self.translateItem(guestAuthorData)
+
+    def translateItem(self, guestAuthorData):
+        metadata = self._extractMetadata(guestAuthorData.get('wp:postmeta'))
+        guestAuthorObject = Author(*metadata)
+        self.addObject(guestAuthorObject)
+        return guestAuthorObject
 
     def listAuthors(self):
         return [

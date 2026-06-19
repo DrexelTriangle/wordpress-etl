@@ -1,6 +1,13 @@
 from abc import ABC, abstractmethod
 import json
+import os
 from pathlib import Path
+
+_CRITICAL_CONFLICT_LOGS = {"auth_conflicts", "gauth_conflicts"}
+
+
+def _truthy_env(name):
+    return os.getenv(name, "").strip().lower() in ("1", "true", "yes", "on")
 
 class Sanitizer(ABC):
     def __init__(self, data: list, policies: dict):
@@ -50,18 +57,29 @@ class Sanitizer(ABC):
         return serialized
 
     def _log(self, filename, conflictName):
+        write_noncritical_logs = _truthy_env("WP_SANITIZER_NONCRITICAL_LOGS")
+        write_conflicts = conflictName in _CRITICAL_CONFLICT_LOGS or write_noncritical_logs
+        if not write_noncritical_logs and not write_conflicts:
+            return
+
         logDir = Path("logs")
         logDir.mkdir(parents=True, exist_ok=True)
-        changesPath = logDir / f"{filename}.json"
-        with changesPath.open("w+", encoding="utf-8") as file:
-            json.dump(
-                {
-                    "changes": self._serializeChanges(),
-                },
-                file,
-                indent=4,
-            )
+        if write_noncritical_logs:
+            changesPath = logDir / f"{filename}.json"
+            changesPath.parent.mkdir(parents=True, exist_ok=True)
+            with changesPath.open("w+", encoding="utf-8") as file:
+                json.dump(
+                    {
+                        "changes": self._serializeChanges(),
+                    },
+                    file,
+                    indent=4,
+                )
+        if not write_conflicts:
+            return
+
         conflictsPath = logDir / f"{conflictName}.json"
+        conflictsPath.parent.mkdir(parents=True, exist_ok=True)
         existing_conflicts = []
         if conflictsPath.exists():
             try:

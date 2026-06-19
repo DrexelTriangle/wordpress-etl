@@ -20,7 +20,12 @@ class AuthorTranslator(Translator):
         if on_progress:
             on_progress(f"translating {len(self.source)} authors")
         for author in self.source:
-            self.addObject(self._getAuthor(author))
+            self.translateItem(author)
+
+    def translateItem(self, author):
+        obj = self._getAuthor(author)
+        self.addObject(obj)
+        return obj
     
     def _log(self, fileDestination):
         with open(fileDestination, 'w+', encoding='utf-8') as file:

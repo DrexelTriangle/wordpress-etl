@@ -7,6 +7,7 @@ methods, which re-import the worker's module in each worker process.
 """
 import re
 
+from Utils.MediaURL import rewrite_media_urls_in_html
 from Utils.Utility import Utility
 from Utils.WPContentSanitization import (
     sanitize_backslashes,
@@ -63,6 +64,11 @@ def process_article(payload):
     sanitized = add_missing_paragraph_tags(sanitized)
     if sanitized != before:
         fixes.append("paragraph tags restored")
+
+    before = sanitized
+    sanitized = rewrite_media_urls_in_html(sanitized)
+    if sanitized != before:
+        fixes.append("media urls rewritten")
 
     excerpt = _excerpt_for(sanitized, categories)
     changed = sanitized != original

@@ -1,8 +1,8 @@
 from Formatter.Formatter import Formatter
+from Utils.MediaURL import canonicalize_media_url
 import json
 
 class ArticleFormatter(Formatter):
-    WORDPRESS_IMAGE_BASE_URL = "https://www.thetriangle.org"
     EXCLUDED_SQL_FIELDS = {"authorCleanNames"}
     CMS_COLUMNS = [
         "id",
@@ -67,22 +67,9 @@ class ArticleFormatter(Formatter):
         )
         photo_url = obj.get("photoURL")
         if isinstance(photo_url, str):
-            lowered = photo_url.strip().lower()
-            trimmed = photo_url.strip()
-            if trimmed == "":
+            photo_url = canonicalize_media_url(photo_url)
+            if not photo_url.strip():
                 photo_url = None
-            elif lowered.startswith("http://") or lowered.startswith("https://"):
-                photo_url = trimmed
-            elif trimmed.startswith("//"):
-                photo_url = f"https:{trimmed}"
-            elif lowered.startswith("www.thetriangle.org/"):
-                photo_url = f"https://{trimmed}"
-            elif lowered.startswith("wp-content/"):
-                photo_url = f"{self.WORDPRESS_IMAGE_BASE_URL}/{trimmed}"
-            elif trimmed.startswith("/wp-content/"):
-                photo_url = f"{self.WORDPRESS_IMAGE_BASE_URL}{trimmed}"
-            else:
-                photo_url = trimmed
 
         return {
             "id": obj.get("id"),

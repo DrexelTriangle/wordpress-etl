@@ -4,10 +4,20 @@ import argparse
 import os
 
 
+# WordPress ids start at 0, and the generated tables declare AUTO_INCREMENT
+# primary keys. Without this, MariaDB reads an explicit 0 as "assign the next
+# value", which then collides with the real row holding id 1 and rejects the
+# whole multi-row INSERT -- so one id-0 row leaves the entire table empty.
+# mysqldump emits the same setting for the same reason.
+_SQL_PREAMBLE = "SET sql_mode = CONCAT(@@sql_mode, ',NO_AUTO_VALUE_ON_ZERO');"
+
+
 def write_sql_file(path, commands):
     outputPath = Path(path)
     outputPath.parent.mkdir(parents=True, exist_ok=True)
     with outputPath.open("w", encoding="utf-8") as file:
+        file.write(_SQL_PREAMBLE)
+        file.write("\n")
         for command in commands:
             file.write(command)
             file.write("\n")
@@ -42,12 +52,18 @@ def parse_args():
         action="store_true",
         help="Resolve ambiguous author matches automatically using the highest similarity score instead of prompting",
     )
+    parser.add_argument(
+        "--skip-media-reports",
+        action="store_true",
+        help="Skip logs/media attachment inventory, reference, reconciliation, and copy-manifest reports",
+    )
     return parser.parse_args()
 
 
 def _run_pipeline(tui, args) -> None:
     from App import Pipeline
     from Formatter.ArticleFormatter import ArticleFormatter
+    from Formatter.CommentFormatter import CommentFormatter
     from Formatter.SeoFormatter import SeoFormatter
     from Formatter.AuthorFormatter import AuthorFormatter
     from Formatter.ArtAuthFormatter import ArtAuthFormatter
@@ -55,6 +71,8 @@ def _run_pipeline(tui, args) -> None:
         ArticleEmbeddingsFormatter,
         EmbeddingsDependencyError,
     )
+    from Utils.MediaInventory import write_media_reports
+    from Utils.WPComments import load_wordpress_comments
     from Utils.Utility import Utility
 
     pipeline = Pipeline(
@@ -97,13 +115,28 @@ def _run_pipeline(tui, args) -> None:
     Utility.canonicalizeArticleSlugs(sanitizedArticles)
     pipeline.writeArticleOutput(sanitizedArticles)
 
+    if not args.skip_media_reports:
+        pipeline.runStep(
+            "Writing media inventory reports...",
+            "Wrote media inventory reports",
+            lambda: write_media_reports(sanitizedArticles),
+        )
+
     def write_sql_outputs():
-        for path, commands in [
+        outputs = [
             ("logs/sql/articles.sql", ArticleFormatter(sanitizedArticles).iter_format("articles")),
             ("logs/sql/seo.sql", SeoFormatter(sanitizedArticles).iter_format("seo")),
             ("logs/sql/authors.sql", AuthorFormatter(allAuthors).iter_format("authors")),
             ("logs/sql/articles_authors.sql", ArtAuthFormatter(sanitizedArticles).iter_format("articles_authors")),
-        ]:
+        ]
+        comments = load_wordpress_comments(
+            Utility.resolveExportZipMembers()[0],
+            sanitizedArticles,
+        )
+        if comments:
+            outputs.append(("logs/sql/comments.sql", CommentFormatter(comments).iter_format("comments")))
+
+        for path, commands in outputs:
             write_sql_file(path, commands)
 
     pipeline.runStep("Formatting SQL...", "Wrote SQL", write_sql_outputs)
@@ -126,7 +159,8 @@ def _run_pipeline(tui, args) -> None:
 
 
 if __name__ == "__main__":
+    args = parse_args()
+
     from TUI import ETLApp
 
-    args = parse_args()
     ETLApp(lambda tui: _run_pipeline(tui, args)).run()

@@ -66,10 +66,18 @@ class ArticleFormatter(Formatter):
             or obj.get("modDate")
         )
         photo_url = obj.get("photoURL")
-        if isinstance(photo_url, str):
+        # WordPress signals "no featured image" with -1, and it arrives either as
+        # an int or as the string "-1" depending on the export path. Neither is a
+        # URL, and letting one through means consumers render <img src="-1">
+        # instead of falling back to no image, so both normalize to NULL.
+        if photo_url is None or str(photo_url).strip() in ("", "-1", "0"):
+            photo_url = None
+        elif isinstance(photo_url, str):
             photo_url = canonicalize_media_url(photo_url)
             if not photo_url.strip():
                 photo_url = None
+        else:
+            photo_url = None
 
         return {
             "id": obj.get("id"),

@@ -24,13 +24,31 @@ def media_base_url() -> str:
     return value or _DEFAULT_MEDIA_BASE_URL
 
 
+# Legacy Triangle-owned domains whose uploads were migrated into the same media
+# tree. therectangle.org is a defunct predecessor of thetriangle.org: 2011-era
+# articles still link to new.therectangle.org, the domain no longer resolves, and
+# the files live under the same wp-content/uploads/ paths as everything else. Any
+# host added here must have its files present in the media tree.
+_LEGACY_MEDIA_HOSTS = ("thetriangle.org", "therectangle.org")
+
 # Any Triangle-hosted (scheme-full, protocol-relative, or scheme-less) wp-content
 # upload URL, with or without the /proxy/ segment. group(1) is the canonical
 # "wp-content/uploads/..." suffix. Stops at whitespace or HTML attribute/URL
 # delimiters so it is safe to run over raw body HTML.
+_LEGACY_HOST_ALTERNATION = r'|'.join(
+    host.replace('.', r'\.') for host in _LEGACY_MEDIA_HOSTS
+)
 _TRIANGLE_UPLOAD_IN_HTML = re.compile(
-    r'(?i)(?:https?:)?//(?:www\.)?thetriangle\.org/(?:proxy/)?'
+    r'(?i)(?:(?:https?:)?//(?:[a-z0-9-]+\.)*(?:' + _LEGACY_HOST_ALTERNATION + r')/'
+    r'|(?:[a-z0-9-]+\.)*(?:' + _LEGACY_HOST_ALTERNATION + r')/)'
+    r'(?:proxy/)?'
     r'(wp-content/uploads/[^\s"\'<>)]+)'
+)
+
+# Relative wp-content upload references in body HTML. The prefix capture keeps us
+# from rewriting external absolute URLs such as https://cdn.example/wp-content/...
+_RELATIVE_UPLOAD_IN_HTML = re.compile(
+    r'(?i)(^|[\s"\'(=])/?(wp-content/uploads/[^\s"\'<>)]+)'
 )
 
 
@@ -50,10 +68,12 @@ def canonicalize_media_url(value, base: str | None = None):
     is_absolute = (
         lowered.startswith(("http://", "https://"))
         or trimmed.startswith("//")
-        or lowered.startswith("www.thetriangle.org/")
+        or any(f"{host}/" in lowered.split("/")[0] + "/" for host in _LEGACY_MEDIA_HOSTS)
     )
-    # Absolute URL pointing at a different host — leave it alone.
-    if is_absolute and "thetriangle.org" not in lowered:
+    # Absolute URL pointing at a different host — leave it alone. Third-party
+    # sites also serve /wp-content/uploads/ paths (they run WordPress too), so
+    # matching on the path alone would corrupt genuine external links.
+    if is_absolute and not any(host in lowered for host in _LEGACY_MEDIA_HOSTS):
         return trimmed
 
     idx = lowered.find("wp-content/uploads/")
@@ -75,4 +95,5 @@ def rewrite_media_urls_in_html(html: str, base: str | None = None) -> str:
         return html
     if base is None:
         base = media_base_url()
-    return _TRIANGLE_UPLOAD_IN_HTML.sub(lambda m: f"{base}/{m.group(1)}", html)
+    rewritten = _TRIANGLE_UPLOAD_IN_HTML.sub(lambda m: f"{base}/{m.group(1)}", html)
+    return _RELATIVE_UPLOAD_IN_HTML.sub(lambda m: f"{m.group(1)}{base}/{m.group(2)}", rewritten)

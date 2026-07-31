@@ -63,6 +63,33 @@ class ClassifyTest(unittest.TestCase):
             classify(comment(content="The casino development vote is Tuesday."))
         )
 
+    def test_spam_domain_in_the_path_is_flagged(self):
+        # Host-parasite spam: the profile page is on a real site, the payload
+        # domain is in the path, so netloc alone never sees it.
+        self.assertEqual(
+            classify(comment(authorURL="https://www.southsidesox.com/users/www.20bet.com")),
+            "referral-host:20bet.com",
+        )
+
+    def test_malformed_url_does_not_hide_the_host(self):
+        # urlparse reads this netloc as "https", concealing the .xyz domain.
+        self.assertEqual(
+            classify(comment(authorURL="http://https//fexie.xyz/top--temporary-email")),
+            "spam-tld:fexie.xyz",
+        )
+
+    def test_spam_author_keyword_is_flagged(self):
+        self.assertEqual(
+            classify(comment(authorName="is erectile dysfunction curable")),
+            "spam-author-keyword:is erectile dysfunction curable",
+        )
+
+    def test_business_commenting_under_its_own_name_is_not_flagged(self):
+        self.assertIsNone(
+            classify(comment(authorName="Legendary Coffee Company",
+                             authorURL="http://www.thelegendarycoffee.com"))
+        )
+
     def test_link_stuffed_body_is_flagged(self):
         self.assertEqual(
             classify(
@@ -117,6 +144,29 @@ class MarkSpamTest(unittest.TestCase):
         self.assertEqual(record["type"], "comment")
         self.assertEqual(record["previousStatus"], "approved")
         self.assertIn("ordinary remark", record["excerpt"])
+
+    def test_author_rotating_domains_is_flagged(self):
+        # One name, three unrelated hosts, none of them individually suspicious.
+        comments = [
+            comment(id=1, authorName="20bet", authorURL="https://www.noteflight.com/profile/x"),
+            comment(id=2, authorName="20bet", authorURL="https://flipboard.com/@20b"),
+            comment(id=3, authorName="20bet", authorURL="https://medley-web.com/userinfo.php"),
+        ]
+
+        flagged = mark_spam(comments)
+
+        self.assertEqual(len(flagged), 3)
+        self.assertEqual(flagged[0]["reason"], "rotating-domains:20bet")
+
+    def test_author_reusing_one_domain_is_not_flagged(self):
+        # A regular contributor links their own site every time.
+        comments = [
+            comment(id=n, authorName="Noel Forté", authorURL="http://noelforte.com/",
+                    content=f"A specific and distinct remark number {n}.")
+            for n in range(1, 6)
+        ]
+
+        self.assertEqual(mark_spam(comments), [])
 
     def test_summarize_groups_by_rule(self):
         comments = [

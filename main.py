@@ -1,7 +1,9 @@
 from pathlib import Path
 
 import argparse
+import json
 import os
+import sys
 
 
 # WordPress ids start at 0, and the generated tables declare AUTO_INCREMENT
@@ -21,6 +23,14 @@ def write_sql_file(path, commands):
         for command in commands:
             file.write(command)
             file.write("\n")
+
+
+def write_json_file(path, payload):
+    outputPath = Path(path)
+    outputPath.parent.mkdir(parents=True, exist_ok=True)
+    with outputPath.open("w", encoding="utf-8") as file:
+        json.dump(payload, file, indent=2, ensure_ascii=False)
+        file.write("\n")
 
 
 def parse_args():
@@ -53,6 +63,11 @@ def parse_args():
         help="Resolve ambiguous author matches automatically using the highest similarity score instead of prompting",
     )
     parser.add_argument(
+        "--headless",
+        action="store_true",
+        help="Run without the TUI, logging steps to stdout. Requires --best-guess, since nothing can answer a prompt",
+    )
+    parser.add_argument(
         "--skip-media-reports",
         action="store_true",
         help="Skip logs/media attachment inventory, reference, reconciliation, and copy-manifest reports",
@@ -71,6 +86,7 @@ def _run_pipeline(tui, args) -> None:
         ArticleEmbeddingsFormatter,
         EmbeddingsDependencyError,
     )
+    from Utils.CommentSpam import mark_spam, summarize
     from Utils.MediaInventory import write_media_reports
     from Utils.WPComments import load_wordpress_comments
     from Utils.Utility import Utility
@@ -110,7 +126,7 @@ def _run_pipeline(tui, args) -> None:
     del guestAuthors
     pipeline.writeAuthorOutput(allAuthors, "logs/merged_auth_output.json", "merged authors")
 
-    sanitizedArticles = pipeline.sanitizeArticleAuthors(translators, allAuthors)
+    sanitizedArticles = pipeline.sanitizeArticleAuthors(translators, allAuthors, best_guess=args.best_guess)
     sanitizedArticles = pipeline.sanitizeArticleContent(sanitizedArticles)
     Utility.canonicalizeArticleSlugs(sanitizedArticles)
     pipeline.writeArticleOutput(sanitizedArticles)
@@ -134,6 +150,17 @@ def _run_pipeline(tui, args) -> None:
             sanitizedArticles,
         )
         if comments:
+            # WordPress's exporter already removed everything it had labelled
+            # spam, so every row here arrived "approved" -- including the spam
+            # its own filter missed. Re-status rather than drop, so a moderator
+            # can reverse a false positive from the CMS.
+            flagged = mark_spam(comments)
+            if flagged:
+                write_json_file("logs/comment_spam_report.json", flagged)
+                tui.step_done(
+                    f"Flagged {len(flagged)} of {len(comments)} comments as spam "
+                    f"({dict(summarize(flagged))})"
+                )
             outputs.append(("logs/sql/comments.sql", CommentFormatter(comments).iter_format("comments")))
 
         for path, commands in outputs:
@@ -158,9 +185,42 @@ def _run_pipeline(tui, args) -> None:
             raise SystemExit(1)
 
 
+class HeadlessTUI:
+    """Stand-in for the Textual app so a run can go in a script or CI job.
+
+    The prompting callbacks raise rather than block. Reaching one means the run
+    needed a human, which unattended is a failure to report, not a hang to wait
+    on -- and with --best-guess neither should be reachable.
+    """
+
+    def step_start(self, msg):
+        print(f"... {msg}", flush=True)
+
+    def step_done(self, msg):
+        print(f"  > {msg}", flush=True)
+
+    def step_error(self, msg):
+        print(f"!!! {msg}", file=sys.stderr, flush=True)
+
+    def show_conflict(self, diffs, left, right, index, total):
+        raise SystemExit(
+            f"Headless run hit an author conflict needing a decision "
+            f"({index + 1}/{total}): {left.get('display_name')!r} vs "
+            f"{right.get('display_name')!r}. Re-run with the TUI to resolve it."
+        )
+
+    def show_select(self, prompt, options, fmt=None):
+        raise SystemExit(f"Headless run hit an author prompt: {prompt}")
+
+
 if __name__ == "__main__":
     args = parse_args()
 
-    from TUI import ETLApp
+    if args.headless:
+        if not args.best_guess:
+            raise SystemExit("--headless requires --best-guess: nothing can answer a prompt")
+        _run_pipeline(HeadlessTUI(), args)
+    else:
+        from TUI import ETLApp
 
-    ETLApp(lambda tui: _run_pipeline(tui, args)).run()
+        ETLApp(lambda tui: _run_pipeline(tui, args)).run()

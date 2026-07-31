@@ -128,9 +128,9 @@ class Pipeline:
                 combined.append(gAuth)
         return combined
 
-    def sanitizeArticleAuthors(self, translators, allAuthors):
+    def sanitizeArticleAuthors(self, translators, allAuthors, best_guess=False):
         articles = translators["articles"].getObjList()
-        articleSanitizer = ArticleAuthorMatcher(articles, allAuthors)
+        articleSanitizer = ArticleAuthorMatcher(articles, allAuthors, best_guess=best_guess)
         self.on_start("Sanitizing article authors...")
         sanitizedArticles = articleSanitizer.sanitize(select_author=self.select_author)
         self.on_done("Sanitized article authors")

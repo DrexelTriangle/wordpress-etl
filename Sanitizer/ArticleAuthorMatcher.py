@@ -80,8 +80,15 @@ class ArticleAuthorMatcher(Sanitizer):
                 self._logChange(aid, name, dname)
                 continue
 
-            prompt = f"Article {aid}: '{name}' ({i + 1}/{len(flagged)})"
-            choice = select_author(prompt, cands, lambda i, c: f"{c[1]} ({c[2]:.0%})") if select_author else -1
+            if self.best_guess:
+                # Unattended runs -- rebuilding the seed for a migration test --
+                # must not stop on a prompt, and must reach the same answer every
+                # time. Highest similarity wins. The choice still lands in the
+                # resolution cache, so a later interactive run can correct it.
+                choice = max(range(len(cands)), key=lambda index: cands[index][2]) if cands else -1
+            else:
+                prompt = f"Article {aid}: '{name}' ({i + 1}/{len(flagged)})"
+                choice = select_author(prompt, cands, lambda i, c: f"{c[1]} ({c[2]:.0%})") if select_author else -1
 
             if choice == -1:
                 self.unknown_authors.setdefault(name, []).append(aid)

@@ -24,6 +24,7 @@ class ArticleTranslator(Translator):
       "featuredImgID": -1,
       "id": self.objCount,
       "slug": data.get('wp:post_name', Article.defaultValue),
+      "wpPostID": self._normalizeInt(data.get('wp:post_id')),
       "priority": False,
       "modDate": data.get('wp:post_modified_gmt', Article.defaultValue),
       "photoURL": self._checkForImg(text),
@@ -72,6 +73,14 @@ class ArticleTranslator(Translator):
       return title
     # WP export payloads sometimes carry slashed quotes in title text.
     return title.replace('\\"', '"').replace("\\'", "'")
+
+  def _normalizeInt(self, value):
+    if value in (None, ""):
+      return None
+    try:
+      return int(str(value).strip())
+    except (TypeError, ValueError):
+      return None
   
   def _checkForImg(self, text:str):
     matchObj = _IMG_UPLOAD_PATTERN.search(text) 

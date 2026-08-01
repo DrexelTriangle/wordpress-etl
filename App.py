@@ -50,6 +50,11 @@ class Pipeline:
             "gAuth": GuestAuthorTranslator(extracted["guestAuth"]),
             "auth": AuthorTranslator(extracted["auth"]),
         }
+        # The same resolution the fused path performs, so the two cannot
+        # disagree about who wrote an article.
+        translators["articles"].guestAuthorNames = Extractor.buildGuestAuthorNameMap(
+            Utility.resolveExportZipMembers(ZIP_FILE)[1]
+        )
         self.on_start("Translating...")
         try:
             translators["auth"].translate(on_progress=self.on_start)

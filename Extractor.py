@@ -63,6 +63,38 @@ _GUEST_AUTHOR_META_KEYS = frozenset((
 
 
 class Extractor:
+  @staticmethod
+  def buildGuestAuthorNameMap(source):
+    """Map a guest author's term slug to their real display name.
+
+    A post credits a guest author with
+    `<category domain="author" nicename="cap-beeboop">beeboop</category>`,
+    where the element text is the SLUG, not the name. When the slug resembles
+    the name ("michael-duffin") the matcher still finds the author, but when it
+    is a handle it cannot: `cap-beeboop` is Michael Davis, and all ten of his
+    articles arrived with no byline. Only the guest author export carries the
+    real name, so it is the authority for this mapping.
+    """
+    names = {}
+    try:
+      with Extractor._openXml(source) as handle:
+        context = etree.iterparse(handle, events=("end",), tag=("item",), recover=True)
+        for _, elem in context:
+          slug = elem.findtext(f"{{{_WP_NS}}}post_name")
+          title = elem.findtext("title")
+          if slug and title and title.strip():
+            names.setdefault(slug.strip(), title.strip())
+          elem.clear()
+          parent = elem.getparent()
+          if parent is not None:
+            while elem.getprevious() is not None:
+              del parent[0]
+    except Exception:
+      # A missing or unreadable guest author export must not take down the
+      # whole run; without the map the previous term-text behaviour applies.
+      return {}
+    return names
+
   def __init__(self, posts, guestAuths):
     self.postsFile = posts
     self.guestAuthsFile = guestAuths
@@ -344,6 +376,12 @@ class Extractor:
     def progress(msg):
       if on_progress:
         on_progress(msg)
+
+    # Built first: posts are translated before the guest authors are parsed, so
+    # without this pre-pass an article's author term cannot be resolved to a
+    # real name at the point it is needed.
+    progress("indexing guest author names")
+    translators["articles"].guestAuthorNames = self.buildGuestAuthorNameMap(self.guestAuthsFile)
 
     progress("parsing/translating wp-posts.xml")
     self._translatePosts(self.postsFile, translators["articles"], translators["auth"])

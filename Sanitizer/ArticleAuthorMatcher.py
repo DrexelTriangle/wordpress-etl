@@ -70,12 +70,48 @@ class ArticleAuthorMatcher(Sanitizer):
 
         self._applyMatches()
 
+    def _resolveCachedMatch(self, name):
+        """A cached decision, re-resolved against the CURRENT export's authors.
+
+        The cache stores (author_id, display_name), but WordPress renumbers
+        authors between exports, so the stored id routinely belongs to somebody
+        else next time. Ava Buckingham was 554 and is now 553 (that id no longer
+        exists, so her articles lost their author); Mary Elizabeth Hoffman was
+        338, and 338 is now Snehal Yarlagadda -- silently crediting her articles
+        to a different person, which no integrity check catches because the row
+        does exist.
+
+        The cached decision means "this byline is that PERSON", so the name is
+        what carries over and the id is looked up fresh. If the person is not in
+        this export at all, returns None so the caller falls through to normal
+        resolution rather than trusting a dead id.
+        """
+        entry = self.resolution_cache.get(name)
+        if not entry:
+            return None
+        try:
+            _, cachedName = entry
+        except (TypeError, ValueError):
+            return None
+        if not cachedName:
+            return None
+
+        key = Utility.cleanDocument(cachedName, "similarity")
+        current = self.policies._author_lookup.get(key) if key else None
+        if current is None:
+            return None
+        return current
+
     def _manualResolve(self, flagged: list, select_author=None):
         for i, item in enumerate(flagged):
             aid, name, cands = item["article_id"], item["author_name"], item["candidates"]
 
-            if name in self.resolution_cache:
-                author_id, dname = self.resolution_cache[name]
+            cached = self._resolveCachedMatch(name)
+            if cached is not None:
+                author_id, dname = cached
+                # Refresh so the cache heals itself instead of carrying a stale
+                # id forward into every future run.
+                self.resolution_cache[name] = (author_id, dname)
                 self.author_matches.setdefault(aid, {})[name] = (author_id, dname)
                 self._logChange(aid, name, dname)
                 continue
@@ -108,14 +144,21 @@ class ArticleAuthorMatcher(Sanitizer):
             
             matches = self.author_matches.get(data.get("id", "unknown"), {})
             ids, names = [], []
-            
+            # A byline that names the same person twice must still produce one
+            # link: articles_authors has no unique constraint, so a repeat wrote
+            # a duplicate row and the byline rendered the name twice.
+            seen = set()
+
             for name in (data.get("authorCleanNames") or []):
                 if name in matches:
                     match = matches[name]
                     entries = match if isinstance(match, list) else [match]
                     for aid, dname in entries:
+                        if aid in seen:
+                            continue
+                        seen.add(aid)
                         ids.append(aid)
                         names.append(dname)
-            
+
             data["authorIDs"] = ids
             data["authors"] = names

@@ -99,15 +99,33 @@ class Policy():
             if entryId not in candidateIds and entryName not in candidateNames:
                 continue
             canonical = entry[-1]
+            canonicalId, canonicalName = self._conflictIdentity(canonical)
+
+            # A cache entry matched by NAME carries the id from the export it
+            # was answered against, and WordPress has since renumbered. Keeping
+            # that stale id makes both sides of the dispute collapse onto it,
+            # emitting two author rows with the same primary key -- which fails
+            # the whole authors INSERT. The decision is about which record wins,
+            # so take the winner's fields but the CURRENT export's id.
+            resolvedId = canonicalId
+            if canonicalId not in candidateIds:
+                if canonicalName is not None and canonicalName == aName:
+                    resolvedId = aId
+                elif canonicalName is not None and canonicalName == bName:
+                    resolvedId = bId
+                else:
+                    resolvedId = aId
+
             if isinstance(canonical, dict):
-                return Author(canonical.get("id"),
+                return Author(resolvedId,
                     canonical.get("display_name"),
                     canonical.get("first_name"),
                     canonical.get("last_name"),
                     canonical.get("email"),
                     canonical.get("login"),
                 )
-            
+
+            canonical.data["id"] = resolvedId
             return canonical
         return None
     

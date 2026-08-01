@@ -78,6 +78,41 @@ class ResolveFromConflicts(unittest.TestCase):
         self.assertIsNotNone(resolved)
         self.assertEqual(resolved.data["display_name"], "Mary Elizabeth Hoffman")
 
+    def test_name_match_uses_the_current_export_id_not_the_cached_one(self):
+        # The cached canonical carries id 338 from the export it was answered
+        # against. Returning that stale id makes both sides of the dispute
+        # collapse onto it, so the authors INSERT emits two rows with the same
+        # primary key and the entire load fails.
+        policy = policy_with(CACHED)
+        resolved = policy._resolveFromConflicts(
+            author(343, "Mary Elizabeth Hoffman"),
+            author(363, "Elizabeth Hoffman"),
+        )
+        self.assertEqual(resolved.data["id"], 343)
+        self.assertEqual(resolved.data["display_name"], "Mary Elizabeth Hoffman")
+
+    def test_id_match_keeps_the_cached_id(self):
+        policy = policy_with(CACHED)
+        resolved = policy._resolveFromConflicts(
+            author(338, "Mary Elizabeth Hoffman"),
+            author(359, "Elizabeth Hoffman"),
+        )
+        self.assertEqual(resolved.data["id"], 338)
+
+    def test_two_disputes_for_one_person_do_not_collide(self):
+        # Both sides resolving through the cache must not yield the same id
+        # twice, which is what produced "Duplicate entry '338' for key PRIMARY".
+        policy = policy_with(CACHED)
+        first = policy._resolveFromConflicts(
+            author(343, "Mary Elizabeth Hoffman"), author(363, "Elizabeth Hoffman")
+        )
+        second = policy._resolveFromConflicts(
+            author(343, "Mary Elizabeth Hoffman"), author(999, "Someone Else")
+        )
+        self.assertEqual(first.data["id"], 343)
+        self.assertEqual(second.data["id"], 343)
+        self.assertNotIn(338, {first.data["id"], second.data["id"]})
+
     def test_unrelated_people_are_not_matched(self):
         policy = policy_with(CACHED)
         self.assertIsNone(

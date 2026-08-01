@@ -7,10 +7,13 @@ import re
 
 _IMG_UPLOAD_PATTERN = re.compile(r"wp-content\/uploads\/(.*?)\\")
 
-class ArticleTranslator(Translator):  
+class ArticleTranslator(Translator):
   # Constructor
   def __init__(self, incomingData):
     super().__init__(incomingData)
+    # {guest author term slug -> real display name}, supplied by the Extractor.
+    # Empty is valid: resolution then falls back to the term's own text.
+    self.guestAuthorNames = {}
 
   def _getArticleData(self, data):
     text = str(U._html_text_norm(data.get('content:encoded', Article.defaultValue))).replace('"', '\\"')
@@ -103,6 +106,7 @@ class ArticleTranslator(Translator):
         if not isinstance(tagData, dict):
           continue
 
+        nicename = tagData.get("@nicename", Article.defaultValue)
         domain = tagData.get("@domain", Article.defaultValue)
         text = U._html_text_norm(tagData.get("#text", Article.defaultValue))
 
@@ -118,9 +122,12 @@ class ArticleTranslator(Translator):
         elif (domain == "category" and text is not None and text != Article.defaultValue):
           resultCategories.append(text)
         elif (domain == "author"):
-          cleanName = text.translate(str.maketrans('', '', '.-_ ')).lower()
+          # The term's text is the slug ("beeboop"), not the byline. Resolve it
+          # through the guest author export, which holds the real name.
+          resolved = self.guestAuthorNames.get(nicename, text)
+          cleanName = resolved.translate(str.maketrans('', '', '.-_ ')).lower()
           obj["authorCleanNames"].append(cleanName)
-          obj["authors"].append(text)
+          obj["authors"].append(resolved)
 
     except (KeyError, TypeError):
       resultTags.append('NO_TAGS')

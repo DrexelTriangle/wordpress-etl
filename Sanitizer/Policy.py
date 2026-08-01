@@ -72,14 +72,31 @@ class Policy():
 
         return Author(id, displayName, firstName, lastName, email, login)
                 
+    @staticmethod
+    def _conflictIdentity(record):
+        """(id, normalized display name) used to match a cached decision.
+
+        WordPress renumbers author ids between exports, so matching on the id
+        alone stops working the moment the export is refreshed: every conflict
+        answered in a previous run is raised again, which aborts an unattended
+        (--headless) run. The name is the stable half of the identity.
+        """
+        data = record if isinstance(record, dict) else record.data
+        name = data.get("display_name")
+        normalized = Utility.cleanDocument(name, "similarity") if name else None
+        return data.get("id"), (normalized or None)
+
     def _resolveFromConflicts(self, a, b):
+        aId, aName = self._conflictIdentity(a)
+        bId, bName = self._conflictIdentity(b)
+        candidateIds = {aId, bId} - {None}
+        candidateNames = {aName, bName} - {None}
 
         for entry in self.conflicts:
             if not entry:
                 continue
-            entryFirst = entry[0]
-            entryFirstId = entryFirst.get("id") if isinstance(entryFirst, dict) else entryFirst.data.get("id")
-            if entryFirstId not in {a.data.get("id"), b.data.get("id")}:
+            entryId, entryName = self._conflictIdentity(entry[0])
+            if entryId not in candidateIds and entryName not in candidateNames:
                 continue
             canonical = entry[-1]
             if isinstance(canonical, dict):

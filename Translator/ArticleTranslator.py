@@ -103,14 +103,12 @@ class ArticleTranslator(Translator):
         if not isinstance(tagData, dict):
           continue
 
-        nicename = tagData.get("@nicename", Article.defaultValue)
         domain = tagData.get("@domain", Article.defaultValue)
         text = U._html_text_norm(tagData.get("#text", Article.defaultValue))
 
-        isCrosswordOrComics = nicename in {"crossword", "comics"}
         isNoTags = obj["tags"] is None or obj["tags"] == Article.defaultValue
         isNoText = obj["text"] is None or obj["text"] == Article.defaultValue
-        if (isCrosswordOrComics or isNoTags or isNoText):
+        if (isNoTags or isNoText):
           obj["tags"] = -1
           obj["categories"] = -1
           return

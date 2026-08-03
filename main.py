@@ -42,8 +42,15 @@ def parse_args():
     )
     parser.add_argument(
         "--embedding-model",
-        default=os.getenv("WP_EMBED_MODEL", "sentence-transformers/paraphrase-MiniLM-L3-v2"),
-        help="SentenceTransformer model name",
+        # Must match the CMS embedding sidecar's EMBED_MODEL. A distance between
+        # vectors from two different models is meaningless, so a mismatch here
+        # degrades search ranking and "related articles" silently rather than
+        # failing. Was paraphrase-MiniLM-L3-v2, a symmetric paraphrase model;
+        # bge-small-en-v1.5 is trained for query-to-document retrieval, which is
+        # what search actually does. Both are 384-dimensional, so VECTOR(384) is
+        # unchanged.
+        default=os.getenv("WP_EMBED_MODEL", "BAAI/bge-small-en-v1.5"),
+        help="SentenceTransformer model name; must match the CMS sidecar's EMBED_MODEL",
     )
     parser.add_argument(
         "--embedding-batch-size",

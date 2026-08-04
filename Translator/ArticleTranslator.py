@@ -55,10 +55,15 @@ class ArticleTranslator(Translator):
     lengthCheck = 4 if debugMode else 100
     isTextNotNull = text != Article.defaultValue and len(text) >= lengthCheck
     isTitleNotNull = title != Article.defaultValue
-    isTextNotSudoku = isTextNotNull and ('sudoku' not in text)
     isTitleNotUnderscore = isTitleNotNull and ('_' not in title)
 
-    return isTextNotSudoku and isTitleNotUnderscore
+    # There used to be a `'sudoku' not in text` drop here, alongside the
+    # crossword/comics category drop already removed from _processTags.
+    # Production publishes sudoku, so it belongs in the corpus -- and the check
+    # was on the BODY, so it also silently dropped any article that merely
+    # mentioned the word. Its only visible effect was an empty Sudoku
+    # subsection that looked like a broken section page rather than a filter.
+    return isTextNotNull and isTitleNotUnderscore
 
   def _normalizeCommentStatus(self, value):
     # WordPress exports carry inconsistent casing/whitespace for comment_status

@@ -3,13 +3,15 @@ from contextlib import contextmanager
 
 from lxml import etree  # type: ignore[attr-defined]
 from Utils.Utility import Utility as U
-from Utils.Constants import EXPORT_DIR
+from Utils.Constants import EXPORT_DIR, THUMBNAIL_META_KEY
 
 # Sentinel for "key absent" so dict values of None are handled correctly.
 _MISSING = object()
 
 _POST_ITEM_KEYS = frozenset((
   "content:encoded",
+  # The byline for every pre-Co-Authors-Plus post; without it they are authorless.
+  "dc:creator",
   "wp:comment_status",
   "description",
   "wp:post_id",
@@ -19,6 +21,10 @@ _POST_ITEM_KEYS = frozenset((
   "category",
   "wp:postmeta",
   "title",
+  # Attachment <item>s ride in the same list; these two are what a featured
+  # image resolves through (see ArticleTranslator.resolveFeaturedImages).
+  "wp:post_type",
+  "wp:attachment_url",
 ))
 _GUEST_AUTHOR_ITEM_KEYS = frozenset(("wp:postmeta",))
 _AUTHOR_KEYS = frozenset((
@@ -31,15 +37,20 @@ _AUTHOR_KEYS = frozenset((
 
 _WP_NS = "http://wordpress.org/export/1.2/"
 _CONTENT_NS = "http://purl.org/rss/1.0/modules/content/"
+_DC_NS = "http://purl.org/dc/elements/1.1/"
 _CONTENT_ENCODED_TAG = f"{{{_CONTENT_NS}}}encoded"
+_DC_CREATOR_TAG = f"{{{_DC_NS}}}creator"
 _WP_POSTMETA_TAG = f"{{{_WP_NS}}}postmeta"
 _WP_POST_TYPE_TAG = f"{{{_WP_NS}}}post_type"
+_WP_POST_ID_TAG = f"{{{_WP_NS}}}post_id"
+_WP_ATTACHMENT_URL_TAG = f"{{{_WP_NS}}}attachment_url"
 _WP_META_KEY_TAG = f"{{{_WP_NS}}}meta_key"
 _WP_META_VALUE_TAG = f"{{{_WP_NS}}}meta_value"
 _ARTICLE_SCALAR_TAGS = {
   "title": "title",
   "description": "description",
   _CONTENT_ENCODED_TAG: "content:encoded",
+  _DC_CREATOR_TAG: "dc:creator",
   f"{{{_WP_NS}}}comment_status": "wp:comment_status",
   f"{{{_WP_NS}}}post_id": "wp:post_id",
   f"{{{_WP_NS}}}post_name": "wp:post_name",
@@ -261,11 +272,9 @@ class Extractor:
     return meta_key, {"wp:meta_key": meta_key, "wp:meta_value": meta_value}
 
   def _articleItemToObj(self, elem):
-    # ~half of all <item>s are attachments (media), never articles; bail before
-    # the expensive content normalization/tag/metadata build so they cost only
-    # one tag scan instead of a full translate that _shouldSkip would discard.
-    if elem.findtext(_WP_POST_TYPE_TAG) != "post":
-      return None
+    # Callers must have checked wp:post_type == "post" first: ~half of all
+    # <item>s are attachments (media), never articles, and they must cost one
+    # tag scan rather than a full content normalization/tag/metadata build.
     result = {}
     for child in elem:
       tag = child.tag
@@ -276,9 +285,25 @@ class Extractor:
         self._appendValue(result, "category", self._categoryToObj(child))
       elif tag == _WP_POSTMETA_TAG:
         meta_key, value = self._postmetaPair(child)
-        if isinstance(meta_key, str) and "yoast" in meta_key:
+        if isinstance(meta_key, str) and ("yoast" in meta_key or meta_key == THUMBNAIL_META_KEY):
           self._appendValue(result, "wp:postmeta", value)
     return result
+
+  def _attachmentURLPair(self, elem):
+    """(attachment post id, file URL) for a media <item>.
+
+    A post's featured image is only ever a `_thumbnail_id` pointing at one of
+    these ids, so this index is what turns that id back into a usable URL.
+    """
+    postID = None
+    url = None
+    for child in elem:
+      tag = child.tag
+      if tag == _WP_POST_ID_TAG:
+        postID = self._textValue(child)
+      elif tag == _WP_ATTACHMENT_URL_TAG:
+        url = self._textValue(child)
+    return postID, url
 
   def _authorToObj(self, elem):
     result = {}
@@ -344,13 +369,21 @@ class Extractor:
   def _translatePosts(self, path, articleTranslator, authorTranslator):
     self._keyCache = {}
     self._attrCache = {}
+    # Attachments are interleaved with (and usually follow) the posts that
+    # reference them, so featured images can only be resolved once the whole
+    # file has been streamed. Returned for that second, in-memory pass.
+    attachmentURLs = {}
     with self._openXml(path) as handle:
       context = etree.iterparse(handle, events=("end",), tag=("item", "{*}author"), recover=True)
       for _, elem in context:
         if elem.tag == "item":
-          obj = self._articleItemToObj(elem)
-          if obj is not None:
-            articleTranslator.translateItem(obj)
+          postType = elem.findtext(_WP_POST_TYPE_TAG)
+          if postType == "post":
+            articleTranslator.translateItem(self._articleItemToObj(elem))
+          elif postType == "attachment":
+            postID, url = self._attachmentURLPair(elem)
+            if postID and url:
+              attachmentURLs[postID] = url
         else:
           authorTranslator.translateItem(self._authorToObj(elem))
         elem.clear()
@@ -358,6 +391,7 @@ class Extractor:
         if parent is not None:
           while elem.getprevious() is not None:
             del parent[0]
+    return attachmentURLs
 
   def _translateGuestAuthors(self, path, guestAuthorTranslator):
     self._keyCache = {}
@@ -384,7 +418,9 @@ class Extractor:
     translators["articles"].guestAuthorNames = self.buildGuestAuthorNameMap(self.guestAuthsFile)
 
     progress("parsing/translating wp-posts.xml")
-    self._translatePosts(self.postsFile, translators["articles"], translators["auth"])
+    attachmentURLs = self._translatePosts(self.postsFile, translators["articles"], translators["auth"])
+    progress("resolving featured images")
+    translators["articles"].resolveFeaturedImages(attachmentURLs)
     progress("parsing/translating wp-guestAuths.xml")
     self._translateGuestAuthors(self.guestAuthsFile, translators["gAuth"])
     return translators

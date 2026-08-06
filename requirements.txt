@@ -1,6 +1,16 @@
-textual>=0.50.0
-numpy>=2.4.2
-lxml>=5.0.0
-minhashlib>=0.2.0
-numba>=0.60.0
-sentence-transformers>=3.0.0
+# Runtime dependencies. Upper bounds are deliberate: this pipeline is run rarely
+# and in bursts (a migration, then months of nothing), so an unpinned resolver
+# picking up a new major on the next run is the likeliest way for it to break
+# without a line of our code changing. numba and minhashlib are pre-1.0, where
+# minor releases are the breaking ones, so they are capped a minor ahead.
+#
+# The tests need nothing extra -- they are stdlib unittest, so there is no
+# separate dev requirements file. Run them from the repo root, one module at a
+# time, e.g. `python -m unittest tests.test_media_url`.
+
+textual>=0.50.0,<9
+numpy>=2.4.2,<3
+lxml>=5.0.0,<7
+minhashlib>=0.2.0,<0.3
+numba>=0.60.0,<0.66
+sentence-transformers>=3.0.0,<6

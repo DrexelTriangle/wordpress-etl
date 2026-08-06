@@ -1,8 +1,7 @@
 from pathlib import Path
 import json
 from Translator.Translator import Translator
-from Translator.Article import Article
-from Utils.Constants import THUMBNAIL_META_KEY
+from Utils.Constants import DEFAULT_VALUE, THUMBNAIL_META_KEY
 from Utils.Utility import Utility as U
 import re
 
@@ -17,7 +16,7 @@ class ArticleTranslator(Translator):
     self.guestAuthorNames = {}
 
   def _getArticleData(self, data):
-    text = str(U._html_text_norm(data.get('content:encoded', Article.defaultValue))).replace('"', '\\"')
+    text = str(U._html_text_norm(data.get('content:encoded', DEFAULT_VALUE))).replace('"', '\\"')
     return {
       "authorIDs": [],
       "authors": [],
@@ -28,20 +27,20 @@ class ArticleTranslator(Translator):
       "description": U._html_text_norm(data.get('description')),
       "featuredImgID": self._thumbnailID(data.get('wp:postmeta')),
       "id": self.objCount,
-      "slug": data.get('wp:post_name', Article.defaultValue),
+      "slug": data.get('wp:post_name', DEFAULT_VALUE),
       "wpPostID": self._normalizeInt(data.get('wp:post_id')),
       "priority": False,
-      "modDate": data.get('wp:post_modified_gmt', Article.defaultValue),
+      "modDate": data.get('wp:post_modified_gmt', DEFAULT_VALUE),
       # Fallback only: overwritten by the post's featured image, if it has one,
       # once the attachments have been indexed (resolveFeaturedImages).
       "photoURL": self._checkForImg(text),
-      "pubDate": data.get('wp:post_date_gmt', Article.defaultValue),
+      "pubDate": data.get('wp:post_date_gmt', DEFAULT_VALUE),
       "tags": data.get('category'),
       "categories": [],
       "metadata": data.get('wp:postmeta'),
       "text": text,
       "excerpt": "",
-      "title": self._normalizeTitle(U._html_text_norm(data.get('title', Article.defaultValue))),
+      "title": self._normalizeTitle(U._html_text_norm(data.get('title', DEFAULT_VALUE))),
     }
 
 
@@ -57,8 +56,8 @@ class ArticleTranslator(Translator):
     title = obj["title"]
 
     lengthCheck = 4 if debugMode else 100
-    isTextNotNull = text != Article.defaultValue and len(text) >= lengthCheck
-    isTitleNotNull = title != Article.defaultValue
+    isTextNotNull = text != DEFAULT_VALUE and len(text) >= lengthCheck
+    isTitleNotNull = title != DEFAULT_VALUE
     isTitleNotUnderscore = isTitleNotNull and ('_' not in title)
 
     # There used to be a `'sudoku' not in text` drop here, alongside the
@@ -141,7 +140,7 @@ class ArticleTranslator(Translator):
     resultCategories = []
     try:
       terms = obj["tags"]
-      if terms is None or terms == Article.defaultValue:
+      if terms is None or terms == DEFAULT_VALUE:
         terms = []
       elif isinstance(terms, dict):
         terms = [terms]
@@ -152,20 +151,20 @@ class ArticleTranslator(Translator):
         if not isinstance(tagData, dict):
           continue
 
-        nicename = tagData.get("@nicename", Article.defaultValue)
-        domain = tagData.get("@domain", Article.defaultValue)
-        text = U._html_text_norm(tagData.get("#text", Article.defaultValue))
+        nicename = tagData.get("@nicename", DEFAULT_VALUE)
+        domain = tagData.get("@domain", DEFAULT_VALUE)
+        text = U._html_text_norm(tagData.get("#text", DEFAULT_VALUE))
 
-        isNoTags = obj["tags"] is None or obj["tags"] == Article.defaultValue
-        isNoText = obj["text"] is None or obj["text"] == Article.defaultValue
+        isNoTags = obj["tags"] is None or obj["tags"] == DEFAULT_VALUE
+        isNoText = obj["text"] is None or obj["text"] == DEFAULT_VALUE
         if (isNoTags or isNoText):
           obj["tags"] = -1
           obj["categories"] = -1
           return
 
-        if (domain == "post_tag" and text is not None and text != Article.defaultValue):
+        if (domain == "post_tag" and text is not None and text != DEFAULT_VALUE):
           resultTags.append(text)
-        elif (domain == "category" and text is not None and text != Article.defaultValue):
+        elif (domain == "category" and text is not None and text != DEFAULT_VALUE):
           resultCategories.append(text)
         elif (domain == "author"):
           # The term's text is the slug ("beeboop"), not the byline. Resolve it
@@ -219,7 +218,7 @@ class ArticleTranslator(Translator):
   def _processMetadata(self, obj):
     collection = {}
     metadata = obj.get('metadata')
-    if metadata is None or metadata == Article.defaultValue:
+    if metadata is None or metadata == DEFAULT_VALUE:
       obj['metadata'] = collection
       return
 

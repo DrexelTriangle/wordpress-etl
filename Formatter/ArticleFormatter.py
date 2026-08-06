@@ -24,6 +24,9 @@ class ArticleFormatter(Formatter):
         "text",
         "excerpt",
         "title",
+        "focus_keyword",
+        "meta_description",
+        "seo_title",
     ]
     CMS_SCHEMA = {
         "id": "BIGINT PRIMARY KEY AUTO_INCREMENT",
@@ -45,6 +48,20 @@ class ArticleFormatter(Formatter):
         "text": "LONGTEXT",
         "excerpt": "LONGTEXT",
         "title": "LONGTEXT",
+        "focus_keyword": "LONGTEXT",
+        "meta_description": "LONGTEXT",
+        "seo_title": "LONGTEXT",
+    }
+
+    # Yoast keeps its editor fields in postmeta, which the translator collects
+    # into `metadata`. These three are the ones the CMS editor reads back, so
+    # they land in their own columns instead of only inside the metadata blob.
+    # Older posts wrote the keyphrase to the _text_input key, so it is a
+    # fallback rather than a separate field.
+    SEO_META_KEYS = {
+        "focus_keyword": ("_yoast_wpseo_focuskw", "_yoast_wpseo_focuskw_text_input"),
+        "meta_description": ("_yoast_wpseo_metadesc",),
+        "seo_title": ("_yoast_wpseo_title",),
     }
 
     def __init__(self, articleData):
@@ -57,6 +74,34 @@ class ArticleFormatter(Formatter):
         if value in (None, "", "0000-00-00", "0000-00-00 00:00:00"):
             return None
         return value
+
+    def _seo_columns(self, metadata):
+        # Yoast title/description templates ("%%title%% %%sep%% %%sitename%%")
+        # are placeholders WordPress expands at render time; they are noise once
+        # the post leaves WP, so they drop out rather than reaching an editor.
+        if isinstance(metadata, list):
+            merged = {}
+            for itm in metadata:
+                if isinstance(itm, dict):
+                    merged.update(itm)
+            metadata = merged
+        if not isinstance(metadata, dict):
+            metadata = {}
+
+        columns = {}
+        for column, keys in self.SEO_META_KEYS.items():
+            value = None
+            for key in keys:
+                candidate = metadata.get(key)
+                if not isinstance(candidate, str):
+                    continue
+                candidate = candidate.strip()
+                if not candidate or "%%" in candidate:
+                    continue
+                value = candidate
+                break
+            columns[column] = value
+        return columns
 
     def _to_cms_row(self, obj):
         creation_date = self._normalize_datetime(
@@ -79,7 +124,10 @@ class ArticleFormatter(Formatter):
         else:
             photo_url = None
 
+        metadata = obj.get("metadata")
+
         return {
+            **self._seo_columns(metadata),
             "id": obj.get("id"),
             "creation_date": creation_date,
             "slug": obj.get("slug"),
@@ -95,7 +143,7 @@ class ArticleFormatter(Formatter):
             "pub_date": self._normalize_datetime(obj.get("pubDate")),
             "tags": obj.get("tags"),
             "categories": obj.get("categories"),
-            "metadata": obj.get("metadata"),
+            "metadata": metadata,
             "text": obj.get("text"),
             "excerpt": obj.get("excerpt"),
             "title": obj.get("title"),

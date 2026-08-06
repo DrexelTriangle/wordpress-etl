@@ -172,5 +172,79 @@ class ExtractAndResolve(unittest.TestCase):
         )
 
 
+class ExtractIntoMemoryAndTranslate(unittest.TestCase):
+    """The same resolution down the *other* pipeline.
+
+    `WP_FUSED_EXTRACT_TRANSLATE=0` extracts every <item> into a list first and
+    translates it afterwards, so featured images resolve inside
+    `ArticleTranslator.translate` rather than `Extractor._translatePosts`. That
+    is a second implementation of the same behavior, and the two are only
+    correct if they agree -- hence the comparison test at the end.
+    """
+
+    def setUp(self):
+        self.tempDir = tempfile.TemporaryDirectory()
+        self.postsPath = Path(self.tempDir.name) / "wp-posts.xml"
+        self.postsPath.write_text(WXR, encoding="utf-8")
+        self.addCleanup(self.tempDir.cleanup)
+
+    def _translateInMemory(self):
+        extractor = Extractor(str(self.postsPath), str(self.postsPath))
+        # _xml2Dict rather than getData: getData deletes the export directory
+        # on its way out, which a test has no business doing.
+        extractor._xml2Dict(str(self.postsPath), str(self.postsPath))
+        articles = ArticleTranslator(extractor.data["art"])
+        articles.translate()
+        return {obj["slug"]: obj for obj in articles.getObjList()}
+
+    def _translateStreaming(self):
+        articles = ArticleTranslator([])
+        extractor = Extractor(str(self.postsPath), str(self.postsPath))
+        attachmentURLs = extractor._translatePosts(str(self.postsPath), articles, AuthorTranslator([]))
+        articles.resolveFeaturedImages(attachmentURLs)
+        return {obj["slug"]: obj for obj in articles.getObjList()}
+
+    def test_shortcode_only_post_gets_its_featured_image(self):
+        article = self._translateInMemory()["heres-your-sudoku"]
+        self.assertEqual(article["featuredImgID"], 59172)
+        self.assertEqual(
+            article["photoURL"],
+            "https://cms.thetriangle.org/wp-content/uploads/2023/11/sudoku.png",
+        )
+
+    def test_featured_image_replaces_the_body_image(self):
+        article = self._translateInMemory()["featured-image-wins"]
+        self.assertEqual(
+            article["photoURL"],
+            "https://cms.thetriangle.org/wp-content/uploads/2023/11/sudoku.png",
+        )
+
+    def test_body_image_is_kept_when_no_featured_image_is_set(self):
+        article = self._translateInMemory()["no-featured-image"]
+        self.assertEqual(article["featuredImgID"], -1)
+        self.assertEqual(article["photoURL"], "wp-content/uploads/2023/11/only-image.jpg")
+
+    def test_attachments_are_not_translated_as_articles(self):
+        self.assertEqual(
+            sorted(self._translateInMemory()),
+            ["featured-image-wins", "heres-your-sudoku", "no-featured-image"],
+        )
+
+    def test_both_pipelines_agree(self):
+        # The guard against the two paths drifting: whichever one a run picks,
+        # every article must come out with the same image.
+        inMemory = self._translateInMemory()
+        streaming = self._translateStreaming()
+        self.assertEqual(sorted(inMemory), sorted(streaming))
+        self.assertEqual(
+            {slug: obj["photoURL"] for slug, obj in inMemory.items()},
+            {slug: obj["photoURL"] for slug, obj in streaming.items()},
+        )
+        self.assertEqual(
+            {slug: obj["featuredImgID"] for slug, obj in inMemory.items()},
+            {slug: obj["featuredImgID"] for slug, obj in streaming.items()},
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

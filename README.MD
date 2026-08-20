@@ -44,6 +44,29 @@ From the `wordpress-etl` directory:
 python3 main.py
 ```
 
+### Extracting a Second Site (per-run profiles)
+
+The pipeline was written against `thetriangle.org`, and several of its rules are
+facts about that specific site rather than about WordPress. Those are now
+environment settings, each defaulting to the historical Triangle behaviour, so
+an unset environment runs exactly as before. See `Utils/SiteProfile.py` for the
+full reasoning and `profiles/rectangle.env` for a worked example.
+
+| Variable | Default | What it controls |
+| --- | --- | --- |
+| `LEGACY_MEDIA_HOSTS` | `thetriangle.org,therectangle.org` | Domains whose uploads get pulled onto `MEDIA_BASE_URL`. Only list a host whose files are actually in that media tree — listing a live foreign domain rewrites working URLs into 404s. Empty means "rewrite relative paths only". |
+| `MIN_BODY_LENGTH` | `100` | Bodies shorter than this are treated as extraction noise. |
+| `KEEP_SHORT_POSTS_WITH_IMAGE` | `false` | Exempt a too-short post from the floor when it has a featured image, for sites where an image-only post is real content. |
+| `ID_OFFSET` | `0` | Starting point for the generated id sequences. Ids are a per-run counter, not the WP post id, so a second site loaded into the same tables must start past the first one's high-water mark. |
+| `CATEGORY_TERM_SOURCE` | `text` | Record a category's display `text` or its `nicename` slug. Slugs survive a site renaming its sections; display text is what the CMS seeds section names from. |
+
+Usage:
+
+```bash
+set -a; source profiles/rectangle.env; set +a
+python3 main.py
+```
+
 ### Optional Modes
 
 Generate article embedding SQL output:

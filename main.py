@@ -223,6 +223,12 @@ class HeadlessTUI:
 if __name__ == "__main__":
     args = parse_args()
 
+    # Resolve the per-site settings up front: this validates every one of them,
+    # and puts the profile the run actually used in the log next to its output.
+    from Utils.SiteProfile import describe as _describe_profile
+
+    print(_describe_profile())
+
     if args.headless:
         if not args.best_guess:
             raise SystemExit("--headless requires --best-guess: nothing can answer a prompt")

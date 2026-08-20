@@ -2,6 +2,11 @@ from pathlib import Path
 import json
 from Translator.Translator import Translator
 from Utils.Constants import DEFAULT_VALUE, THUMBNAIL_META_KEY
+from Utils.SiteProfile import (
+  category_term_source,
+  keep_short_posts_with_image,
+  min_body_length,
+)
 from Utils.Utility import Utility as U
 import re
 
@@ -55,8 +60,15 @@ class ArticleTranslator(Translator):
     text = obj["text"]
     title = obj["title"]
 
-    lengthCheck = 4 if debugMode else 100
-    isTextNotNull = text != DEFAULT_VALUE and len(text) >= lengthCheck
+    lengthCheck = 4 if debugMode else min_body_length()
+    isLongEnough = text != DEFAULT_VALUE and len(text) >= lengthCheck
+    # An image-only post has a body too short to pass the floor because the
+    # picture IS the article -- on a humour site that is the visual gag, not
+    # extraction noise. Opt-in, since on a news archive a bodyless post really
+    # is junk.
+    if not isLongEnough and keep_short_posts_with_image() and self._hasFeaturedImage(obj):
+      isLongEnough = True
+    isTextNotNull = isLongEnough
     isTitleNotNull = title != DEFAULT_VALUE
     isTitleNotUnderscore = isTitleNotNull and ('_' not in title)
 
@@ -93,6 +105,18 @@ class ArticleTranslator(Translator):
     except (TypeError, ValueError):
       return None
   
+  def _hasFeaturedImage(self, obj):
+    """True only for a real featured image. `featuredImgID` uses -1 as its
+    "unset" sentinel (see _thumbnailID), and -1 is truthy -- a plain truth test
+    here rescues bodyless posts that have no image at all."""
+    value = obj.get("featuredImgID")
+    if value is None:
+      return False
+    try:
+      return int(value) > 0
+    except (TypeError, ValueError):
+      return False
+
   def _thumbnailID(self, metadata):
     """The `_thumbnail_id` postmeta value, or -1 when the post has no featured
     image. -1 is WordPress' own "unset" sentinel and what this field carried
@@ -138,6 +162,9 @@ class ArticleTranslator(Translator):
   def _processTags(self, obj):
     resultTags = []
     resultCategories = []
+    # Read once per article rather than once per term.
+    useNicename = category_term_source() == "nicename"
+    keepImageOnly = keep_short_posts_with_image()
     try:
       terms = obj["tags"]
       if terms is None or terms == DEFAULT_VALUE:
@@ -157,6 +184,12 @@ class ArticleTranslator(Translator):
 
         isNoTags = obj["tags"] is None or obj["tags"] == DEFAULT_VALUE
         isNoText = obj["text"] is None or obj["text"] == DEFAULT_VALUE
+        # A bodyless post is normally junk, and -1 here drops it before the
+        # length floor in _dataSanityCheck ever runs -- so the image-only
+        # exemption has to be honoured on this path too, or it silently does
+        # nothing for exactly the posts it exists for.
+        if isNoText and keepImageOnly and self._hasFeaturedImage(obj):
+          isNoText = False
         if (isNoTags or isNoText):
           obj["tags"] = -1
           obj["categories"] = -1
@@ -164,8 +197,13 @@ class ArticleTranslator(Translator):
 
         if (domain == "post_tag" and text is not None and text != DEFAULT_VALUE):
           resultTags.append(text)
-        elif (domain == "category" and text is not None and text != DEFAULT_VALUE):
-          resultCategories.append(text)
+        elif (domain == "category"):
+          # Which half of the term is recorded is per-site: display text is what
+          # the CMS seeds its section names from, the nicename slug is the half
+          # that survives a site renaming its sections. See Utils.SiteProfile.
+          term = nicename if useNicename else text
+          if term is not None and term != DEFAULT_VALUE:
+            resultCategories.append(term)
         elif (domain == "author"):
           # The term's text is the slug ("beeboop"), not the byline. Resolve it
           # through the guest author export, which holds the real name.

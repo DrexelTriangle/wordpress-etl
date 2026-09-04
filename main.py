@@ -93,10 +93,15 @@ def _run_pipeline(tui, args) -> None:
         ArticleEmbeddingsFormatter,
         EmbeddingsDependencyError,
     )
+    from Formatter.PollFormatter import PollFormatter
+    from Formatter.PollOptionFormatter import PollOptionFormatter
     from Utils.CommentSpam import mark_spam, summarize
     from Utils.MediaInventory import write_media_reports
     from Utils.WPComments import load_wordpress_comments
+    from Utils.WPPolls import load_wordpress_polls, poll_options
     from Utils.Utility import Utility
+    from Utils.Constants import POLLS_ANSWERS_FILE, POLLS_QUESTIONS_FILE
+    from Utils.SiteProfile import id_offset
 
     pipeline = Pipeline(
         on_start=tui.step_start,
@@ -170,6 +175,27 @@ def _run_pipeline(tui, args) -> None:
                 )
             outputs.append(("logs/sql/comments.sql", CommentFormatter(comments).iter_format("comments")))
 
+        # Polls come from their own tables rather than the export, so they are
+        # present only when someone has run scripts/dump_wp_polls.sh. Without
+        # the dumps the rest of the run is unaffected -- but nothing else
+        # re-seeds the archive, so a reseed without them empties it.
+        if POLLS_QUESTIONS_FILE.is_file() and POLLS_ANSWERS_FILE.is_file():
+            polls = load_wordpress_polls(
+                POLLS_QUESTIONS_FILE,
+                POLLS_ANSWERS_FILE,
+                id_offset=id_offset(),
+            )
+            if polls:
+                options = poll_options(polls)
+                tui.step_done(f"Loaded {len(polls)} polls with {len(options)} options")
+                outputs.append(("logs/sql/polls.sql", PollFormatter(polls).iter_format("cms_polls")))
+                outputs.append((
+                    "logs/sql/poll_options.sql",
+                    PollOptionFormatter(options).iter_format("cms_poll_options"),
+                ))
+        else:
+            tui.step_done("No poll dumps in Data/; skipping polls (see scripts/dump_wp_polls.sh)")
+
         for path, commands in outputs:
             write_sql_file(path, commands)
 
@@ -222,6 +248,12 @@ class HeadlessTUI:
 
 if __name__ == "__main__":
     args = parse_args()
+
+    # Resolve the per-site settings up front: this validates every one of them,
+    # and puts the profile the run actually used in the log next to its output.
+    from Utils.SiteProfile import describe as _describe_profile
+
+    print(_describe_profile())
 
     if args.headless:
         if not args.best_guess:

@@ -96,12 +96,41 @@ python3 main.py \
 ### Input
 
 - WordPress export XML data.
+- Optional poll dumps at `Data/wp-pollsq.tsv` and `Data/wp-pollsa.tsv` (see
+  **Polls** below).
 
 ### Output
 
 - Cleaned, transformed data structures used by the pipeline.
 - SQL command files/log output suitable for downstream import.
 - Optional embedding SQL output at `logs/sql/article_embeddings.sql`.
+- Optional poll archive at `logs/sql/polls.sql` and `logs/sql/poll_options.sql`.
+
+### Polls
+
+Polls are the one part of the site the WordPress exporter does not emit:
+wp-polls keeps its data in its own `wp_pollsq` / `wp_pollsa` tables, so there is
+nothing in `wp-export.zip` to read. They come from the database instead:
+
+```bash
+scripts/dump_wp_polls.sh   # writes Data/wp-pollsq.tsv and Data/wp-pollsa.tsv
+python3 main.py
+```
+
+The dump needs an ssh key and nothing else — it reads the WordPress database
+credentials from `wp-config.php` on the web host and connects to the database
+host directly. Without the two TSVs the run simply skips polls; **nothing else
+re-seeds the poll archive, so a reseed without them leaves it empty.**
+
+Two things this stage exists to get right:
+
+- **Vote counts.** The CMS's `POST /v1/polls` has no field for them, so polls
+  created through the API read zero. Seeding as SQL preserves the real numbers.
+- **Dates.** `pollq_timestamp` and `pollq_expiry` are Unix timestamps and are
+  read as UTC, which is what `cms_polls.starts_at` holds. Do not take dates from
+  the rendered `/pollsarchive` page instead: it prints times in UTC as well, so
+  converting them from the paper's timezone puts every poll four to five hours
+  late.
 
 ## Notes
 
